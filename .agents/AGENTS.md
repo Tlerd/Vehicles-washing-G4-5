@@ -7,7 +7,7 @@ Tài liệu này chứa các quy định chung của dự án, bộ quy tắc ph
 ## 1. QUY ĐỊNH CHUNG
 *   **Dự án chính thức:** Dự án phát triển chính của kho lưu trữ này là **Dự án rửa xe AutoWash Pro** (Hệ thống quản lý rửa tự động thông minh với đặt lịch trước và chương trình khách hàng thân thiết). Mọi đặc tả, logic, và thiết kế mã nguồn phải tập trung hoàn toàn vào dự án này.
 *   **Người kiểm tra/phê duyệt chính (Reviewer):** Lập trình viên **Anh** là người kiểm tra và phê duyệt chính. Mọi đề xuất, kế hoạch và mã nguồn phải được thông báo và phê duyệt bởi **Anh**.
-*   Mọi thay đổi liên quan đến cấu trúc, logic nghiệp vụ quan trọng đều phải được ghi nhận lại trong thư mục [learnings/](file:///d:/demoSWP/demo1/.agents/learnings/).
+*   Mọi thay đổi liên quan đến cấu trúc, logic nghiệp vụ quan trọng đều phải được ghi nhận lại trong thư mục [learnings/](file:///d:/demoSWP/Vehicles-washing-G4-5/.agents/learnings/).
 *   Tuân thủ nghiêm ngặt bộ quy tắc phát triển tương ứng cho từng phần (FE/BE) được đặc tả bên dưới.
 *   **Bắt buộc thực hiện demo giao diện bằng Stitch để khách hàng và cố vấn thống nhất trước khi tiến hành code Front-end.**
 *   **Hiểu rõ ngữ cảnh phát triển và tách biệt các lớp (decoupling). Khi chưa có dữ liệu/API thật từ Back-end, phải chạy Mock Data trước để kiểm thử độc lập.**
@@ -18,18 +18,18 @@ Tài liệu này chứa các quy định chung của dự án, bộ quy tắc ph
 
 ### Back-end (BE)
 *   **2026-06-24**: Thiết lập bộ quy tắc phát triển BE bằng Java Spring Boot dành cho sinh viên.
-    *   *Chi tiết thiết kế & quyết định*: Xem tại [2026-06-24-backend-rules-design.md](file:///d:/demoSWP/demo1/docs/superpowers/specs/2026-06-24-backend-rules-design.md).
-    *   *Nhật ký chi tiết*: Xem tại [2026-06-24-brainstorm-backend-rules.md](file:///d:/demoSWP/demo1/.agents/learnings/2026-06-24-brainstorm-backend-rules.md).
+    *   *Chi tiết thiết kế & quyết định*: Xem tại [2026-06-24-backend-rules-design.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/specs/2026-06-24-backend-rules-design.md).
+    *   *Nhật ký chi tiết*: Xem tại [2026-06-24-brainstorm-backend-rules.md](file:///d:/demoSWP/Vehicles-washing-G4-5/.agents/learnings/2026-06-24-brainstorm-backend-rules.md).
 
 ### Front-end (FE)
 *   **2026-06-24**: Thiết lập bộ quy tắc phát triển FE bằng React, TypeScript và Tailwind CSS dành cho sinh viên.
-    *   *Nhật ký chi tiết*: Xem tại [2026-06-24-brainstorm-frontend-rules.md](file:///d:/demoSWP/demo1/.agents/learnings/2026-06-24-brainstorm-frontend-rules.md).
+    *   *Nhật ký chi tiết*: Xem tại [2026-06-24-brainstorm-frontend-rules.md](file:///d:/demoSWP/Vehicles-washing-G4-5/.agents/learnings/2026-06-24-brainstorm-frontend-rules.md).
 *   **2026-06-24**: Hoàn thành thảo luận & thống nhất luồng đặt lịch (Booking Wizard Flow) và Đăng nhập cho AutoWash Pro.
-    *   *Chi tiết thiết kế*: Xem tại [2026-06-24-autowash-pro-design.md](file:///d:/demoSWP/demo1/docs/superpowers/specs/2026-06-24-autowash-pro-design.md).
-    *   *Nhật ký chi tiết*: Xem tại [2026-06-24-autowash-pro-brainstorming.md](file:///d:/demoSWP/demo1/.agents/learnings/2026-06-24-autowash-pro-brainstorming.md).
+    *   *Chi tiết thiết kế*: Xem tại [2026-06-24-autowash-pro-design.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/specs/2026-06-24-autowash-pro-design.md).
+    *   *Nhật ký chi tiết*: Xem tại [2026-06-24-autowash-pro-brainstorming.md](file:///d:/demoSWP/Vehicles-washing-G4-5/.agents/learnings/2026-06-24-autowash-pro-brainstorming.md).
 *   **2026-06-24**: Hoàn thành nâng cấp Front-end với 6 bước Booking Wizard, Customer Dashboard, Washing Counter và Admin Portal chạy offline bằng Mock Data.
-    *   *Chi tiết kế hoạch*: Xem tại [2026-06-24-autowash-pro-loyalty-admin-plan.md](file:///d:/demoSWP/demo1/docs/superpowers/plans/2026-06-24-autowash-pro-loyalty-admin-plan.md).
-    *   *Nhật ký chi tiết*: Xem tại [2026-06-24-autowash-pro-frontend-implementation.md](file:///d:/demoSWP/demo1/.agents/learnings/2026-06-24-autowash-pro-frontend-implementation.md).
+    *   *Chi tiết kế hoạch*: Xem tại [2026-06-24-autowash-pro-loyalty-admin-plan.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/plans/2026-06-24-autowash-pro-loyalty-admin-plan.md).
+    *   *Nhật ký chi tiết*: Xem tại [2026-06-24-autowash-pro-frontend-implementation.md](file:///d:/demoSWP/Vehicles-washing-G4-5/.agents/learnings/2026-06-24-autowash-pro-frontend-implementation.md).
 
 ---
 

@@ -37,8 +37,3 @@ Tài liệu này ghi nhận quá trình thảo luận và thiết kế bộ quy 
     *   Tích hợp `springdoc-openapi-starter-webmvc-ui` để tự động hóa Swagger UI tại `/swagger-ui/index.html`.
 *   **Lý do**: Thống nhất giao tiếp giữa Front-end và Back-end nhanh chóng, không tốn thời gian viết tài liệu thủ công.
 
----
-
-## 3. Danh Sách Tài Liệu Sinh Ra
-
-*   **Quy tắc chi tiết**: Đã được lưu vào [rules.md](file:///d:/demoSWP/demo1/Back-end/.agents/rules/rules.md) để các tác nhân AI và lập trình viên dễ dàng tuân thủ khi viết code.
