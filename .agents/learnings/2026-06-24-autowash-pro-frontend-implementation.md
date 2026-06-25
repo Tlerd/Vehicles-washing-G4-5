@@ -25,3 +25,106 @@
 - Verify the build by executing `npm run build` inside `Front-end`.
 - Start the local dev server `npm run dev` to showcase the flow to stakeholders.
 - Maintain and update log details in the project's global [AGENTS.md](file:///d:/demoSWP/demo1/.agents/AGENTS.md) journal.
+
+---
+
+# Development Journal: AutoWash Pro Requirements Document Generation
+
+- **Date**: 2026-06-26
+- **Author**: Agent (Antigravity)
+- **Story/Feature Reference**: [results](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results)
+
+## Summary of Changes
+- Generated 6 core project requirement documents in `docs/superpowers/results`:
+  - [vision_scope.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/vision_scope.md) - Vision & Scope.
+  - [business_rules.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/business_rules.md) - Core loyalty formulas and business constraints.
+  - [user_stories.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/user_stories.md) - Agile user stories for Customer, Guest, Staff, and Admin roles.
+  - [acceptance_criteria.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/acceptance_criteria.md) - Scenario-based verification checks for key flows.
+  - [tasks.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/tasks.md) - Comprehensive implementation task backlog.
+  - [functional_requirements.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/functional_requirements.md) - Table index linking to 13 separate requirements issues files.
+- Created 13 separate requirement files representing individual GitHub Issues templates containing Front-end, Back-end tasks and Acceptance Criteria:
+  - [FR-001-customer-registration-otp.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/FR-001-customer-registration-otp.md) to [FR-013-ai-campaign-promotion-builder.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/FR-013-ai-campaign-promotion-builder.md).
+
+---
+
+# Development Journal: AutoWash Pro Task Assignment Revision for AI Module
+
+- **Date**: 2026-06-26
+- **Author**: Agent (Antigravity)
+- **Story/Feature Reference**: [2026-06-26-autowash-pro-stitch-design-plan.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/plans/2026-06-26-autowash-pro-stitch-design-plan.md)
+
+## Summary of Changes
+- Adjusted the pair programming assignment for **FR-013: AI Campaign Promotion Builder (Admin)**.
+- Replaced the FE pairing (**Phong & An**) and BE team with **Anh** taking full ownership as the Lead Developer for both the Front-end and Back-end parts of the AI campaign builder feature.
+- To maintain the pair programming rule ("No single-developer tasks"), **An** was assigned to support/review the Front-end of FR-013, and **Phat** was assigned to support/review the Back-end of FR-013.
+- Synced the changes across the workspace plan, the system implementation plan, and the task list tracker.
+
+## Technical Decisions & Trade-offs
+- **Planner direct coding**: Anh (Planner/Reviewer) will directly implement and take charge of the AI component integration, keeping other developers focused on core booking, customer directory, and payment functions.
+- **Support pairing preserved**: Retained peer review support (An for FE, Phat for BE) to ensure code quality and avoid isolated changes, consistent with project rules.
+
+---
+
+# Development Journal: AutoWash Pro GitHub Issues & Project Mapping Setup
+
+- **Date**: 2026-06-26
+- **Author**: Agent (Antigravity) - Duc Anh (Planner / Reviewer)
+- **Story/Feature Reference**: [github-issue-uploader.js](file:///D:/demoSWP/Vehicles-washing-G4-5/github-issue-uploader.js)
+
+## Summary of Changes
+- Created a standalone Node.js helper script [github-issue-uploader.js](file:///D:/demoSWP/Vehicles-washing-G4-5/github-issue-uploader.js) that automates:
+  - Fetching the Project Node ID for GitHub Project #5.
+  - Parsing the pair programming assignment plans for all 13 Functional Requirements from the design plan.
+  - Creating all 13 GitHub Issues on the repository.
+  - Mapping the newly created issues into the Project board.
+- The script uses native `fetch` (compatible with Node.js v18+) for GraphQL and REST API requests, allowing the developer to run it locally without additional dependencies.
+
+## Technical Decisions & Trade-offs
+- **Platform Limitations Workaround**: Since both `run_command` (Access denied to NUL device) and browser subagent (CDP/127.0.0.1 resolution) are currently limited by environment sandboxing, we delegated execution to a standalone local Node.js script. This lets the active developer (Duc Anh) execute it directly in their native terminal using their GitHub PAT.
+
+---
+
+# Development Journal: AutoWash Pro Vision & Scope Revision and Case Collision Resolution
+
+- **Date**: 2026-06-26
+- **Author**: Agent (Antigravity) - Duc Anh (Planner / Reviewer)
+- **Story/Feature Reference**: [VISION_SCOPE.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/VISION_SCOPE.md)
+
+## Summary of Changes
+- Overwrote the deprecated placeholder in the results directory with a comprehensive and professional project Vision & Scope document for AutoWash Pro in [VISION_SCOPE.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/VISION_SCOPE.md).
+- Provided explicit instructions on resolving Git-on-Windows case-insensitive file collisions for `vision_scope.md` and `VISION_SCOPE.md`.
+
+## Technical Decisions & Trade-offs
+- **Reconstruction from Sources**: Recompiled the vision, objectives, scope, limitations, and stakeholders from raw project summaries and specs (`AutoWash_Pro_Project_Summary.md`, `Phân Tích Dự Án AutoWash.md`, and design specifications) to make [VISION_SCOPE.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/VISION_SCOPE.md) a complete, high-fidelity reference.
+
+## Key Learnings & Gotchas
+- **Gotcha**: On Windows, file names are case-insensitive. Attempting to track both `vision_scope.md` and `VISION_SCOPE.md` in Git creates a local filesystem collision, shadowing the actual content with the deprecation notice. The solution is to remove the lowercase version from Git's tracking database (`git rm --cached`).
+
+---
+
+# Development Journal: AutoWash Pro Mission-FR Summary Document Generation
+
+- **Date**: 2026-06-26
+- **Author**: Agent (Antigravity) - Duc Anh (Planner / Reviewer)
+- **Story/Feature Reference**: [mission-FR.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/mission-FR.md)
+
+## Summary of Changes
+- Generated a consolidated mapping document [mission-FR.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/mission-FR.md) in the `results` folder.
+- Integrated the 13 Functional Requirements detailed breakdowns from the Stitch design plan file [2026-06-26-autowash-pro-stitch-design-plan.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/plans/2026-06-26-autowash-pro-stitch-design-plan.md) with their respective technical specifications in `results`.
+
+## Technical Decisions & Trade-offs
+- **Consolidated Tracking**: Created a single source of truth for task assignments, pairing developers, and specifications to align front-end and back-end tasks.
+
+---
+
+# Development Journal: AutoWash Pro Task Assignment Integration Across 13 Specs
+
+- **Date**: 2026-06-26
+- **Author**: Agent (Antigravity) - Duc Anh (Planner / Reviewer)
+- **Story/Feature Reference**: [results](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results)
+
+## Summary of Changes
+- Appended the pair programming task assignments and detailed sub-task breakdowns from the Stitch design plan into each of the 13 individual functional requirement specification files in the `results` directory (`FR-001-customer-registration-otp.md` to `FR-013-ai-campaign-promotion-builder.md`).
+
+## Technical Decisions & Trade-offs
+- **Localized Task Context**: Placing the assignments and breakdowns directly into the specification files ensures developers have immediate access to their tasks and pairing partners when viewing the requirements.

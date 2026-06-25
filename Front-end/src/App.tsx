@@ -1,134 +1,58 @@
-import React, { useState } from 'react';
-import { BookingProvider, useBooking } from './context/BookingContext';
-import { AuthPage } from './pages/auth/AuthPage';
-import { BookingPage } from './pages/booking/BookingPage';
-import { CustomerDashboard } from './pages/dashboard/CustomerDashboard';
-import { WashingCounterPage } from './pages/washing-counter/WashingCounterPage';
-import { AdminPage } from './pages/admin/AdminPage';
-import { LogOut, Car } from 'lucide-react';
-
-function AppContent() {
-  const { 
-    activeRole, 
-    userSession, 
-    setUserSession, 
-    currentUser, 
-    setCurrentUser, 
-    loginCustomer 
-  } = useBooking();
-  
-  const [view, setView] = useState<'dashboard' | 'booking'>('dashboard');
-
-  const handleStartBooking = (isGuest: boolean, customerData?: any) => {
-    if (isGuest) {
-      setCurrentUser({
-        id: 'guest',
-        name: 'Guest Customer',
-        phone: '',
-        tier: 'Member',
-        accumulatedPoints: 0,
-        totalSpend: 0,
-        createdAt: new Date().toISOString()
-      });
-      setView('booking');
-    } else {
-      const found = loginCustomer(customerData.phone);
-      if (found) {
-        setCurrentUser(found);
-      } else {
-        const newCust = {
-          id: `c_${Date.now()}`,
-          name: customerData.name || 'New Customer',
-          phone: customerData.phone,
-          tier: customerData.tier || 'Member',
-          accumulatedPoints: 0,
-          totalSpend: 0,
-          createdAt: new Date().toISOString()
-        };
-        setCurrentUser(newCust);
-      }
-      setView('dashboard');
-    }
-  };
-
-  const handleLogout = () => {
-    setCurrentUser(null);
-    setUserSession(null);
-    setView('dashboard');
-  };
-
-  // Determine role label and color for the top bar
-  const roleMeta: Record<string, { label: string; color: string }> = {
-    customer: { label: 'Customer Portal', color: 'text-blue-400' },
-    washing_counter: { label: 'Washing Counter', color: 'text-orange-400' },
-    admin: { label: 'Admin Panel', color: 'text-emerald-400' },
-  };
-
-  const isLoggedIn = !!(userSession || (currentUser && currentUser.id === 'guest'));
-
-  return (
-    <div className="min-h-screen bg-[#031427] text-slate-100 flex flex-col font-sans transition-colors duration-200">
-      {/* Top bar — only shows when logged in */}
-      {isLoggedIn && (
-        <div className="bg-[#020b16] border-b border-slate-800/80 px-6 py-2.5 flex items-center justify-between z-50">
-          <div className="flex items-center gap-2.5">
-            <Car className="w-5 h-5 text-orange-500" />
-            <span className="text-sm font-bold tracking-tight">AutoWash <span className="text-orange-500">Pro</span></span>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 font-semibold uppercase tracking-wider ml-1">
-              <span className={roleMeta[activeRole]?.color}>{roleMeta[activeRole]?.label}</span>
-            </span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-300">
-              Xin chào, <span className="font-bold text-blue-400">{userSession?.name || currentUser?.name}</span>
-              {userSession?.role === 'customer' && currentUser?.id !== 'guest' && (
-                <span className="ml-1 text-yellow-400 font-semibold">({currentUser?.tier})</span>
-              )}
-            </span>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-1 text-[11px] font-semibold text-red-400 hover:text-red-300 bg-red-950/20 px-2.5 py-1 rounded-lg border border-red-900/30 transition-all"
-            >
-              <LogOut className="w-3 h-3" />
-              Đăng xuất
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {activeRole === 'customer' ? (
-          currentUser === null ? (
-            <AuthPage onStartBooking={handleStartBooking} />
-          ) : currentUser.id === 'guest' || view === 'booking' ? (
-            <BookingPage onComplete={() => setView('dashboard')} />
-          ) : (
-            <CustomerDashboard onStartBooking={() => setView('booking')} />
-          )
-        ) : activeRole === 'washing_counter' ? (
-          userSession === null ? (
-            <AuthPage onStartBooking={handleStartBooking} />
-          ) : (
-            <WashingCounterPage />
-          )
-        ) : (
-          userSession === null ? (
-            <AuthPage onStartBooking={handleStartBooking} />
-          ) : (
-            <AdminPage />
-          )
-        )}
-      </div>
-    </div>
-  );
-}
+import React from 'react';
+import { Car, ShieldCheck, Database, LayoutGrid } from 'lucide-react';
 
 export default function App() {
   return (
-    <BookingProvider>
-      <AppContent />
-    </BookingProvider>
+    <div className="min-h-screen bg-[#031427] text-slate-100 flex flex-col items-center justify-center p-6 font-sans">
+      <div className="max-w-md w-full bg-[#020b16]/60 backdrop-blur-md border border-slate-800/80 p-8 rounded-3xl shadow-2xl flex flex-col items-center text-center">
+        
+        {/* Logo Icon */}
+        <div className="w-16 h-16 bg-orange-500/10 border border-orange-500/20 rounded-2xl flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(249,115,22,0.1)]">
+          <Car className="w-8 h-8 text-orange-500" />
+        </div>
+
+        {/* Title */}
+        <h1 className="text-2xl font-extrabold text-white tracking-tight">
+          AutoWash <span className="text-orange-500">Pro</span>
+        </h1>
+        <p className="text-slate-400 text-xs mt-1.5 font-medium tracking-wide uppercase">
+          Smart Car Wash & Loyalty Program
+        </p>
+
+        {/* Divider */}
+        <div className="w-12 h-[1px] bg-slate-800 my-6"></div>
+
+        {/* Status Message */}
+        <h2 className="text-sm font-semibold text-slate-200 flex items-center gap-1.5 mb-2">
+          <ShieldCheck className="w-4 h-4 text-emerald-400" /> Project Reset Successfully
+        </h2>
+        <p className="text-slate-400 text-xs leading-relaxed max-w-xs mb-8">
+          The codebase has been reset to clean boilerplate. All mock data has been removed. We are ready to build the new architecture.
+        </p>
+
+        {/* Next Steps List */}
+        <div className="w-full text-left bg-slate-950/40 border border-slate-850 p-4 rounded-2xl space-y-3.5 mb-6">
+          <div className="flex gap-3">
+            <Database className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-xs font-bold text-slate-200">1. Back-end APIs</p>
+              <p className="text-[10px] text-slate-500">Implement Login & Role Authorization in Spring Boot.</p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <LayoutGrid className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-xs font-bold text-slate-200">2. Front-end Integration</p>
+              <p className="text-[10px] text-slate-500">Build authentication forms and fetch real backend data.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Info Label */}
+        <span className="text-[10px] font-mono text-slate-600 bg-slate-900/50 px-3 py-1 rounded-full border border-slate-850">
+          SU26SWP08 • Group 4 & 5
+        </span>
+      </div>
+    </div>
   );
 }

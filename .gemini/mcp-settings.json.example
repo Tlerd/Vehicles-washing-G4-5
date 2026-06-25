@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "StitchMCP": {
+      "command": "node",
+      "args": [
+        "C:\\path\\to\\stitch-mcp\\dist\\index.js"
+      ],
+      "env": {
+        "STITCH_PROJECT_PATH": "d:\\demoSWP\\Vehicles-washing-G4-5"
+      }
+    }
+  }
+}

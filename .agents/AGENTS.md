@@ -5,6 +5,8 @@ Tài liệu này chứa các quy định chung của dự án, bộ quy tắc ph
 ---
 
 ## 1. QUY ĐỊNH CHUNG
+*   **Dự án chính thức:** Dự án phát triển chính của kho lưu trữ này là **Dự án rửa xe AutoWash Pro** (Hệ thống quản lý rửa tự động thông minh với đặt lịch trước và chương trình khách hàng thân thiết). Mọi đặc tả, logic, và thiết kế mã nguồn phải tập trung hoàn toàn vào dự án này.
+*   **Người kiểm tra/phê duyệt chính (Reviewer):** Lập trình viên **Anh** là người kiểm tra và phê duyệt chính. Mọi đề xuất, kế hoạch và mã nguồn phải được thông báo và phê duyệt bởi **Anh**.
 *   Mọi thay đổi liên quan đến cấu trúc, logic nghiệp vụ quan trọng đều phải được ghi nhận lại trong thư mục [learnings/](file:///d:/demoSWP/demo1/.agents/learnings/).
 *   Tuân thủ nghiêm ngặt bộ quy tắc phát triển tương ứng cho từng phần (FE/BE) được đặc tả bên dưới.
 *   **Bắt buộc thực hiện demo giao diện bằng Stitch để khách hàng và cố vấn thống nhất trước khi tiến hành code Front-end.**
@@ -134,5 +136,32 @@ com.example.project
 *   Tích hợp dependency `springdoc-openapi-starter-webmvc-ui` phiên bản mới nhất vào `pom.xml`.
 *   Sử dụng `@Tag(name = "...", description = "...")` ở cấp Controller để phân nhóm API.
 *   Sử dụng `@Operation(summary = "...", description = "...")` ở cấp endpoint để mô tả chức năng của API.
-*   Sử dụng `@Schema(description = "...", example = "...")` ở cấp thuộc tính của DTO để mô tả dữ liệu và cung cấp ví dụ mẫu.
+*   Sử dụng `@Schema(description = "...", example = "...")` ở cấp thuộc tính của DTO để mô tả dữ liệu và cung cấp vị dụ mẫu.
 *   Xem tài liệu bằng cách truy cập `http://localhost:8080/swagger-ui/index.html` sau khi chạy ứng dụng.
+
+---
+
+## 6. QUY TẮC CẤU HÌNH VÀ SỬ DỤNG STITCH MCP (STITCH MCP WORKFLOW)
+
+### 6.1. Quy định Kiểm tra và Bảo mật Cấu hình
+*   **Kiểm tra bắt buộc**: Mỗi khi bắt đầu một phiên làm việc liên quan đến Front-end (FE), Agent phải chủ động kiểm tra xem cấu hình Stitch MCP đã được thiết lập đúng cho IDE chưa. Nếu chưa, Agent **phải dừng lại và yêu cầu hoặc hướng dẫn lập trình viên hoàn tất việc cấu hình MCP**.
+*   **Bảo mật cấu hình cá nhân**: File cấu hình thật (`.gemini/mcp-settings.json` hoặc file cấu hình MCP của IDE khác) chứa thông tin đường dẫn tuyệt đối của từng máy lập trình viên. File này đã được thêm vào `.gitignore` để không bị đẩy lên Git.
+*   **Tuyệt đối KHÔNG commit** file cấu hình thật lên Git repo chung để tránh gây xung đột trên 6 máy của nhóm. Chỉ thay đổi và lưu trữ cục bộ.
+
+### 6.2. Yêu cầu Hiển thị & Đồng bộ trên Trình duyệt
+*   Khi sử dụng các công cụ Stitch MCP để sinh màn hình hoặc chỉnh sửa giao diện, Agent **bắt buộc phải hướng dẫn hoặc nhắc nhở lập trình viên mở trình duyệt web** tại URL tương ứng (ví dụ: dashboard của Stitch hoặc cổng chạy cục bộ của dự án) để trực quan hóa thiết kế, kiểm tra tính đúng đắn và đồng bộ hóa trải nghiệm.
+
+### 6.3. Bộ Hướng dẫn Kết nối và Cài đặt Stitch MCP
+
+#### Cách 1: Tự động cấu hình bằng cách Copy mã JSON từ Stitch (Khuyên dùng)
+1. Lập trình viên truy cập giao diện Stitch trên trình duyệt.
+2. Tìm mục cấu hình MCP hoặc tích hợp, sao chép (copy) đoạn mã JSON cấu hình được cung cấp sẵn.
+3. Gửi đoạn mã JSON vừa copy vào khung chat cho Agent.
+4. Agent sẽ tự động phân tích cấu trúc, tự động thay đổi đường dẫn dự án (`STITCH_PROJECT_PATH`) cho khớp với máy hiện tại, sau đó tự tạo/ghi đè file `.gemini/mcp-settings.json` cho lập trình viên mà không làm ảnh hưởng đến Git.
+
+#### Cách 2: Cài đặt và cấu hình thủ công qua file mẫu
+1. Nhân bản file cấu hình mẫu [.gemini/mcp-settings.json.example](file:///d:/demoSWP/Vehicles-washing-G4-5/.gemini/mcp-settings.json.example) thành file thực tế `.gemini/mcp-settings.json` (đường dẫn tương đối: `.gemini/mcp-settings.json`).
+2. Mở file `.gemini/mcp-settings.json` và thay thế các giá trị mẫu bằng đường dẫn thực tế trên máy tính của bạn:
+   *   Thay thế đường dẫn đến file thực thi của Stitch MCP (`args`).
+   *   Thay thế đường dẫn đến thư mục dự án (`STITCH_PROJECT_PATH` trong phần `env`).
+3. Khởi động lại hoặc làm mới (Reload) MCP servers trong IDE để áp dụng cấu hình mới.
