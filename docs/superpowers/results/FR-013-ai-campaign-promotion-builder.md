@@ -2,23 +2,25 @@
 
 This document specifies the technical design, requirements, and BDD verification scenarios for implementing the AI-driven Marketing Campaign and Point-Multiplier Promotion Builder.
 
-*   **Parent Epic**: `EPIC: FR-001..FR-013 Delivery`
-*   **Milestone**: Release 1.0
-*   **Priority**: `priority:low`
-*   **Estimate**: 4 days
-*   **Functional Area**: `area:exceptions`
+* **Parent Epic**: `EPIC: FR-001..FR-013 Delivery`
+* **Milestone**: Release 1.0
+* **Priority**: `priority:low`
+* **Estimate**: 4 days
+* **Functional Area**: `area:exceptions`
 
 ---
 
 ## 1. Functional & Business Logic Analysis
 
 ### 1.1. Granular Operations (CRUD Matrix)
-*   **Create**: Add a new point promotion configuration campaign.
-*   **Read**: Retrieve list of active promotions to display on the Customer Portal dashboard.
-*   **Update**: Toggle campaign visibility or manually disable a promotion before the end date.
-*   **Delete**: Remove a campaign record.
+
+* **Create**: Add a new point promotion configuration campaign.
+* **Read**: Retrieve list of active promotions to display on the Customer Portal dashboard.
+* **Update**: Toggle campaign visibility or manually disable a promotion before the end date.
+* **Delete**: Remove a campaign record.
 
 ### 1.2. Data Dictionary / Fields
+
 | Field Name | Type | Mandatory | Description / Constraints |
 | :--- | :--- | :--- | :--- |
 | `id` | String (UUID) | Yes | Primary Key. |
@@ -30,21 +32,25 @@ This document specifies the technical design, requirements, and BDD verification
 | `endDate` | String | Yes | ISO Date `YYYY-MM-DD`. |
 
 ### 1.3. Business Rules & Constraints
-*   **Campaign Scope Trigger**: Point calculations ($K_{km}$) must verify that the checkout date is $\ge$ `startDate` and $\le$ `endDate`, and that `customer.tier === targetTier` (or `targetTier === 'All'`).
-*   **AI Tagline Generator**: When the Admin saves a campaign, the system wraps the campaign goal text and calls a mock generator returning a clean technical English tagline.
-*   **Validity Constraint**: Multiplier must be $\ge 1.0$ and $\le 5.0$.
+
+* **Campaign Scope Trigger**: Point calculations ($K_{km}$) must verify that the checkout date is $\ge$ `startDate` and $\le$ `endDate`, and that `customer.tier === targetTier` (or `targetTier === 'All'`).
+* **AI Tagline Generator**: When the Admin saves a campaign, the system wraps the campaign goal text and calls a mock generator returning a clean technical English tagline.
+* **Validity Constraint**: Multiplier must be $\ge 1.0$ and $\le 5.0$.
 
 ### 1.4. Role-Based Access Control (RBAC)
-*   **Authorized Roles**: Administrators.
-*   **Security Restrictions**: Write endpoints must require Admin authorization JWT.
+
+* **Authorized Roles**: Administrators.
+* **Security Restrictions**: Write endpoints must require Admin authorization JWT.
 
 ---
 
 ## 2. Front-end Specifications (FE)
 
 ### 2.1. UI/UX Layout & Wireframe Concept
-*   **Layout**: Configured inside [AdminPage.tsx](file:///d:/demoSWP/Vehicles-washing-G4-5/Front-end/src/pages/admin/AdminPage.tsx) under the "Promotions Builder" tab.
-*   **Wireframe (AI Creator Form)**:
+
+* **Layout**: Configured inside [AdminPage.tsx](file:///d:/demoSWP/Vehicles-washing-G4-5/Front-end/src/pages/admin/AdminPage.tsx) under the "Promotions Builder" tab.
+* **Wireframe (AI Creator Form)**:
+
     ```text
     +---------------------------------------------------------------+
     | AI Campaign Creator                                           |
@@ -58,14 +64,16 @@ This document specifies the technical design, requirements, and BDD verification
     ```
 
 ### 2.2. Components & Interactive Controls
-*   **Form controls**: Standard inputs, select dropdowns, and date pickers.
-*   **Promotions List Grid**: Displays active and expired campaigns with toggle switches.
+
+* **Form controls**: Standard inputs, select dropdowns, and date pickers.
+* **Promotions List Grid**: Displays active and expired campaigns with toggle switches.
 
 ---
 
 ## 3. Back-end Specifications (BE)
 
 ### 3.1. Database Schema Design
+
 ```sql
 CREATE TABLE promotions (
     id VARCHAR(36) PRIMARY KEY,
@@ -82,9 +90,11 @@ CREATE TABLE promotions (
 ### 3.2. RESTful API Contract
 
 #### Create Point Campaign
-*   **Method & Path**: `POST /api/promotions`
-*   **Auth**: Bearer Admin JWT
-*   **Request Payload**:
+
+* **Method & Path**: `POST /api/promotions`
+* **Auth**: Bearer Admin JWT
+* **Request Payload**:
+
     ```json
     {
       "goal": "Boost Silver washes in July",
@@ -94,7 +104,9 @@ CREATE TABLE promotions (
       "endDate": "2026-07-31"
     }
     ```
-*   **Response Payload (201 Created)**:
+
+* **Response Payload (201 Created)**:
+
     ```json
     {
       "success": true,
@@ -108,23 +120,45 @@ CREATE TABLE promotions (
 ## 4. Acceptance Criteria (AC)
 
 ### AC-1: AI Promotion Generation & Publication (Happy Path)
-*   **Given** the Admin enters goal `Boost Silver washes in July` and multiplier `1.5`.
-*   **When** they click "Generate & Publish".
-*   **Then** the backend creates the configuration, calls the AI proxy to return the tagline, and returns `201 Created`.
-*   **And** the campaign is listed as active.
+
+* **Given** the Admin enters goal `Boost Silver washes in July` and multiplier `1.5`.
+* **When** they click "Generate & Publish".
+* **Then** the backend creates the configuration, calls the AI proxy to return the tagline, and returns `201 Created`.
+* **And** the campaign is listed as active.
 
 ### AC-2: Multiplier Application on Checkout (Happy Path)
-*   **Given** an active campaign provides `1.5`x points for Silver members between July 1 and July 31.
-*   **When** a Silver member completes a wash on July 10, paying `200,000` VND.
-*   **Then** the system applies the campaign multiplier ($K_{km} = 1.5$).
-*   **And** credits $\lfloor 200 \times 1.1 \text{ (Silver)} \times 1.5 \rfloor = 330$ points.
+
+* **Given** an active campaign provides `1.5`x points for Silver members between July 1 and July 31.
+* **When** a Silver member completes a wash on July 10, paying `200,000` VND.
+* **Then** the system applies the campaign multiplier ($K_{km} = 1.5$).
+* **And** credits $\lfloor 200 \times 1.1 \text{ (Silver)} \times 1.5 \rfloor = 330$ points.
 
 ### AC-3: Out-of-Date Campaign Excluded (Edge Case)
-*   **Given** a campaign for 1.5x points ended on June 30.
-*   **When** a checkout is processed on July 1.
-*   **Then** the point engine must set the campaign multiplier to `K_km = 1.0` (ignoring the promotion).
+
+* **Given** a campaign for 1.5x points ended on June 30.
+* **When** a checkout is processed on July 1.
+* **Then** the point engine must set the campaign multiplier to `K_km = 1.0` (ignoring the promotion).
 
 ### AC-4: Campaign Target Tier Mismatch (Edge Case)
-*   **Given** a campaign is active providing 2.0x points targeting `Platinum` members.
-*   **When** a `Gold` customer completes a checkout.
-*   **Then** the point engine ignores the campaign multiplier for this transaction.
+
+* **Given** a campaign is active providing 2.0x points targeting `Platinum` members.
+* **When** a `Gold` customer completes a checkout.
+* **Then** the point engine ignores the campaign multiplier for this transaction.
+
+---
+
+## 5. Task Assignments & Detailed Breakdowns
+
+### 👥 Task Assignments & Pair Programming Roles
+
+* **Front-end Developers**: **Anh & An**
+* **Back-end Developers**: **Anh & Phat**
+
+### 📝 Detailed Sub-task Breakdowns
+
+* **Front-end Development (Anh & An)**:
+  * `[ ]` Design AI campaign entry form (Campaign goal, Target customer tier) and display creation results: **Anh** (Lead) & **An** (Support/Review)
+  * `[ ]` Build Promotion tab on customer side displaying active promotional campaigns: **Anh** (Lead) & **An** (Support/Review)
+* **Back-end Development (Anh & Phat)**:
+  * `[ ]` Integrate mock-AI to analyze and generate promotional content, automatically save to `promotions` table with multiplier coefficient $K_{km}$: **Anh** (Lead) & **Phat** (Review/Support)
+  * `[ ]` API Controllers to activate / publish new promotional campaigns: **Anh** (Lead) & **Phat** (Review/Support)
