@@ -165,3 +165,35 @@ com.example.project
    *   Thay thế đường dẫn đến file thực thi của Stitch MCP (`args`).
    *   Thay thế đường dẫn đến thư mục dự án (`STITCH_PROJECT_PATH` trong phần `env`).
 3. Khởi động lại hoặc làm mới (Reload) MCP servers trong IDE để áp dụng cấu hình mới.
+
+---
+
+## 7. CẤU HÌNH MÔI TRƯỜNG CHẠY CHUNG (SHARED DEVELOPMENT ENVIRONMENT)
+
+### 7.1. Cấu hình Runtime Back-end Mặc định
+*   **Ngôn ngữ lập trình**: Java
+*   **Phiên bản Java SDK mặc định**: **Java 17 (LTS)**. Tất cả các thành viên trong nhóm phải sử dụng đúng JDK 17 cho dự án Spring Boot 3.
+*   **Công cụ quản lý Build**: Maven (`pom.xml`).
+
+### 7.2. Cấu hình Database Chung (MS SQL Server)
+Để đảm bảo sự đồng bộ trên cả 6 máy của nhóm phát triển, thông tin cấu hình kết nối SQL Server local bắt buộc phải tuân theo:
+*   **Cổng kết nối**: `1433`
+*   **Tài khoản đăng nhập**: `sa`
+*   **Mật khẩu**: `123456`
+*   **Tên database**: `autowash_pro`
+
+### 7.3. Quy trình Thiết lập Môi trường Database của Agent
+Khi bắt đầu phiên làm việc thiết lập môi trường hoặc khi lập trình viên hỏi về cấu hình DB, Agent bắt buộc phải thực hiện các bước sau:
+1.  **Hỏi lập trình viên**: *"Bạn có muốn sử dụng Docker để chạy Database SQL Server không? (Có / Không)"*
+2.  **Nếu Lập trình viên chọn "Có" (Sử dụng Docker)**:
+    *   Yêu cầu cài đặt [Docker Desktop cho Windows](https://www.docker.com/products/docker-desktop/) (nếu chưa cài).
+    *   Hướng dẫn chạy lệnh dưới đây ở thư mục gốc dự án để khởi động container:
+        ```bash
+        docker compose up -d
+        ```
+    *   Xác nhận container `autowash-sqlserver` đang chạy ổn định.
+3.  **Nếu Lập trình viên chọn "Không" (Tự cài đặt thủ công)**:
+    *   Hướng dẫn tải cài đặt **SQL Server Developer/Express** và **SSMS**.
+    *   Yêu cầu chọn chế độ bảo mật **Mixed Mode** và đặt mật khẩu tài khoản **`sa`** là **`123456`**.
+    *   Hướng dẫn cấu hình **TCP/IP** (bật Enabled trong SQL Server Configuration Manager, đặt port là **1433** cho IPAll) và restart lại service SQL Server.
+
