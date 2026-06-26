@@ -17,11 +17,17 @@ Tài liệu này chứa các quy định chung của dự án, bộ quy tắc ph
 ## 2. NHẬT KÝ CẬP NHẬT DỰ ÁN (PROJECT UPDATE LOG)
 
 ### Back-end (BE)
+*   **2026-06-26**: Tạo hướng dẫn generative code (AI prompting guide) cho cả FE và BE.
+    *   *Chi tiết*: Xem tại [generative_code_guide.md](file:///d:/demoSWP/Vehicles-washing-G4-5/generative_code_guide.md).
+    *   *Nhật ký chi tiết*: Xem tại [2026-06-26-generative-code-guide.md](file:///d:/demoSWP/Vehicles-washing-G4-5/.agents/learnings/2026-06-26-generative-code-guide.md).
 *   **2026-06-24**: Thiết lập bộ quy tắc phát triển BE bằng Java Spring Boot dành cho sinh viên.
     *   *Chi tiết thiết kế & quyết định*: Xem tại [2026-06-24-backend-rules-design.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/specs/2026-06-24-backend-rules-design.md).
     *   *Nhật ký chi tiết*: Xem tại [2026-06-24-brainstorm-backend-rules.md](file:///d:/demoSWP/Vehicles-washing-G4-5/.agents/learnings/2026-06-24-brainstorm-backend-rules.md).
 
 ### Front-end (FE)
+*   **2026-06-26**: Tạo hướng dẫn generative code (AI prompting guide) cho cả FE và BE.
+    *   *Chi tiết*: Xem tại [generative_code_guide.md](file:///d:/demoSWP/Vehicles-washing-G4-5/generative_code_guide.md).
+    *   *Nhật ký chi tiết*: Xem tại [2026-06-26-generative-code-guide.md](file:///d:/demoSWP/Vehicles-washing-G4-5/.agents/learnings/2026-06-26-generative-code-guide.md).
 *   **2026-06-24**: Thiết lập bộ quy tắc phát triển FE bằng React, TypeScript và Tailwind CSS dành cho sinh viên.
     *   *Nhật ký chi tiết*: Xem tại [2026-06-24-brainstorm-frontend-rules.md](file:///d:/demoSWP/Vehicles-washing-G4-5/.agents/learnings/2026-06-24-brainstorm-frontend-rules.md).
 *   **2026-06-24**: Hoàn thành thảo luận & thống nhất luồng đặt lịch (Booking Wizard Flow) và Đăng nhập cho AutoWash Pro.
