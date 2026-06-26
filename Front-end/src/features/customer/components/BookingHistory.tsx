@@ -22,11 +22,11 @@ const getStatusVariant = (status: string): 'success' | 'warning' | 'error' | 'in
 
 const translateStatus = (status: string): string => {
   switch (status) {
-    case 'PENDING': return 'CHỜ XỬ LÝ';
-    case 'CONFIRMED': return 'ĐÃ XÁC NHẬN';
-    case 'COMPLETED': return 'HOÀN THÀNH';
-    case 'CANCELLED': return 'ĐÃ HUỶ';
-    case 'CHECKED_IN': return 'ĐÃ CHECK-IN';
+    case 'PENDING': return 'PENDING';
+    case 'CONFIRMED': return 'CONFIRMED';
+    case 'COMPLETED': return 'COMPLETED';
+    case 'CANCELLED': return 'CANCELLED';
+    case 'CHECKED_IN': return 'CHECKED-IN';
     default: return status;
   }
 };
@@ -36,7 +36,7 @@ export const BookingHistory: React.FC<BookingHistoryProps> = ({ bookings }) => {
     return (
       <div className={styles.empty}>
         <span className={styles.emptyIcon}>📋</span>
-        Chưa có lịch đặt nào. Đặt lịch rửa xe ngay!
+        No bookings yet. Book a wash now!
       </div>
     );
   }
@@ -54,7 +54,7 @@ export const BookingHistory: React.FC<BookingHistoryProps> = ({ bookings }) => {
           <div key={booking.id} className={styles.item}>
             <span className={styles.refBadge}>{booking.bookingRef || booking.id}</span>
             <div className={styles.info}>
-              <div className={styles.infoTop}>{serviceNames || 'Dịch vụ rửa xe'}</div>
+              <div className={styles.infoTop}>{serviceNames || 'Car wash service'}</div>
               <div className={styles.infoBottom}>
                 {branch?.name || booking.branchId} • {formatDate(booking.date)} • {formatTime(booking.time)}
               </div>

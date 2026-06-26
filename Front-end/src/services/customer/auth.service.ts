@@ -1,47 +1,32 @@
 import { Customer } from '../../types';
 import { mockStore } from '../mockStore';
 
-const ADMIN_CREDENTIALS = {
-  phone: '0999999999',
-  password: 'password123',
-};
-
-const adminUser: Customer = {
-  id: 'admin',
-  name: 'System Admin',
-  phone: ADMIN_CREDENTIALS.phone,
-  email: 'admin@autowash.pro',
-  role: 'ADMIN',
-  tier: 'Platinum',
-  accumulatedPoints: 0,
-  totalSpend: 0,
-  createdAt: '2026-06-26T00:00:00Z',
-};
-
 export const authService = {
-  login(phone: string, password: string): { success: boolean; customer: Customer | null; error?: string } {
-    if (phone === ADMIN_CREDENTIALS.phone) {
-      if (password === ADMIN_CREDENTIALS.password) {
-        return { success: true, customer: adminUser };
-      }
-      return { success: false, customer: null, error: 'Invalid admin password' };
-    }
-
+  login(phone: string, _password: string): { success: boolean; customer: Customer | null; error?: string } {
     const customer = mockStore.getCustomerByPhone(phone);
     if (customer) {
       return { success: true, customer };
     }
-    return {
-      success: false,
-      customer: null,
-      error: 'Invalid login. Try customer 0901234567 or admin 0999999999.',
-    };
+    return { success: false, customer: null, error: 'Invalid login credentials. Try: 0901234567' };
+  },
+
+  sendOtp(email: string): { success: boolean; otpExpiresIn: number } {
+    // Mock sending OTP
+    console.log(`Mock OTP sent to ${email}: 123456`);
+    return { success: true, otpExpiresIn: 60 };
+  },
+
+  verifyOtp(email: string, otp: string): { success: boolean; error?: string } {
+    if (otp === '123456') {
+      return { success: true };
+    }
+    return { success: false, error: 'Invalid OTP code. Use 123456.' };
   },
 
   register(name: string, phone: string, email: string, _password: string): { success: boolean; customer: Customer | null; error?: string } {
     const existing = mockStore.getCustomerByPhone(phone);
-    if (existing || phone === ADMIN_CREDENTIALS.phone) {
-      return { success: false, customer: null, error: 'Phone number is already registered' };
+    if (existing) {
+      return { success: false, customer: null, error: 'Phone number already registered' };
     }
 
     const newCustomer: Customer = {
@@ -49,9 +34,8 @@ export const authService = {
       name,
       phone,
       email,
-      role: 'CUSTOMER',
       tier: 'Member',
-      accumulatedPoints: 100,
+      accumulatedPoints: 100, // Welcome bonus
       totalSpend: 0,
       createdAt: new Date().toISOString(),
     };
@@ -63,13 +47,12 @@ export const authService = {
   loginAsGuest(): Customer {
     return {
       id: 'guest',
-      name: 'Khach vang lai',
+      name: 'Guest',
       phone: '',
-      role: 'CUSTOMER',
       tier: 'Member',
       accumulatedPoints: 0,
       totalSpend: 0,
       createdAt: new Date().toISOString(),
     };
-  },
+  }
 };

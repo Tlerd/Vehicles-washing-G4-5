@@ -1,14 +1,12 @@
 export type CarSize = 'hatchback' | 'sedan' | 'suv' | 'pickup';
 export type BookingStatus = 'PENDING' | 'CONFIRMED' | 'CHECKED_IN' | 'COMPLETED' | 'CANCELLED';
 export type CustomerTier = 'Member' | 'Silver' | 'Gold' | 'Platinum';
-export type UserRole = 'CUSTOMER' | 'ADMIN';
 
 export interface Customer {
   id: string;
   name: string;
   phone: string;
   email?: string;
-  role: UserRole;
   tier: CustomerTier;
   accumulatedPoints: number;
   totalSpend: number;
@@ -32,6 +30,7 @@ export interface ServiceItem {
   basePrice: number;
   duration: number; // minutes
   category: 'combo' | 'single';
+  group?: string;
   icon: string;
   includes?: string[];
   suitableFor?: string;
@@ -84,6 +83,8 @@ export interface BookingDraft {
   date: string | null;
   time: string | null;
   vehicleId: string | null;
+  bookingId?: string;
+  appliedVoucherId?: string;
 }
 
 export interface Promotion {
@@ -94,10 +95,6 @@ export interface Promotion {
   validUntil: string;
   bgGradient: string;
   icon: string;
-  targetTier?: CustomerTier | 'ALL';
-  kmMultiplier?: number;
-  isActive?: boolean;
-  createdAt?: string;
 }
 
 export interface PointsTransaction {

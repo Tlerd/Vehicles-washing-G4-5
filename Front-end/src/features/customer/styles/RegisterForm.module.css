@@ -1,0 +1,121 @@
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-text-main, #0f172a);
+  letter-spacing: 0.025em;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  height: 3rem;
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid #e0f2fe; /* sky-100 */
+  background-color: rgba(255, 255, 255, 0.7);
+  padding-left: 2.75rem;
+  padding-right: 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-main, #0f172a);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+
+.input::placeholder {
+  color: #94a3b8; /* slate-400 */
+}
+
+.input:focus {
+  border-color: #38bdf8; /* sky-400 */
+  background-color: #ffffff;
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1); /* sky-500/10 */
+}
+
+.inputIcon {
+  position: absolute;
+  left: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8; /* slate-400 */
+}
+
+.errorText {
+  padding-left: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #e11d48; /* rose-600 */
+}
+
+.submitWrapper {
+  padding-top: 0.5rem;
+}
+
+.submitBtn {
+  height: 3rem;
+  width: 100%;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  box-shadow: 0 12px 32px rgba(37, 99, 235, 0.24);
+  transition: all 0.3s ease;
+  background-color: #1d4ed8;
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.submitBtn:hover:not(:disabled) {
+  transform: scale(1.02);
+  background-color: #1e40af;
+}
+
+.submitBtn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.errorMessage {
+  border-radius: 0.75rem;
+  border: 1px solid #ffe4e6; /* rose-100 */
+  background-color: #fff1f2; /* rose-50 */
+  padding: 0.75rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #e11d48; /* rose-600 */
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .5; }
+}

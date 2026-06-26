@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from './context/AuthContext';
 import { LoginPage } from './features/customer/pages/LoginPage';
+import { LandingPage } from './features/customer/pages/LandingPage';
 import { DashboardPage } from './features/customer/pages/DashboardPage';
 import { BookingWizardPage } from './features/customer/pages/BookingWizardPage';
 import { VehicleList } from './features/customer/components/VehicleList';
@@ -12,8 +13,6 @@ import { LoyaltyTierSection } from './features/customer/components/LoyaltyTierSe
 import { CustomerLayout } from './layouts/CustomerLayout';
 import { bookingService } from './services/customer/booking.service';
 import { mockStore } from './services/mockStore';
-import { AdminCustomerRegistryPage } from './features/admin/pages/AdminCustomerRegistryPage';
-import { getPortalForUser } from './features/auth/roleAccess';
 
 type PageId = 'dashboard' | 'booking' | 'vehicles' | 'history' | 'promotions' | 'points';
 
@@ -63,20 +62,20 @@ function CustomerPortal() {
             <LoyaltyTierSection currentTier={currentUser?.tier} currentPoints={currentUser?.accumulatedPoints} />
             <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '24px' }}>
               {currentUser && <ProfileCard customer={currentUser} />}
-              <div style={{
-                background: '#ffffff',
-                borderRadius: '12px',
-                border: '1px solid #f1f5f9',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                padding: '20px',
-              }}>
-                <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a', marginBottom: '16px' }}>
-                  Point history
-                </h3>
-                <PointsHistory
-                  transactions={mockStore.getTransactionsByCustomer(currentUser?.id || '')}
-                />
-              </div>
+            <div style={{
+              background: '#ffffff',
+              borderRadius: '12px',
+              border: '1px solid #f1f5f9',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+              padding: '20px',
+            }}>
+              <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a', marginBottom: '16px' }}>
+                ⭐ Points History
+              </h3>
+              <PointsHistory
+                transactions={mockStore.getTransactionsByCustomer(currentUser?.id || '')}
+              />
+            </div>
             </div>
           </div>
         );
@@ -94,14 +93,14 @@ function CustomerPortal() {
 }
 
 function App() {
-  const { currentUser, logout } = useAuth();
-  const portal = getPortalForUser(currentUser);
+  const { isAuthenticated } = useAuth();
+  const [showLanding, setShowLanding] = useState(true);
 
-  if (portal === 'admin') {
-    return <AdminCustomerRegistryPage onBackToCustomerPortal={logout} />;
+  if (showLanding && !isAuthenticated) {
+    return <LandingPage onNavigateToAuth={() => setShowLanding(false)} />;
   }
 
-  if (portal === 'auth') {
+  if (!isAuthenticated) {
     return <LoginPage onLoginSuccess={() => {}} />;
   }
 

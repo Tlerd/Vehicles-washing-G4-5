@@ -23,10 +23,10 @@ export const StepDateTime: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <h3 className={styles.title}>Chọn Ngày & Giờ</h3>
-      <p className={styles.subtitle}>Chọn khoảng thời gian thuận tiện nhất cho bạn</p>
+      <h3 className={styles.title}>Select Date & Time</h3>
+      <p className={styles.subtitle}>Choose the most convenient time slot</p>
 
-      <span className={styles.sectionLabel}>📅 Chọn ngày</span>
+      <span className={styles.sectionLabel}>📅 Select date</span>
       <div className={styles.calendar}>
         {days.map(day => (
           <div
@@ -37,12 +37,12 @@ export const StepDateTime: React.FC = () => {
             <span className={styles.dayName}>{day.dayName}</span>
             <span className={styles.dayNum}>{day.dayNum}</span>
             <span className={styles.dayMonth}>{day.monthName}</span>
-            {day.isToday && <span className={styles.todayBadge}>HÔM NAY</span>}
+            {day.isToday && <span className={styles.todayBadge}>TODAY</span>}
           </div>
         ))}
       </div>
 
-      <span className={styles.sectionLabel}>🕐 Chọn giờ</span>
+      <span className={styles.sectionLabel}>🕐 Select time</span>
       {draft.date ? (
         <div className={styles.timeGrid}>
           {timeSlots.map(slot => (
@@ -59,7 +59,7 @@ export const StepDateTime: React.FC = () => {
           ))}
         </div>
       ) : (
-        <div className={styles.noDate}>📅 Vui lòng chọn ngày trước</div>
+        <div className={styles.noDate}>📅 Please select a date first</div>
       )}
     </div>
   );

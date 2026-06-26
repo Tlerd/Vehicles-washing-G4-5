@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Vehicle, CarSize } from '../../../types';
 import { vehicleService } from '../../../services/customer/vehicle.service';
 import { useAuth } from '../../../context/AuthContext';
@@ -10,20 +10,50 @@ import styles from '../styles/VehicleList.module.css';
 
 export const VehicleList: React.FC = () => {
   const { currentUser } = useAuth();
-  const [vehicles, setVehicles] = useState<Vehicle[]>(() =>
-    vehicleService.getVehicles(currentUser?.id || '')
-  );
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Search state
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Form states
   const [showForm, setShowForm] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
-
   const [formPlate, setFormPlate] = useState('');
   const [formBrand, setFormBrand] = useState('');
   const [formSize, setFormSize] = useState<CarSize>('sedan');
   const [formNotes, setFormNotes] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
-  const refreshVehicles = () => {
-    setVehicles(vehicleService.getVehicles(currentUser?.id || ''));
+  // Delete confirmation states
+  const [vehicleToDelete, setVehicleToDelete] = useState<Vehicle | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const fetchVehicles = async () => {
+    if (!currentUser) return;
+    setIsLoading(true);
+    try {
+      const data = await vehicleService.getVehicles(currentUser.id);
+      setVehicles(data);
+    } catch (error) {
+      console.error('Failed to fetch vehicles', error);
+      // Fallback for demo purposes if backend is down
+      setVehicles([]);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchVehicles();
+  }, [currentUser]);
+
+  const filteredVehicles = useMemo(() => {
+    return vehicles.filter(v => 
+      v.licensePlate.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      v.brand.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [vehicles, searchTerm]);
 
   const resetForm = () => {
     setFormPlate('');
@@ -47,28 +77,53 @@ export const VehicleList: React.FC = () => {
     setShowForm(true);
   };
 
-  const handleSave = () => {
-    if (!formPlate || !formBrand) return;
-
-    if (editingVehicle) {
-      vehicleService.updateVehicle(editingVehicle.id, {
-        licensePlate: formPlate,
-        brand: formBrand,
-        size: formSize,
-        notes: formNotes,
-      });
-    } else {
-      vehicleService.addVehicle(currentUser?.id || '', formPlate, formBrand, formSize, formNotes);
+  const handleSave = async () => {
+    if (!formPlate || !formBrand || !currentUser) return;
+    setIsSaving(true);
+    
+    try {
+      if (editingVehicle) {
+        // Submit only changed fields
+        const updates: Partial<Vehicle> = {};
+        if (editingVehicle.licensePlate !== formPlate) updates.licensePlate = formPlate;
+        if (editingVehicle.brand !== formBrand) updates.brand = formBrand;
+        if (editingVehicle.size !== formSize) updates.size = formSize;
+        if (editingVehicle.notes !== formNotes) updates.notes = formNotes;
+        
+        if (Object.keys(updates).length > 0) {
+          await vehicleService.updateVehicle(editingVehicle.id, updates);
+        }
+      } else {
+        await vehicleService.addVehicle(currentUser.id, formPlate, formBrand, formSize, formNotes);
+      }
+      await fetchVehicles();
+      setShowForm(false);
+      resetForm();
+    } catch (error) {
+      console.error('Failed to save vehicle', error);
+      alert('Could not save vehicle. Please try again.');
+    } finally {
+      setIsSaving(false);
     }
-
-    refreshVehicles();
-    setShowForm(false);
-    resetForm();
   };
 
-  const handleDelete = (id: string) => {
-    vehicleService.deleteVehicle(id);
-    refreshVehicles();
+  const confirmDelete = (v: Vehicle) => {
+    setVehicleToDelete(v);
+  };
+
+  const handleDelete = async () => {
+    if (!vehicleToDelete) return;
+    setIsDeleting(true);
+    try {
+      await vehicleService.deleteVehicle(vehicleToDelete.id);
+      await fetchVehicles();
+      setVehicleToDelete(null);
+    } catch (error) {
+      console.error('Failed to delete vehicle', error);
+      alert('Could not delete vehicle.');
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const sizeIcon = (size: string) => {
@@ -79,15 +134,27 @@ export const VehicleList: React.FC = () => {
   return (
     <div>
       <div className={styles.header}>
-        <h3 className={styles.title}>🚗 Xe của tôi</h3>
-        <button className={styles.addBtn} onClick={openAddForm}>+ Thêm xe mới</button>
+        <h3 className={styles.title}>🚗 My Vehicles</h3>
+        <button className={styles.addBtn} onClick={openAddForm}>+ Add new vehicle</button>
       </div>
 
-      {vehicles.length === 0 ? (
-        <div className={styles.empty}>Chưa có xe nào. Hãy thêm chiếc xe đầu tiên của bạn!</div>
+      <div style={{ marginBottom: '1rem' }}>
+        <Input 
+          placeholder="Search by plate or brand..." 
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
+      {isLoading ? (
+        <div style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>Loading vehicles...</div>
+      ) : filteredVehicles.length === 0 ? (
+        <div className={styles.empty}>
+          {searchTerm ? 'No vehicles match your search.' : 'No vehicles yet. Add your first vehicle!'}
+        </div>
       ) : (
         <div className={styles.list}>
-          {vehicles.map(v => (
+          {filteredVehicles.map(v => (
             <div key={v.id} className={styles.vehicleItem}>
               <span className={styles.vehicleIcon}>{sizeIcon(v.size)}</span>
               <div className={styles.vehicleInfo}>
@@ -97,35 +164,36 @@ export const VehicleList: React.FC = () => {
               <span className={styles.vehicleSize}>{v.size.toUpperCase()}</span>
               <div className={styles.vehicleActions}>
                 <button className={styles.actionBtn} onClick={() => openEditForm(v)}>✏️</button>
-                <button className={`${styles.actionBtn} ${styles.deleteBtn}`} onClick={() => handleDelete(v.id)}>🗑️</button>
+                <button className={`${styles.actionBtn} ${styles.deleteBtn}`} onClick={() => confirmDelete(v)}>🗑️</button>
               </div>
             </div>
           ))}
         </div>
       )}
 
+      {/* Add/Edit Modal */}
       <Modal
         isOpen={showForm}
         onClose={() => { setShowForm(false); resetForm(); }}
-        title={editingVehicle ? 'Sửa thông tin xe' : 'Thêm xe mới'}
+        title={editingVehicle ? 'Edit vehicle info' : 'Add new vehicle'}
         size="sm"
       >
         <div className={styles.formGrid}>
           <Input
-            label="Biển số xe"
+            label="License plate"
             placeholder="51G-123.45"
             value={formPlate}
             onChange={e => setFormPlate(e.target.value)}
           />
           <Input
-            label="Hãng xe / Mẫu xe"
+            label="Brand / Model"
             placeholder="Toyota Camry"
             value={formBrand}
             onChange={e => setFormBrand(e.target.value)}
           />
           <div>
             <label style={{ fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px', display: 'block' }}>
-              Kích thước xe
+              Vehicle size
             </label>
             <div className={styles.sizeSelect}>
               {CAR_TYPES.map(ct => (
@@ -141,17 +209,40 @@ export const VehicleList: React.FC = () => {
             </div>
           </div>
           <Input
-            label="Ghi chú (Không bắt buộc)"
-            placeholder="VD: Xe màu trắng, ghế da"
+            label="Notes (Optional)"
+            placeholder="E.g., White car, leather seats"
             value={formNotes}
             onChange={e => setFormNotes(e.target.value)}
           />
           <div className={styles.formActions}>
             <Button variant="secondary" size="sm" onClick={() => { setShowForm(false); resetForm(); }}>
-              Huỷ
+              Cancel
             </Button>
-            <Button size="sm" onClick={handleSave}>
-              {editingVehicle ? 'Cập nhật' : 'Thêm xe mới'}
+            <Button size="sm" onClick={handleSave} disabled={isSaving || !formPlate || !formBrand}>
+              {isSaving ? 'Saving...' : editingVehicle ? 'Update' : 'Add new vehicle'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={!!vehicleToDelete}
+        onClose={() => setVehicleToDelete(null)}
+        title="Confirm Deletion"
+        size="sm"
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <p style={{ margin: 0, fontSize: '0.875rem', color: '#334155', lineHeight: '1.5' }}>
+            Are you sure you want to delete the vehicle <strong>{vehicleToDelete?.licensePlate} ({vehicleToDelete?.brand})</strong>? 
+            This action cannot be undone.
+          </p>
+          <div className={styles.formActions}>
+            <Button variant="secondary" size="sm" onClick={() => setVehicleToDelete(null)}>
+              Cancel
+            </Button>
+            <Button variant="danger" size="sm" onClick={handleDelete} disabled={isDeleting}>
+              {isDeleting ? 'Deleting...' : 'Delete'}
             </Button>
           </div>
         </div>

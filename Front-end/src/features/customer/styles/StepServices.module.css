@@ -1,278 +1,307 @@
 .container {
-  padding: 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .title {
-  font-size: 20px;
+  font-size: 1.5rem;
   font-weight: 700;
-  color: #0f172a;
-  margin: 0 0 4px;
+  color: var(--color-text-main, #0f172a);
+  margin-bottom: 0.25rem;
 }
 
 .subtitle {
-  font-size: 14px;
   color: #64748b;
-  margin: 0 0 24px;
+  font-size: 0.9375rem;
+  margin-bottom: 1rem;
 }
 
-.categoryLabel {
-  font-size: 13px;
+/* Accordion Group */
+.group {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  background-color: white;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.groupHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background-color: #f8fafc;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
+}
+
+.groupHeader:hover {
+  background-color: #f1f5f9;
+}
+
+.groupTitle {
+  font-size: 1.125rem;
   font-weight: 700;
-  color: #0ea5e9;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 12px;
-  margin-top: 24px;
+  color: #1e293b;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
-.categoryDivider {
-  flex: 1;
-  height: 1px;
-  background: #e2e8f0;
+.groupCount {
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 500;
+  background-color: #e2e8f0;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
 }
 
-.grid {
+.groupIcon {
+  color: #64748b;
+  transition: transform 0.3s ease;
+}
+
+.groupIconOpen {
+  transform: rotate(180deg);
+}
+
+.groupContent {
+  padding: 1.25rem;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  border-top: 1px solid #e2e8f0;
 }
 
-.serviceCard {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 16px;
-  background: #ffffff;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
+@media (min-width: 768px) {
+  .groupContent {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Service Card */
+.card {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1rem;
   cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.serviceCard:hover {
-  border-color: #bae6fd;
-  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.08);
-}
-
-.serviceCardSelected {
-  border-color: #0ea5e9;
-  background: #f0f9ff;
-}
-
-.serviceIcon {
-  font-size: 28px;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.serviceInfo {
-  flex: 1;
-  min-width: 0;
-}
-
-.serviceName {
-  font-size: 14px;
-  font-weight: 600;
-  color: #0f172a;
-  margin-bottom: 2px;
-}
-
-.serviceDesc {
-  font-size: 12px;
-  color: #64748b;
-  line-height: 1.4;
-  margin-bottom: 6px;
-}
-
-.serviceMeta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.servicePrice {
-  font-size: 13px;
-  font-weight: 700;
-  color: #0ea5e9;
-}
-
-.serviceDuration {
-  font-size: 11px;
-  color: #94a3b8;
-  background: #f1f5f9;
-  padding: 2px 8px;
-  border-radius: 4px;
-}
-
-.serviceCheck {
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  border: 2px solid #e2e8f0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  margin-top: 2px;
-  transition: all 0.2s ease;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.serviceCheckActive {
-  background: #0ea5e9;
-  border-color: #0ea5e9;
-  color: #ffffff;
-}
-
-.detailBtn {
-  font-size: 11px;
-  color: #0ea5e9;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  padding: 0;
-  font-family: 'Inter', sans-serif;
-}
-
-.detailBtn:hover {
-  text-decoration: underline;
-}
-
-.modalBody {
-  font-size: 14px;
-  color: #334155;
-  line-height: 1.6;
-  margin: 0 0 16px;
-}
-
-.modalMeta {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.modalPrice {
-  font-size: 18px;
-  font-weight: 700;
-  color: #0ea5e9;
-}
-
-.serviceCardPremium {
-  border-color: #f59e0b;
-  background: linear-gradient(to bottom right, #fffbeb, #ffffff);
-}
-
-.serviceCardPremium:hover {
-  border-color: #d97706;
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
-}
-
-.serviceCardPremium.serviceCardSelected {
-  border-color: #d97706;
-  background: linear-gradient(to bottom right, #fef3c7, #fffbeb);
-  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
-}
-
-.serviceHeader {
+  transition: all 0.2s;
+  background-color: white;
+  position: relative;
   display: flex;
   flex-direction: column;
+}
+
+.cardSelected {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1);
+}
+
+.cardPremium {
+  border: 1px solid #f59e0b;
+  background: linear-gradient(to bottom right, #fffbeb, #fef3c7);
+}
+
+.cardPremium.cardSelected {
+  border-color: #d97706;
+  background: linear-gradient(to bottom right, #fef3c7, #fde68a);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.cardTitleWrapper {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.cardIcon {
+  font-size: 1.5rem;
+}
+
+.cardName {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #0f172a;
+  margin-bottom: 0.25rem;
+}
+
+.cardMeta {
+  font-size: 0.8125rem;
+  color: #64748b;
+  display: flex;
   align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
+  gap: 0.375rem;
+}
+
+.cardPrice {
+  font-weight: 800;
+  color: #2563eb;
+  font-size: 1.125rem;
 }
 
 .premiumBadge {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: linear-gradient(135deg, #f59e0b, #ea580c);
   color: white;
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 800;
-  padding: 2px 6px;
-  border-radius: 4px;
-  text-transform: uppercase;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  margin-left: 0.5rem;
+  vertical-align: middle;
 }
 
-.servicePoints {
-  font-size: 12px;
-  color: #f59e0b;
-  font-weight: 600;
-  margin-bottom: 8px;
+.cardCheck {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
   display: flex;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 700;
+  transition: all 0.2s;
+  flex-shrink: 0;
 }
 
-.pointsIcon {
-  font-size: 14px;
+.cardCheckSelected {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.cardCheckPremium {
+  background-color: #f59e0b;
+  border-color: #f59e0b;
+}
+
+.toggleDetailsBtn {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.toggleDetailsBtn:hover {
+  text-decoration: underline;
+}
+
+/* Expanded Details */
+.cardExpanded {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed #cbd5e1;
+  font-size: 0.875rem;
+  color: #334155;
+  animation: slideDown 0.3s ease-out forwards;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .detailSection {
-  margin-top: 16px;
-  background: #f8fafc;
-  padding: 12px;
-  border-radius: 8px;
+  margin-top: 0.75rem;
 }
 
 .detailSectionTitle {
-  font-size: 13px;
   font-weight: 700;
-  color: #0f172a;
-  margin-bottom: 6px;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .detailList {
   margin: 0;
-  padding-left: 20px;
-  font-size: 13px;
+  padding-left: 1.25rem;
   color: #475569;
-  line-height: 1.6;
 }
 
-.detailText {
-  margin: 0;
-  font-size: 13px;
-  color: #475569;
-  line-height: 1.6;
+.detailList li {
+  margin-bottom: 0.25rem;
 }
 
-.totalPointsSummary {
-  margin-top: 24px;
-  padding: 16px;
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  border-radius: 12px;
+/* Loyalty Points Panel - Sticky */
+.pointsPanel {
+  position: sticky;
+  bottom: 0;
+  background-color: white;
+  border-top: 2px solid #e2e8f0;
+  border-radius: 1rem 1rem 0 0;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
+  z-index: 10;
+  margin: 1rem -1.5rem -1.5rem -1.5rem;
 }
 
-.totalLabel {
-  font-size: 14px;
-  font-weight: 600;
-  color: #166534;
-}
-
-.totalValue {
-  font-size: 16px;
-  font-weight: 800;
-  color: #15803d;
-}
-
-.modalDuration {
-  font-size: 13px;
-  color: #64748b;
-  background: #f1f5f9;
-  padding: 4px 10px;
-  border-radius: 6px;
-}
-
-@media (max-width: 640px) {
-  .grid {
-    grid-template-columns: 1fr;
+@media (min-width: 768px) {
+  .pointsPanel {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
   }
+}
+
+.pointsSummary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.pointsTotalRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.pointsLabel {
+  font-weight: 600;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.pointsValue {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pointsFormula {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pointsFormula span {
+  background-color: #f1f5f9;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-family: monospace;
 }

@@ -1,30 +1,31 @@
+import apiClient from '../../config/axios';
 import { Vehicle, CarSize } from '../../types';
-import { mockStore } from '../mockStore';
 
 export const vehicleService = {
-  getVehicles(customerId: string): Vehicle[] {
-    return mockStore.getVehiclesByCustomer(customerId);
+  async getVehicles(customerId: string): Promise<Vehicle[]> {
+    const response = await apiClient.get(`/vehicles`, {
+      params: { customerId }
+    });
+    return response.data;
   },
 
-  addVehicle(customerId: string, licensePlate: string, brand: string, size: CarSize, notes?: string): Vehicle {
-    const vehicle: Vehicle = {
-      id: `v_${Date.now()}`,
+  async addVehicle(customerId: string, licensePlate: string, brand: string, size: CarSize, notes?: string): Promise<Vehicle> {
+    const response = await apiClient.post('/vehicles', {
       customerId,
       licensePlate,
       brand,
       size,
       notes,
-      isDefault: false,
-    };
-    mockStore.addVehicle(vehicle);
-    return vehicle;
+    });
+    return response.data;
   },
 
-  updateVehicle(id: string, updates: Partial<Vehicle>): void {
-    mockStore.updateVehicle(id, updates);
+  async updateVehicle(id: string, updates: Partial<Vehicle>): Promise<Vehicle> {
+    const response = await apiClient.patch(`/vehicles/${id}`, updates);
+    return response.data;
   },
 
-  deleteVehicle(id: string): void {
-    mockStore.deleteVehicle(id);
+  async deleteVehicle(id: string): Promise<void> {
+    await apiClient.delete(`/vehicles/${id}`);
   }
 };

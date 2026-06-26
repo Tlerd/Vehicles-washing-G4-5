@@ -228,7 +228,10 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const [transactionLogs, setTransactionLogs] = useState<TransactionLog[]>([
     { id: 't1', customerId: 'c1', type: 'earn', points: 280, description: 'Earned from booking AWP-1001', createdAt: new Date().toISOString() },
-    { id: 't2', customerId: 'c1', type: 'tier_change', points: 0, description: 'Upgraded to Gold Tier', createdAt: new Date().toISOString() }
+    { id: 't2', customerId: 'c1', type: 'tier_change', points: 0, description: 'Upgraded to Gold Tier', createdAt: new Date().toISOString() },
+    // FR-007 Mock: Points about to expire (earned ~11 months ago)
+    { id: 't3', customerId: 'c1', type: 'earn', points: 150, description: 'Earned from booking AWP-0821 (Expiring soon!)', createdAt: new Date(Date.now() - 335 * 24 * 60 * 60 * 1000).toISOString() },
+    { id: 't4', customerId: 'c2', type: 'earn', points: 90, description: 'Earned from booking AWP-0905 (Expiring soon!)', createdAt: new Date(Date.now() - 340 * 24 * 60 * 60 * 1000).toISOString() }
   ]);
 
   const [promotions, setPromotions] = useState<Promotion[]>([
