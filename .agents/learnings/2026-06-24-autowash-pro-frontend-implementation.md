@@ -128,3 +128,20 @@
 
 ## Technical Decisions & Trade-offs
 - **Localized Task Context**: Placing the assignments and breakdowns directly into the specification files ensures developers have immediate access to their tasks and pairing partners when viewing the requirements.
+
+---
+
+# Development Journal: AutoWash Pro Dockerization of Front-end Environment
+
+- **Date**: 2026-06-26
+- **Author**: Agent (Antigravity) - Duc Anh (Planner / Reviewer)
+- **Story/Feature Reference**: Local Environment Setup
+
+## Summary of Changes
+- Created a development [Dockerfile](file:///d:/demoSWP/Vehicles-washing-G4-5/Front-end/Dockerfile) for the Front-end React/Vite application utilizing Node 20-alpine.
+- Created [.dockerignore](file:///d:/demoSWP/Vehicles-washing-G4-5/Front-end/.dockerignore) to prevent unnecessary files (node_modules, dist) from being copied into the image.
+- Updated the root [docker-compose.yml](file:///d:/demoSWP/Vehicles-washing-G4-5/docker-compose.yml) to add the `frontend` service running on port `3000` with volume mounts for live syncing/hot reloading.
+
+## Technical Decisions & Trade-offs
+- **Legacy Peer Deps**: Configured the Dockerfile to run `npm install --legacy-peer-deps` to bypass local ERESOLVE dependency errors caused by Vite 8 vs React plugin conflicts.
+- **Anonymous node_modules Volume**: Mounted `/app/node_modules` inside the container to prevent local host `node_modules` (if existing or missing) from overriding container-specific packages.

@@ -12,6 +12,19 @@ services:
       - mssql-data:/var/opt/mssql
     restart: always
 
+  frontend:
+    build:
+      context: ./Front-end
+      dockerfile: Dockerfile
+    container_name: autowash-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./Front-end:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+
 volumes:
   mssql-data:
     driver: local

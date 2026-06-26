@@ -25,6 +25,7 @@ Tài liệu này chứa các quy định chung của dự án, bộ quy tắc ph
     *   *Nhật ký chi tiết*: Xem tại [2026-06-24-brainstorm-backend-rules.md](file:///d:/demoSWP/Vehicles-washing-G4-5/.agents/learnings/2026-06-24-brainstorm-backend-rules.md).
 
 ### Front-end (FE)
+*   **2026-06-26**: Cập nhật bản mô phỏng giao diện Đăng nhập và Đăng ký trên Stitch (Customer Authentication - Interactive Portal) với các tương tác tab chạy bằng JS.
 *   **2026-06-26**: Tạo hướng dẫn generative code (AI prompting guide) cho cả FE và BE.
     *   *Chi tiết*: Xem tại [generative_code_guide.md](file:///d:/demoSWP/Vehicles-washing-G4-5/generative_code_guide.md).
     *   *Nhật ký chi tiết*: Xem tại [2026-06-26-generative-code-guide.md](file:///d:/demoSWP/Vehicles-washing-G4-5/.agents/learnings/2026-06-26-generative-code-guide.md).
