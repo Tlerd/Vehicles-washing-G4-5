@@ -1,0 +1,157 @@
+.container {
+  padding: 24px 0;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0 0 24px;
+}
+
+.sectionLabel {
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.calendar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.dayCard {
+  min-width: 72px;
+  padding: 14px 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #ffffff;
+  flex-shrink: 0;
+}
+
+.dayCard:hover {
+  border-color: #bae6fd;
+}
+
+.dayCardSelected {
+  border-color: #0ea5e9;
+  background: #0ea5e9;
+}
+
+.dayName {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.dayCardSelected .dayName {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.dayNum {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.dayCardSelected .dayNum {
+  color: #ffffff;
+}
+
+.dayMonth {
+  font-size: 10px;
+  color: #94a3b8;
+  display: block;
+}
+
+.dayCardSelected .dayMonth {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.todayBadge {
+  font-size: 9px;
+  background: #dcfce7;
+  color: #16a34a;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+.dayCardSelected .todayBadge {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+.timeGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+
+.timeSlot {
+  padding: 10px 8px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #ffffff;
+  color: #334155;
+  font-family: 'Inter', sans-serif;
+}
+
+.timeSlot:hover:not(.timeSlotDisabled) {
+  border-color: #0ea5e9;
+  background: #f0f9ff;
+}
+
+.timeSlotSelected {
+  background: #0ea5e9;
+  border-color: #0ea5e9;
+  color: #ffffff;
+}
+
+.timeSlotDisabled {
+  background: #f8fafc;
+  color: #cbd5e1;
+  cursor: not-allowed;
+  border-color: #f1f5f9;
+}
+
+.noDate {
+  text-align: center;
+  padding: 32px;
+  color: #94a3b8;
+  font-size: 14px;
+  background: #f8fafc;
+  border-radius: 10px;
+}
+
+@media (max-width: 640px) {
+  .timeGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

@@ -1,0 +1,71 @@
+import React, { createContext, useContext, useState, useCallback } from 'react';
+import { Customer } from '../types';
+import { authService } from '../services/customer/auth.service';
+
+interface AuthContextType {
+  currentUser: Customer | null;
+  isAuthenticated: boolean;
+  isAdmin: boolean;
+  isGuest: boolean;
+  login: (phone: string, password: string) => { success: boolean; error?: string };
+  register: (name: string, phone: string, email: string, password: string) => { success: boolean; error?: string };
+  loginAsGuest: () => void;
+  logout: () => void;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState<Customer | null>(null);
+
+  const login = useCallback((phone: string, password: string) => {
+    const result = authService.login(phone, password);
+    if (result.success && result.customer) {
+      setCurrentUser(result.customer);
+      return { success: true };
+    }
+    return { success: false, error: result.error };
+  }, []);
+
+  const register = useCallback((name: string, phone: string, email: string, password: string) => {
+    const result = authService.register(name, phone, email, password);
+    if (result.success && result.customer) {
+      setCurrentUser(result.customer);
+      return { success: true };
+    }
+    return { success: false, error: result.error };
+  }, []);
+
+  const loginAsGuest = useCallback(() => {
+    const guest = authService.loginAsGuest();
+    setCurrentUser(guest);
+  }, []);
+
+  const logout = useCallback(() => {
+    setCurrentUser(null);
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('session');
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{
+      currentUser,
+      isAuthenticated: currentUser !== null,
+      isAdmin: currentUser?.role === 'ADMIN',
+      isGuest: currentUser?.id === 'guest',
+      login,
+      register,
+      loginAsGuest,
+      logout,
+    }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error('useAuth must be used within AuthProvider');
+  return context;
+};
