@@ -8,8 +8,8 @@ export const StepBranch: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <h3 className={styles.title}>Chọn chi nhánh</h3>
-      <p className={styles.subtitle}>Chọn địa điểm gần nhất để đặt lịch</p>
+      <h3 className={styles.title}>Select branch</h3>
+      <p className={styles.subtitle}>Choose the nearest location for your booking</p>
 
       <div className={styles.grid}>
         {BRANCHES.map(branch => (

@@ -6,20 +6,22 @@ import { priceService } from './price.service';
 export const bookingService = {
   createBooking(draft: BookingDraft, customerId: string): Booking {
     if (!draft.branchId || !draft.date || !draft.time) {
-      throw new Error('Thiếu thông tin đặt lịch bắt buộc');
+      throw new Error('Missing required booking information');
     }
 
     const totalPrice = priceService.calculateFinalPrice(draft.selectedServices, draft.carSize);
     
-    let tierMultiplier = 1.0;
+    let pointsEarned = 0;
     if (customerId !== 'guest') {
+      let tierMultiplier = 1.0;
       const customer = mockStore.getCustomerById(customerId);
       if (customer) {
         const tierDef = LOYALTY_TIERS.find(t => t.name === customer.tier);
         if (tierDef) tierMultiplier = tierDef.multiplier;
       }
+      pointsEarned = Math.floor((totalPrice / 1000) * tierMultiplier);
     }
-    const pointsEarned = Math.floor((totalPrice / 1000) * tierMultiplier);
+    
     const bookingRef = `AWP-${Math.floor(2000 + Math.random() * 8000)}`;
 
     const booking: Booking = {
@@ -78,19 +80,19 @@ export const bookingService = {
   validateBooking(draft: BookingDraft): { valid: boolean; errors: string[] } {
     const errors: string[] = [];
     
-    if (!draft.carSize) errors.push('Vui lòng chọn loại xe');
-    if (draft.selectedServices.length === 0) errors.push('Vui lòng chọn ít nhất một dịch vụ');
-    if (!draft.branchId) errors.push('Vui lòng chọn chi nhánh');
-    if (!draft.date) errors.push('Vui lòng chọn ngày');
-    if (!draft.time) errors.push('Vui lòng chọn khung giờ');
+    if (!draft.carSize) errors.push('Please select a vehicle type');
+    if (draft.selectedServices.length === 0) errors.push('Please select at least one service');
+    if (!draft.branchId) errors.push('Please select a branch');
+    if (!draft.date) errors.push('Please select a date');
+    if (!draft.time) errors.push('Please select a time slot');
 
     return { valid: errors.length === 0, errors };
   },
 
   getNextSevenDays(): { date: string; dayName: string; dayNum: number; monthName: string; isToday: boolean }[] {
     const days = [];
-    const dayNames = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-    const monthNames = ['Th1', 'Th2', 'Th3', 'Th4', 'Th5', 'Th6', 'Th7', 'Th8', 'Th9', 'Th10', 'Th11', 'Th12'];
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     
     for (let i = 0; i < 7; i++) {
       const d = new Date();

@@ -17,7 +17,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ customer }) => {
       <div className={styles.email}>{customer.email || customer.phone}</div>
       <div className={styles.tierBadge}>{customer.tier}</div>
       <div className={styles.memberSince}>
-        Thành viên từ {formatDate(customer.createdAt)}
+        Member since {formatDate(customer.createdAt)}
       </div>
     </div>
   );

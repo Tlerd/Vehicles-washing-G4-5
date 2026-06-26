@@ -32,11 +32,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
       {/* Welcome Banner */}
       <div className={styles.welcomeBanner}>
         <div className={styles.welcomeText}>
-          <h2>Chào mừng trở lại, {currentUser?.name || 'Khách'}! 👋</h2>
-          <p>Xế yêu của bạn xứng đáng được chăm sóc tốt nhất. Đặt lịch rửa xe ngay hôm nay.</p>
+          <h2>Welcome back, {currentUser?.name || 'Guest'}! 👋</h2>
+          <p>Your beloved car deserves the best care. Book a wash today.</p>
         </div>
         <button className={styles.welcomeAction} onClick={() => onNavigate('booking')}>
-          📅 Đặt lịch ngay
+          📅 Book now
         </button>
       </div>
 
@@ -56,9 +56,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
         {/* Recent Bookings */}
         <div className={`${styles.section} ${styles.sectionFull}`}>
           <div className={styles.sectionHeader}>
-            <h3 className={styles.sectionTitle}>📋 Đặt lịch gần đây</h3>
+            <h3 className={styles.sectionTitle}>📋 Recent Bookings</h3>
             <button className={styles.sectionAction} onClick={() => onNavigate('history')}>
-              Xem tất cả →
+              View all →
             </button>
           </div>
           <div className={styles.sectionBody}>
@@ -69,7 +69,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
         {/* Promotions */}
         <div className={styles.section}>
           <div className={styles.sectionHeader}>
-            <h3 className={styles.sectionTitle}>🎉 Khuyến mãi</h3>
+            <h3 className={styles.sectionTitle}>🎉 Promotions</h3>
           </div>
           <div className={styles.sectionBody}>
             <PromotionDisplay />
@@ -79,9 +79,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
         {/* Points History */}
         <div className={styles.section}>
           <div className={styles.sectionHeader}>
-            <h3 className={styles.sectionTitle}>⭐ Hoạt động điểm thưởng</h3>
+            <h3 className={styles.sectionTitle}>⭐ Points Activity</h3>
             <button className={styles.sectionAction} onClick={() => onNavigate('points')}>
-              Xem tất cả →
+              View all →
             </button>
           </div>
           <div className={styles.sectionBody}>

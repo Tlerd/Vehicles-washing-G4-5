@@ -1,9 +1,9 @@
-import { Booking, Customer, Vehicle, PointsTransaction, Promotion } from '../types';
+import { Booking, Customer, Vehicle, PointsTransaction } from '../types';
 
 const mockCustomers: Customer[] = [
-  { id: 'c1', name: 'John Doe', phone: '0901234567', email: 'john@example.com', role: 'CUSTOMER', tier: 'Gold', accumulatedPoints: 2450, totalSpend: 7500000, createdAt: '2026-01-10T12:00:00Z' },
-  { id: 'c2', name: 'Bob Marvin', phone: '0912345678', email: 'bob@example.com', role: 'CUSTOMER', tier: 'Silver', accumulatedPoints: 800, totalSpend: 2800000, createdAt: '2026-02-15T12:00:00Z' },
-  { id: 'c3', name: 'Alice Cooper', phone: '0907654321', email: 'alice@example.com', role: 'CUSTOMER', tier: 'Platinum', accumulatedPoints: 4200, totalSpend: 16500000, createdAt: '2026-03-10T12:00:00Z' },
+  { id: 'c1', name: 'John Doe', phone: '0901234567', email: 'john@example.com', tier: 'Gold', accumulatedPoints: 2450, totalSpend: 7500000, createdAt: '2026-01-10T12:00:00Z' },
+  { id: 'c2', name: 'Bob Marvin', phone: '0912345678', email: 'bob@example.com', tier: 'Silver', accumulatedPoints: 800, totalSpend: 2800000, createdAt: '2026-02-15T12:00:00Z' },
+  { id: 'c3', name: 'Alice Cooper', phone: '0907654321', email: 'alice@example.com', tier: 'Platinum', accumulatedPoints: 4200, totalSpend: 16500000, createdAt: '2026-03-10T12:00:00Z' },
 ];
 
 const mockVehicles: Vehicle[] = [
@@ -15,30 +15,12 @@ const mockVehicles: Vehicle[] = [
 
 const today = new Date().toISOString().split('T')[0];
 
-const mockBookings: Booking[] = Array.from({ length: 24 }, (_, index) => {
-  const customer = mockCustomers[index % mockCustomers.length];
-  const customerVehicles = mockVehicles.filter(vehicle => vehicle.customerId === customer.id);
-  const vehicle = customerVehicles[index % customerVehicles.length] ?? mockVehicles[0];
-  const statuses: Booking['status'][] = ['PENDING', 'CONFIRMED', 'CHECKED_IN', 'COMPLETED', 'CANCELLED'];
-  const services = index % 3 === 0 ? ['s1', 's7'] : index % 3 === 1 ? ['s2'] : ['s3'];
-  const timeHour = 8 + (index % 10);
-
-  return {
-    id: `b${index + 1}`,
-    bookingRef: `AWP-${String(1001 + index)}`,
-    customerId: customer.id,
-    vehicleId: vehicle.id,
-    services,
-    carSize: vehicle.size,
-    branchId: index % 2 === 0 ? 'D1' : 'D7',
-    date: index < 21 ? today : '2026-06-18',
-    time: `${String(timeHour).padStart(2, '0')}:${index % 2 === 0 ? '00' : '30'}`,
-    totalPrice: 180000 + index * 25000,
-    status: statuses[index % statuses.length],
-    pointsEarned: 180 + index * 25,
-    createdAt: `2026-06-${String(1 + (index % 24)).padStart(2, '0')}T${String(timeHour).padStart(2, '0')}:00:00Z`,
-  };
-});
+const mockBookings: Booking[] = [
+  { id: 'b1', bookingRef: 'AWP-1001', customerId: 'c1', vehicleId: 'v1', services: ['wc1', 'ec8'], carSize: 'sedan', branchId: 'D1', date: today, time: '09:00', totalPrice: 220000, status: 'COMPLETED', pointsEarned: 220, createdAt: '2026-06-20T09:00:00Z' },
+  { id: 'b2', bookingRef: 'AWP-1002', customerId: 'c1', vehicleId: 'v1', services: ['wc2'], carSize: 'sedan', branchId: 'D7', date: today, time: '14:00', totalPrice: 280000, status: 'CONFIRMED', pointsEarned: 280, createdAt: '2026-06-22T10:00:00Z' },
+  { id: 'b3', bookingRef: 'AWP-1003', customerId: 'c1', vehicleId: 'v2', services: ['wc3'], carSize: 'suv', branchId: 'D1', date: '2026-06-18', time: '10:00', totalPrice: 780000, status: 'COMPLETED', pointsEarned: 780, createdAt: '2026-06-18T10:00:00Z' },
+  { id: 'b4', bookingRef: 'AWP-1004', customerId: 'c2', vehicleId: 'v3', services: ['wc4', 'ic5'], carSize: 'hatchback', branchId: 'D7', date: today, time: '15:30', totalPrice: 320000, status: 'PENDING', pointsEarned: 320, createdAt: '2026-06-23T11:30:00Z' },
+];
 
 const mockTransactions: PointsTransaction[] = [
   { id: 't1', customerId: 'c1', type: 'earn', points: 220, description: 'Earned from booking AWP-1001', createdAt: '2026-06-20T09:30:00Z' },
@@ -47,41 +29,11 @@ const mockTransactions: PointsTransaction[] = [
   { id: 't4', customerId: 'c1', type: 'tier_change', points: 0, description: 'Upgraded to Gold Tier', createdAt: '2026-06-10T12:00:00Z' },
 ];
 
-const mockPromotions: Promotion[] = [
-  {
-    id: 'promo-admin-1',
-    title: 'Gold Weekday Shine',
-    description: '18% off weekday washes for Gold members returning before month end.',
-    discount: '18% OFF',
-    validUntil: '2026-07-31',
-    bgGradient: 'linear-gradient(135deg, #0b7f86, #18344f)',
-    icon: 'Sparkles',
-    targetTier: 'Gold',
-    kmMultiplier: 1.18,
-    isActive: true,
-    createdAt: '2026-06-26T09:00:00Z',
-  },
-  {
-    id: 'promo-admin-2',
-    title: 'Rain Check Recovery',
-    description: 'All members get a cleaner reset after rainy commutes.',
-    discount: '10% OFF',
-    validUntil: '2026-08-15',
-    bgGradient: 'linear-gradient(135deg, #c8553d, #f4a261)',
-    icon: 'TicketPercent',
-    targetTier: 'ALL',
-    kmMultiplier: 1.1,
-    isActive: true,
-    createdAt: '2026-06-24T09:00:00Z',
-  },
-];
-
 class MockStore {
   private customers: Customer[] = [...mockCustomers];
   private vehicles: Vehicle[] = [...mockVehicles];
   private bookings: Booking[] = [...mockBookings];
   private transactions: PointsTransaction[] = [...mockTransactions];
-  private promotions: Promotion[] = [...mockPromotions];
   private bookedSlots: Map<string, string[]> = new Map([
     [`D1_${today}`, ['09:00', '09:30', '14:00']],
     [`D7_${today}`, ['11:00', '11:30', '15:00', '15:30']],
@@ -100,26 +52,9 @@ class MockStore {
     this.customers.push(customer);
   }
 
-  getCustomers(): Customer[] {
-    return [...this.customers];
-  }
-
-  updateCustomer(id: string, updates: Pick<Customer, 'name' | 'phone' | 'email'>): Customer | null {
-    const customer = this.customers.find(c => c.id === id);
-    if (!customer) return null;
-
-    const updatedCustomer = { ...customer, ...updates };
-    this.customers = this.customers.map(c => (c.id === id ? updatedCustomer : c));
-    return updatedCustomer;
-  }
-
   // Vehicles
   getVehiclesByCustomer(customerId: string): Vehicle[] {
     return this.vehicles.filter(v => v.customerId === customerId);
-  }
-
-  getVehicles(): Vehicle[] {
-    return [...this.vehicles];
   }
 
   addVehicle(vehicle: Vehicle): void {
@@ -137,10 +72,6 @@ class MockStore {
   // Bookings
   getBookingsByCustomer(customerId: string): Booking[] {
     return this.bookings.filter(b => b.customerId === customerId).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  }
-
-  getBookings(): Booking[] {
-    return [...this.bookings];
   }
 
   addBooking(booking: Booking): void {
@@ -161,21 +92,8 @@ class MockStore {
     return this.transactions.filter(t => t.customerId === customerId).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
-  getTransactions(): PointsTransaction[] {
-    return [...this.transactions];
-  }
-
   addTransaction(transaction: PointsTransaction): void {
     this.transactions.push(transaction);
-  }
-
-  // Promotions
-  getPromotions(): Promotion[] {
-    return [...this.promotions];
-  }
-
-  addPromotion(promotion: Promotion): void {
-    this.promotions = [promotion, ...this.promotions];
   }
 
   // Update customer points
