@@ -42,8 +42,9 @@ Tài liệu này chứa các quy định chung của dự án, bộ quy tắc ph
 *   **Quy tắc đọc hiểu và ghi nhận log**:
     *   Khi lấy code hoặc tham chiếu logic từ phần việc của thành viên khác, Agent phải đọc tệp nguồn và file log của thành viên đó để hiểu đầy đủ ngữ cảnh.
     *   Tuyệt đối **KHÔNG ghi đè hoặc chỉnh sửa** vào tệp log của người khác. Lập trình viên nào thì chỉ ghi nhật ký vào tệp log mang tên người đó.
-*   **Quy định xóa sạch Front-end (FE) để tái thiết kế/rebuild**:
-    *   **CHÚ Ý QUAN TRỌNG**: Ở phiên tiếp theo bắt đầu viết code Front-end, Agent bắt buộc phải **xóa sạch toàn bộ thư mục/tệp tin Front-end hiện có** (trừ các file cấu hình quan trọng nếu cần) để xây dựng và biên dịch lại giao diện FE hoàn toàn mới từ đầu nhằm tránh xung đột code cũ.
+*   **Quy định kiểm tra và sửa lỗi Front-end (FE)**:
+    *   **Tự động kiểm tra**: Khi bắt đầu phiên làm việc hoặc sau khi sinh/chỉnh sửa code FE, Agent phải tự động kiểm tra xem ứng dụng có chạy ổn định, biên dịch thành công hay không (chạy thử lệnh build/compile hoặc kiểm tra kiểu TypeScript).
+    *   **Xử lý khi có lỗi**: Tuyệt đối **KHÔNG** xóa sạch toàn bộ thư mục Front-end. Nếu gặp lỗi hoặc code không chạy ổn, Agent phải lập tức kích hoạt skill [systematic-debugging](file:///d:/demoSWP/Vehicles-washing-G4-5/.agents/skills/systematic-debugging/SKILL.md) (hoặc các skill debug liên quan), phân tích nhật ký lỗi (logs/terminal output) để tìm nguyên nhân gốc rễ và tiến hành sửa lỗi một cách chọn lọc và cục bộ.
 
 ---
 
