@@ -1,40 +1,47 @@
 .statsRow {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: 14px;
 }
 
 .statCard {
   background: #ffffff;
-  border-radius: 12px;
-  padding: 20px;
-  border: 1px solid #f1f5f9;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border-radius: 14px;
+  padding: 18px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
   transition: all 0.25s ease;
 }
 
 .statCard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.07);
 }
 
 .statIcon {
-  font-size: 28px;
-  margin-bottom: 8px;
-  display: block;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #f0f9ff;
+  color: #0284c7;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  margin-bottom: 12px;
 }
 
 .statValue {
-  font-size: 24px;
-  font-weight: 800;
+  font-size: 23px;
+  font-weight: 900;
   color: #0f172a;
   display: block;
 }
 
 .statLabel {
-  font-size: 12px;
+  font-size: 11px;
   color: #64748b;
-  font-weight: 500;
+  font-weight: 800;
+  text-transform: uppercase;
   margin-top: 2px;
   display: block;
 }

@@ -54,7 +54,7 @@ export const LoginPage: React.FC = () => {
           <h1 className={styles.logoTitle}>
             AutoWash <span className={styles.logoHighlight}>PRO</span>
           </h1>
-          <p className={styles.logoSub}>Premium Car Wash Booking System</p>
+          <p className={styles.logoSub}>Customer, Admin, and Counter Portal</p>
         </div>
 
         <div className={styles.card}>
@@ -81,9 +81,9 @@ export const LoginPage: React.FC = () => {
           {activeTab === 'login' && (
             <form className={styles.form} onSubmit={handleLogin}>
               <Input
-                label="Phone number"
-                type="tel"
-                placeholder="Phone number"
+                label="Phone number or username"
+                type="text"
+                placeholder="customer, admin, or counter"
                 value={loginPhone}
                 onChange={e => setLoginPhone(e.target.value)}
               />

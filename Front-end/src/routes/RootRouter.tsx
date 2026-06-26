@@ -7,6 +7,7 @@ import { UnauthorizedPage } from './UnauthorizedPage';
 import { LandingPage } from '../features/customer/pages/LandingPage';
 import { LoginPage } from '../features/customer/pages/LoginPage';
 import { useAuth } from '../context/AuthContext';
+import { WashingCounterPage } from '../pages/washing-counter/WashingCounterPage';
 
 const RootRedirect = () => {
   const { isAuthenticated, role } = useAuth();
@@ -14,6 +15,7 @@ const RootRedirect = () => {
   if (!isAuthenticated) return <Navigate to="/landing" replace />;
   
   if (role === 'ADMIN') return <Navigate to="/admin" replace />;
+  if (role === 'COUNTER') return <Navigate to="/counter" replace />;
   return <Navigate to="/app" replace />;
 };
 
@@ -26,6 +28,7 @@ export const RootRouter: React.FC = () => {
         {/* Public Routes */}
         <Route path="/landing" element={<LandingPage onNavigateToAuth={() => { window.location.href = '/login'; }} />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/counter-login" element={<Navigate to="/login" replace />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
         
         {/* Protected Customer Routes */}
@@ -46,6 +49,16 @@ export const RootRouter: React.FC = () => {
                 <AdminRouter />
              </ProtectedRoute>
            } 
+        />
+
+        {/* Protected Counter Route */}
+        <Route
+           path="/counter/*"
+           element={
+             <ProtectedRoute allowedRoles={['COUNTER']}>
+                <WashingCounterPage />
+             </ProtectedRoute>
+           }
         />
         
         {/* Fallback */}

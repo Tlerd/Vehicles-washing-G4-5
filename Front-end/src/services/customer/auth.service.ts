@@ -29,7 +29,7 @@ export const authService = {
     try {
       const response = await apiClient.post<AuthResponse>('/auth/login', { phone, password });
       const { token, customer } = normalizeAuthResponse(response.data);
-      return { success: true, customer, token };
+      return { success: Boolean(customer), customer, token };
     } catch (error: any) {
       return { success: false, customer: null, error: getApiMessage(error, 'Invalid login credentials') };
     }

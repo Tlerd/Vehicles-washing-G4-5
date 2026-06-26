@@ -15,10 +15,10 @@ export const AdminRouter: React.FC = () => {
 
   const renderPage = () => {
     switch (activePage) {
-      case 'customers': return <AdminCustomerRegistryPage onBackToCustomerPortal={() => { window.location.href = '/'; }} />;
+      case 'customers': return <AdminCustomerRegistryPage />;
       case 'campaigns': return <CampaignBuilderPanel />;
       case 'revenue': return <RevenueAuditPanel bookings={mockStore.getBookings()} transactions={mockStore.getTransactions()} getCustomerName={(id) => mockStore.getCustomerById(id)?.name || 'Unknown'} />;
-      default: return <AdminCustomerRegistryPage onBackToCustomerPortal={() => { window.location.href = '/'; }} />;
+      default: return <AdminCustomerRegistryPage />;
     }
   };
 
