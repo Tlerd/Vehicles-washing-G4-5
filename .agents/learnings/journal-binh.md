@@ -87,3 +87,47 @@ Triển khai nhiệm vụ **Code chính** của Bình cho FR-001 và FR-002:
 - **Phat**: Review login API (Phat lead trên plan)
 - **FR-003**: Vehicle CRUD Service — Bình code chính
 - Tạo nhánh `feat/fr-001-auth` và PR cho Anh review
+
+---
+
+## Phiên 2026-06-27 — Xác nhận danh tính & nắm bắt lại dự án
+
+- **Date**: 2026-06-27
+- **Author**: Bình (ooobinh)
+- **Agent**: Cursor
+
+### Summary
+- Xác nhận lại danh tính: **Bình**, GitHub **ooobinh**.
+- Đọc lại `AGENTS.md`, `README.md`, `progress_tracker.md`, bộ skills `.agents/skills/`.
+- Trạng thái mới nhất: FE ~90% (Mock Data), BE ~30% (Auth xong), chưa tích hợp FE↔BE.
+
+### Next Steps
+- FR-003 Vehicle CRUD (BE) — nhiệm vụ chính của Bình.
+- FR-004 Booking API (BE).
+- PR `feat/fr-001-auth` cho Anh review.
+
+---
+
+## Phiên 2026-06-27 — Sửa compliance BE (Binh / ooobinh)
+
+- **Date**: 2026-06-27
+- **Author**: Bình (ooobinh)
+- **Agent**: Cursor
+- **Reference**: `.agents/learnings/backend_compliance_checklist.md`
+
+### Summary
+Sửa mã Back-end của Bình cho đúng quy chuẩn AGENTS.md theo checklist compliance:
+
+- Thêm **MapStruct** vào `pom.xml` (+ lombok-mapstruct-binding).
+- Chuyển `CustomerMapper` từ class thủ công sang **MapStruct interface**.
+- Tạo **`AuthMapper`** (MapStruct) — thay mapping thủ công trong `AuthServiceImpl`.
+- `CustomerController`: `@Valid`, `ResponseEntity`, `201 Created` / `204 No Content`.
+- `CustomerRequest` + Auth DTOs: validation Jakarta + message tiếng Việt + `@Schema`.
+- `CustomerServiceImpl`: inject `CustomerMapper`, dùng `ResourceNotFoundException`.
+
+### Verification
+- `mvn clean compile -DskipTests` — **PASS**
+
+### Next Steps
+- Tạo nhánh `feat/fr-001-auth` và gửi PR cho Anh review.
+- Tiếp tục FR-003 Vehicle CRUD API.

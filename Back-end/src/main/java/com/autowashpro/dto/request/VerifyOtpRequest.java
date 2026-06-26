@@ -11,13 +11,13 @@ import lombok.Setter;
 @Setter
 public class VerifyOtpRequest {
 
-    @NotBlank
+    @NotBlank(message = "Số điện thoại không được để trống")
     @Schema(description = "Phone number in E.164 format", example = "+84901234567")
     private String phoneNumber;
 
-    @NotBlank
-    @Size(min = 6, max = 6)
-    @Pattern(regexp = "^[0-9]{6}$")
+    @NotBlank(message = "Mã OTP không được để trống")
+    @Size(min = 6, max = 6, message = "Mã OTP phải gồm 6 chữ số")
+    @Pattern(regexp = "^[0-9]{6}$", message = "Mã OTP phải gồm 6 chữ số")
     @Schema(description = "Six-digit OTP code", example = "123456")
     private String code;
 }
