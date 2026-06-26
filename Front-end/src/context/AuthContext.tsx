@@ -6,8 +6,8 @@ interface AuthContextType {
   currentUser: Customer | null;
   isAuthenticated: boolean;
   isGuest: boolean;
-  login: (phone: string, password: string) => { success: boolean; error?: string };
-  register: (name: string, phone: string, email: string, password: string) => { success: boolean; error?: string };
+  login: (phone: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  register: (name: string, phone: string, email: string, password: string, firebaseToken: string) => Promise<{ success: boolean; error?: string }>;
   loginAsGuest: () => void;
   logout: () => void;
 }
@@ -17,26 +17,33 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<Customer | null>(null);
 
-  const login = useCallback((phone: string, password: string) => {
-    const result = authService.login(phone, password);
+  const login = useCallback(async (phone: string, password: string) => {
+    const result = await authService.login(phone, password);
     if (result.success && result.customer) {
       setCurrentUser(result.customer);
-      // Simulate JWT token storage
-      const token = `mock_jwt_token_${result.customer.id}_${Date.now()}`;
-      localStorage.setItem('auth_token', token);
+      if (result.token) {
+        localStorage.setItem('auth_token', result.token);
+      }
       localStorage.setItem('user', JSON.stringify(result.customer));
       return { success: true };
     }
     return { success: false, error: result.error };
   }, []);
 
-  const register = useCallback((name: string, phone: string, email: string, password: string) => {
-    const result = authService.register(name, phone, email, password);
+  const register = useCallback(async (name: string, phone: string, email: string, password: string, firebaseToken: string) => {
+    const result = await authService.register(name, phone, email, password, firebaseToken);
     if (result.success && result.customer) {
+      // Auto-login after successful registration to retrieve real JWT token
+      const loginResult = await authService.login(phone, password);
+      if (loginResult.success && loginResult.customer) {
+        setCurrentUser(loginResult.customer);
+        if (loginResult.token) {
+          localStorage.setItem('auth_token', loginResult.token);
+        }
+        localStorage.setItem('user', JSON.stringify(loginResult.customer));
+        return { success: true };
+      }
       setCurrentUser(result.customer);
-      // Simulate JWT token storage
-      const token = `mock_jwt_token_${result.customer.id}_${Date.now()}`;
-      localStorage.setItem('auth_token', token);
       localStorage.setItem('user', JSON.stringify(result.customer));
       return { success: true };
     }

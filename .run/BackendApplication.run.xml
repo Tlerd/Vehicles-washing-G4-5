@@ -1,0 +1,22 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="BackendApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" activateToolWindowBeforeRun="false" nameIsGenerated="true">
+    <envs>
+      <env name="TWILIO_ACCOUNT_SID" value="AC77f6f35986ae06c8def152ad98f46277" />
+      <env name="TWILIO_AUTH_TOKEN" value="788711ab8e4de0cdc8c7135900af5c8d" />
+      <env name="TWILIO_PHONE_NUMBER" value="+14245071441" />
+    </envs>
+    <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UnknownPolicyInFreeMode" />
+    <option name="INCLUDE_PROVIDED_SCOPE" value="false" />
+    <module name="backend" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.autowashpro.BackendApplication" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="com.autowashpro.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

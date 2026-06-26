@@ -17,7 +17,7 @@ Báo cáo tiến độ chi tiết của cả hai phần Front-end (FE) và Back-
 
 | FR ID | Chức năng chi tiết | Trạng thái Front-end (FE) | Trạng thái Back-end (BE) | Trạng thái Tích hợp |
 | :--- | :--- | :--- | :--- | :--- |
-| **FR-001** | Đăng ký & Xác thực OTP | **Hoàn thành** (Form nhập + Gửi mock OTP) | **Hoàn thành 90%** (Mock OTP qua console log, chưa gắn Twilio SMS) | Chưa tích hợp |
+| **FR-001** | Đăng ký & Xác thực OTP | **Hoàn thành** (Form nhập + Gửi mock OTP) | **Hoàn thành** (Tích hợp Twilio SMS gửi mã OTP thực tế) | Chưa tích hợp |
 | **FR-002** | Đăng nhập & Quản lý phiên | **Hoàn thành** (Giao diện Member/Guest + Axios config) | **Hoàn thành** (BCrypt + Sinh JWT + filter bảo mật) | Chưa tích hợp |
 | **FR-003** | Quản lý phương tiện CRUD | **Hoàn thành** (Giao diện CRUD + Modal Thêm Xe) | **Chưa bắt đầu** (Đã có Entity/Repo, chưa có Service/Controller) | Chưa tích hợp |
 | **FR-004** | Luồng đặt lịch 6 bước | **Hoàn thành** (Stepper 6 bước hoàn chỉnh) | **Chưa bắt đầu** (Đã có Entity/Repo, chưa có Service/Controller) | Chưa tích hợp |

@@ -17,6 +17,8 @@ Tài liệu này chứa các quy định chung của dự án, bộ quy tắc ph
 ## 2. NHẬT KÝ CẬP NHẬT DỰ ÁN (PROJECT UPDATE LOG)
 
 ### Back-end (BE)
+*   **2026-06-27**: Tích hợp Firebase Phone Authentication thay thế cho Twilio SMS OTP & Dọn dẹp Schema Database.
+    *   *Nhật ký chi tiết*: Xem tại [2026-06-24-autowash-pro-frontend-implementation.md](file:///d:/demoSWP/Vehicles-washing-G4-5/.agents/learnings/2026-06-24-autowash-pro-frontend-implementation.md).
 *   **2026-06-26**: Tạo hướng dẫn generative code (AI prompting guide) cho cả FE và BE.
     *   *Chi tiết*: Xem tại [generative_code_guide.md](file:///d:/demoSWP/Vehicles-washing-G4-5/generative_code_guide.md).
     *   *Nhật ký chi tiết*: Xem tại [2026-06-26-generative-code-guide.md](file:///d:/demoSWP/Vehicles-washing-G4-5/.agents/learnings/2026-06-26-generative-code-guide.md).
@@ -25,6 +27,8 @@ Tài liệu này chứa các quy định chung của dự án, bộ quy tắc ph
     *   *Nhật ký chi tiết*: Xem tại [2026-06-24-brainstorm-backend-rules.md](file:///d:/demoSWP/Vehicles-washing-G4-5/.agents/learnings/2026-06-24-brainstorm-backend-rules.md).
 
 ### Front-end (FE)
+*   **2026-06-27**: Tích hợp Firebase Client SDK để gửi SMS OTP và xác thực số điện thoại, sửa lỗi biên dịch Vite client.
+    *   *Nhật ký chi tiết*: Xem tại [2026-06-24-autowash-pro-frontend-implementation.md](file:///d:/demoSWP/Vehicles-washing-G4-5/.agents/learnings/2026-06-24-autowash-pro-frontend-implementation.md).
 *   **2026-06-26**: Cập nhật bản mô phỏng giao diện Đăng nhập và Đăng ký trên Stitch (Customer Authentication - Interactive Portal) với các tương tác tab chạy bằng JS.
 *   **2026-06-26**: Tạo hướng dẫn generative code (AI prompting guide) cho cả FE và BE.
     *   *Chi tiết*: Xem tại [generative_code_guide.md](file:///d:/demoSWP/Vehicles-washing-G4-5/generative_code_guide.md).
@@ -192,7 +196,7 @@ com.example.project
 Để đảm bảo sự đồng bộ trên cả 6 máy của nhóm phát triển, thông tin cấu hình kết nối SQL Server local bắt buộc phải tuân theo:
 *   **Cổng kết nối**: `1433`
 *   **Tài khoản đăng nhập**: `sa`
-*   **Mật khẩu**: `123456`
+*   **Mật khẩu**: `AutoWash@123456`
 *   **Tên database**: `autowash_pro`
 
 ### 7.3. Quy trình Thiết lập Môi trường Database của Agent
@@ -207,6 +211,6 @@ Khi bắt đầu phiên làm việc thiết lập môi trường hoặc khi lậ
     *   Xác nhận container `autowash-sqlserver` đang chạy ổn định.
 3.  **Nếu Lập trình viên chọn "Không" (Tự cài đặt thủ công)**:
     *   Hướng dẫn tải cài đặt **SQL Server Developer/Express** và **SSMS**.
-    *   Yêu cầu chọn chế độ bảo mật **Mixed Mode** và đặt mật khẩu tài khoản **`sa`** là **`123456`**.
+    *   Yêu cầu chọn chế độ bảo mật **Mixed Mode** và đặt mật khẩu tài khoản **`sa`** là **`AutoWash@123456`**.
     *   Hướng dẫn cấu hình **TCP/IP** (bật Enabled trong SQL Server Configuration Manager, đặt port là **1433** cho IPAll) và restart lại service SQL Server.
 

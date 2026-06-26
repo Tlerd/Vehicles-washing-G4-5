@@ -12,8 +12,10 @@ import com.autowashpro.exception.custom.ConflictException;
 import com.autowashpro.exception.custom.UnauthorizedException;
 import com.autowashpro.repository.CustomerRepository;
 import com.autowashpro.service.AuthService;
-import com.autowashpro.service.OtpService;
 import com.autowashpro.utils.PhoneNormalizer;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,17 +27,14 @@ import java.time.LocalDateTime;
 public class AuthServiceImpl implements AuthService {
 
     private final CustomerRepository customerRepository;
-    private final OtpService otpService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
     public AuthServiceImpl(
             CustomerRepository customerRepository,
-            OtpService otpService,
             PasswordEncoder passwordEncoder,
             JwtTokenProvider jwtTokenProvider) {
         this.customerRepository = customerRepository;
-        this.otpService = otpService;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
     }
@@ -49,8 +48,22 @@ public class AuthServiceImpl implements AuthService {
             throw new ConflictException("Phone number already registered.");
         }
 
-        if (!otpService.isPhoneVerifiedForRegistration(phone)) {
-            throw new BadRequestException("Phone number must be OTP-verified before registration.");
+        try {
+            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(request.getFirebaseToken());
+            String verifiedPhone = (String) decodedToken.getClaims().get("phone_number");
+
+            if (verifiedPhone == null) {
+                throw new BadRequestException("Mã xác minh của Firebase không chứa số điện thoại.");
+            }
+
+            String requestPhone = PhoneNormalizer.toE164(phone);
+            String firebaseVerifiedPhone = PhoneNormalizer.toE164(verifiedPhone);
+
+            if (!requestPhone.equals(firebaseVerifiedPhone)) {
+                throw new BadRequestException("Số điện thoại đăng ký không trùng khớp với số điện thoại xác minh trên Firebase.");
+            }
+        } catch (FirebaseAuthException e) {
+            throw new BadRequestException("Mã xác thực Firebase đã hết hạn hoặc không hợp lệ: " + e.getMessage());
         }
 
         Customer customer = new Customer();

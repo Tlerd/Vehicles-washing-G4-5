@@ -31,3 +31,8 @@ mcp-settings.json
 # OS files
 .DS_Store
 Thumbs.db
+
+# Firebase service account credentials
+*firebase-adminsdk*.json
+firebase-service-account.json
+

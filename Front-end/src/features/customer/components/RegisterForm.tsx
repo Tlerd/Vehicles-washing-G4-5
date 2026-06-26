@@ -1,14 +1,16 @@
-import React, { FormEvent, useMemo, useState } from 'react';
+import React, { FormEvent, useMemo, useState, useEffect } from 'react';
 import { ArrowRight, Loader2, LockKeyhole, Mail, UserRound, Phone } from 'lucide-react';
 import { useCustomerRegister } from '../hooks/use-auth';
 import styles from '../styles/RegisterForm.module.css';
+import { RecaptchaVerifier } from 'firebase/auth';
+import { auth } from '../../../config/firebase-config';
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 const phonePattern = /^(0|\+84)[3|5|7|8|9][0-9]{8}$/;
 
 interface RegisterFormProps {
-  onSuccess: (email: string, expiresIn: number) => void;
+  onSuccess: (phone: string, confirmationResult: any) => void;
 }
 
 export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
@@ -18,6 +20,18 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [recaptchaVerifier, setRecaptchaVerifier] = useState<any>(null);
+
+  useEffect(() => {
+    const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+      size: 'invisible'
+    });
+    setRecaptchaVerifier(verifier);
+
+    return () => {
+      verifier.clear();
+    };
+  }, []);
 
   const fullNameError = fullName.length > 0 && fullName.trim().length === 0 ? 'Full name is required.' : null;
   const phoneError = phone.length > 0 && !phonePattern.test(phone) ? 'Invalid phone number format.' : null;
@@ -42,7 +56,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!canSubmit) return;
+    if (!canSubmit || !recaptchaVerifier) return;
     
     try {
       const response = await registerMutation.mutateAsync({
@@ -50,8 +64,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
         phone: phone.trim(),
         email: email.trim(),
         password,
+        recaptchaVerifier,
       });
-      onSuccess(response.email, response.otpExpiresIn);
+      onSuccess(response.phone, response.confirmationResult);
     } catch (err) {
       // Error handled by hook
     }
@@ -158,6 +173,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
           {registerMutation.error.message}
         </div>
       )}
+      <div id="recaptcha-container"></div>
     </form>
   );
 };

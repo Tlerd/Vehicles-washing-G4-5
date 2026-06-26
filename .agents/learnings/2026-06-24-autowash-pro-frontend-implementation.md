@@ -160,3 +160,122 @@
 
 ## Technical Decisions & Trade-offs
 - **Design Realignment**: Aligned instructions and documentation with the active Front-end codebase. The previous plan incorrectly referenced a dark glassmorphic mode that was not implemented in the actual code (which uses a default light mode with CSS Modules). Realignment avoids future agents breaking the UI layout by attempting to write Tailwind Glassmorphic classes when the project standard is CSS Modules.
+
+---
+
+# Development Journal: AutoWash Pro Twilio SMS OTP Integration
+
+- **Date**: 2026-06-27
+- **Author**: Agent (Antigravity) - Duc Anh (Planner / Reviewer)
+- **Story/Feature Reference**: [FR-001-customer-registration-otp.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/FR-001-customer-registration-otp.md)
+
+## Summary of Changes
+- Integrated official Twilio Java SDK (version `10.1.2`) into the project's dependencies in [pom.xml](file:///d:/demoSWP/Vehicles-washing-G4-5/Back-end/pom.xml).
+- Added externalized Twilio configuration options to [application.properties](file:///d:/demoSWP/Vehicles-washing-G4-5/Back-end/src/main/resources/application.properties) that load credentials dynamically from environment variables (`TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER`).
+- Created a configuration class [TwilioConfig.java](file:///d:/demoSWP/Vehicles-washing-G4-5/Back-end/src/main/java/com/autowashpro/config/TwilioConfig.java) to initialize the Twilio SDK at startup.
+- Refactored [OtpServiceImpl.java](file:///d:/demoSWP/Vehicles-washing-G4-5/Back-end/src/main/java/com/autowashpro/service/impl/OtpServiceImpl.java) to call Twilio SMS API for sending actual OTP messages to customer phones, using the returned Twilio Message SID as the verification identifier.
+
+## Technical Decisions & Trade-offs
+- **Credential Isolation**: Kept all Twilio secrets out of the codebase by routing them through Spring's environment variable resolver, maintaining repository security.
+- **Message SID Mapping**: Swapped out the local UUID stub for Twilio's Message SID. This allows the backend to reference real Twilio SMS transactions when tracking verification tokens.
+
+---
+
+# Development Journal: SQL Server Database Table Initialization Troubleshooting
+
+- **Date**: 2026-06-27
+- **Author**: Duc Anh (Planner / Reviewer)
+- **Story/Feature Reference**: [FR-001-customer-registration-otp.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/FR-001-customer-registration-otp.md)
+
+## Summary of Changes
+- Resolved a `500 Internal Server Error` on the `/api/v1/auth/send-otp` endpoint by identifying that the database schema was blank (missing `otp_tokens` and `customers` tables) while JPA `ddl-auto` was configured to `none`.
+- Troubleshot local database path errors (`D:\SQL\MSSQL16.SQLEXPRESS\MSSQL\DATA\AutoWashPro.mdf`) and syntax errors when importing `AutoWashPro.sql` into the Docker Linux environment.
+- Created and executed a PowerShell utility script to clean the UTF-16LE `AutoWashPro.sql` schema file, removing all `CREATE DATABASE` and `ALTER DATABASE` options, and replacing `AutoWashPro` database references with `autowash_pro`.
+- Wiped the existing Docker database and successfully re-imported all 10 core tables (`booking_services`, `bookings`, `branches`, `customers`, `otp_tokens`, `point_history`, `promotions`, `services`, `vehicles`, `vouchers`) into Docker SQL Server.
+
+## Technical Decisions & Trade-offs
+- **Orphan Command Cleanup**: Skipped database configuration blocks at the beginning of the SSMS-exported file by starting output generation exactly from the first `USE [AutoWashPro]` command.
+- **Wipe and Re-import**: Opted to force-disconnect active Spring Boot connections and drop the database entirely prior to importing, preventing any duplicate object conflicts or incomplete constraints.
+# Development Journal: AutoWash Pro Firebase Phone OTP Integration
+
+- **Date**: 2026-06-27
+- **Author**: Duc Anh (Planner / Reviewer)
+- **Story/Feature Reference**: [FR-001-customer-registration-otp.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/FR-001-customer-registration-otp.md)
+
+## Summary of Changes
+- **Backend & Database Refactoring**:
+  - Removed Twilio dependency from [pom.xml](file:///d:/demoSWP/Vehicles-washing-G4-5/Back-end/pom.xml).
+  - Configured Firebase configurations in [application.properties](file:///d:/demoSWP/Vehicles-washing-G4-5/Back-end/src/main/resources/application.properties) pointing to the local private key [firebase-service-account.json](file:///d:/demoSWP/Vehicles-washing-G4-5/Back-end/src/main/resources/firebase-service-account.json).
+  - Added [FirebaseConfig.java](file:///d:/demoSWP/Vehicles-washing-G4-5/Back-end/src/main/java/com/autowashpro/config/FirebaseConfig.java) to initialize the FirebaseApp bean.
+  - Added the `firebaseToken` field to DTO [RegisterRequest.java](file:///d:/demoSWP/Vehicles-washing-G4-5/Back-end/src/main/java/com/autowashpro/dto/request/RegisterRequest.java).
+  - Modified [AuthServiceImpl.java](file:///d:/demoSWP/Vehicles-washing-G4-5/Back-end/src/main/java/com/autowashpro/service/impl/AuthServiceImpl.java) to verify the ID token via Firebase Admin SDK.
+  - Removed the `/send-otp` and `/verify-otp` mappings in [AuthController.java](file:///d:/demoSWP/Vehicles-washing-G4-5/Back-end/src/main/java/com/autowashpro/controller/AuthController.java).
+  - Safely deprecated TwilioConfig and all obsolete Otp-related classes (OtpToken, OtpTokenRepository, OtpService, etc.).
+  - Removed obsolete `otp_tokens` table creation from [AutoWashPro_Fixed.sql](file:///d:/demoSWP/Vehicles-washing-G4-5/Back-end/database/AutoWashPro_Fixed.sql) and [AutoWashPro.sql](file:///d:/demoSWP/Vehicles-washing-G4-5/Back-end/database/AutoWashPro.sql).
+- **Frontend Refactoring**:
+  - Installed `"firebase"` NPM library in [package.json](file:///d:/demoSWP/Vehicles-washing-G4-5/Front-end/package.json).
+  - Configured [firebase-config.ts](file:///d:/demoSWP/Vehicles-washing-G4-5/Front-end/src/config/firebase-config.ts) with the provided credentials.
+  - Refactored [use-auth.ts](file:///d:/demoSWP/Vehicles-washing-G4-5/Front-end/src/features/customer/hooks/use-auth.ts) to handle Firebase Phone Auth API and local phone normalization (+84 prefix).
+  - Integrated RecaptchaVerifier container in [RegisterForm.tsx](file:///d:/demoSWP/Vehicles-washing-G4-5/Front-end/src/features/customer/components/RegisterForm.tsx) and updated [LoginPage.tsx](file:///d:/demoSWP/Vehicles-washing-G4-5/Front-end/src/features/customer/pages/LoginPage.tsx) and [VerifyOtpForm.tsx](file:///d:/demoSWP/Vehicles-washing-G4-5/Front-end/src/features/customer/components/VerifyOtpForm.tsx) to verify and sign up using Firebase credentials.
+  - Prepend Vite types reference in [vite-env.d.ts](file:///d:/demoSWP/Vehicles-washing-G4-5/Front-end/src/vite-env.d.ts) to resolve TS2339 compiler error on `import.meta.env`.
+
+## Technical Decisions & Trade-offs
+- **Decoupling SMS logic**: Offloaded OTP creation, expiration timer, and SMS dispatch security to Firebase Client SDK, resulting in a cleaner and simpler Spring Boot database schema (dropped the need for `otp_tokens` table).
+- **Environment Fallback Support**: Configured the frontend Firebase credentials to check `import.meta.env` values first with default stubs, facilitating offline/mock fallback testing for the team.
+
+---
+
+# Development Journal: AutoWash Pro Firebase Config Resource Injection & Database Password Sync
+
+- **Date**: 2026-06-27
+- **Author**: Duc Anh (Planner / Reviewer)
+- **Story/Feature Reference**: [FR-001-customer-registration-otp.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/FR-001-customer-registration-otp.md)
+
+## Summary of Changes
+- **Firebase Config Fix**: 
+  - Modified [FirebaseConfig.java](file:///d:/demoSWP/Vehicles-washing-G4-5/Back-end/src/main/java/com/autowashpro/config/FirebaseConfig.java) to inject `org.springframework.core.io.Resource` directly instead of parsing a `String` path using `ClassPathResource`. This fixes the crash issue when the config path in properties contains the `classpath:` prefix (e.g. `classpath:firebase-service-account.json`).
+- **Database Password Synchronization**: 
+  - Updated [AGENTS.md](file:///d:/demoSWP/Vehicles-washing-G4-5/.agents/AGENTS.md) database password guidelines from `123456` to `AutoWash@123456` to align with the actual configuration defined in [application.properties](file:///d:/demoSWP/Vehicles-washing-G4-5/Back-end/src/main/resources/application.properties) and [docker-compose.yml](file:///d:/demoSWP/Vehicles-washing-G4-5/docker-compose.yml).
+
+## Technical Decisions & Trade-offs
+- **Spring Resource Abstraction**: Injecting Spring's `Resource` interface allows Spring Boot to automatically handle protocol prefixes (like `classpath:` or `file:`) natively, making config parsing robust.
+- **Complexity Guidelines Alignment**: Kept the complex password `AutoWash@123456` because SQL Server does not permit simple passwords like `123456` in containerized environments. Updated AGENTS.md instructions to match this requirement.
+
+---
+
+# Development Journal: AutoWash Pro Customer Authentication API Connection (FR-001 & FR-002)
+
+- **Date**: 2026-06-27
+- **Author**: Duc Anh (Planner / Reviewer)
+- **Story/Feature Reference**: [FR-001-customer-registration-otp.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/FR-001-customer-registration-otp.md) and [FR-002-customer-login.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/FR-002-customer-login.md)
+
+## Summary of Changes
+- **Axios Configuration**: Updated the Axios `apiClient` in [axios.ts](file:///d:/demoSWP/Vehicles-washing-G4-5/Front-end/src/config/axios.ts) to point to `/api/v1` base URL instead of `/api`.
+- **API AuthService Connection**: Refactored the `login` and `register` methods in [auth.service.ts](file:///d:/demoSWP/Vehicles-washing-G4-5/Front-end/src/services/customer/auth.service.ts) to be asynchronous and send HTTP requests to `/auth/login` and `/auth/register` endpoints.
+- **State Management & Auto-Login**: Modified [AuthContext.tsx](file:///d:/demoSWP/Vehicles-washing-G4-5/Front-end/src/context/AuthContext.tsx) to handle async user actions, store real JWT token from Backend in `localStorage`, and added auto-login post-registration.
+- **Component Handlers Async/Await**: Refactored [LoginPage.tsx](file:///d:/demoSWP/Vehicles-washing-G4-5/Front-end/src/features/customer/pages/LoginPage.tsx) and [use-auth.ts](file:///d:/demoSWP/Vehicles-washing-G4-5/Front-end/src/features/customer/hooks/use-auth.ts) to support and await the asynchronous authentication flows.
+
+## Technical Decisions & Trade-offs
+- **Post-Registration Auto-Login**: Registering currently returns only the customer ID. We triggered a post-registration login call automatically on the Front-end using the input credentials to retrieve and store the JWT token immediately, providing a seamless signup experience.
+
+---
+
+# Development Journal: AutoWash Pro Code Audit, Security Update & Firebase Provider Fix
+
+- **Date**: 2026-06-27
+- **Author**: Duc Anh (Planner / Reviewer)
+- **Story/Feature Reference**: [FR-001-customer-registration-otp.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/FR-001-customer-registration-otp.md)
+
+## Summary of Changes
+- **Git Security Update**: 
+  - Modified [.gitignore](file:///d:/demoSWP/Vehicles-washing-G4-5/.gitignore) to ignore Firebase credentials JSON files (`*firebase-adminsdk*.json` and `firebase-service-account.json`) to prevent credentials leak to public GitHub repositories.
+- **Firebase Configuration Review**: 
+  - Analyzed the client-side error `auth/configuration-not-found` shown during ReCAPTCHA / SMS OTP verification. Isolated the issue to the **Firebase Authentication Console** where the **Phone Sign-in Provider** has not been enabled for project `washpro-116cd`.
+- **Code Clean-up Identification**: 
+  - Ran a project audit and identified 9 deprecated/blank files left over from the Twilio SMS OTP removal (such as `OtpService.java`, `OtpToken.java`, `TwilioConfig.java`, etc.). Compiled a terminal command list for the developer to execute locally for cleanup.
+
+## Technical Decisions & Trade-offs
+- **Credential Protection**: Adding credential file names directly into gitignore mitigates credential leak risks immediately, regardless of where they are placed in the codebase.
+- **Java Claims Retrieval Validation**: Confirmed that accessing `decodedToken.getClaims().get("phone_number")` in `AuthServiceImpl.java` is correct, since the Firebase Admin SDK `FirebaseToken` class lacks a direct `getPhoneNumber()` method.
+
+
