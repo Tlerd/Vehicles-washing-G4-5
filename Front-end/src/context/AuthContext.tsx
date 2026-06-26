@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { Customer } from '../types';
+import { Customer, UserRole } from '../types';
 import { authService } from '../services/customer/auth.service';
 
 interface AuthContextType {
   currentUser: Customer | null;
   isAuthenticated: boolean;
-  role: 'CUSTOMER' | 'ADMIN' | null;
+  role: UserRole | null;
   login: (phone: string, password: string) => Promise<{ success: boolean; error?: string }>;
   register: (name: string, phone: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
@@ -16,7 +16,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<Customer | null>(() => {
     const stored = localStorage.getItem('user');
-    return stored ? JSON.parse(stored) : null;
+    if (!stored) return null;
+
+    return JSON.parse(stored) as Customer;
   });
 
   const login = useCallback(async (phone: string, password: string) => {
@@ -50,6 +52,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user');
     localStorage.removeItem('session');
+    localStorage.removeItem('counter_session');
   }, []);
 
   return (

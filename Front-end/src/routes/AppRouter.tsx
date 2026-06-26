@@ -8,6 +8,7 @@ import { PointsHistory } from '../features/customer/components/PointsHistory';
 import { PromotionDisplay } from '../features/customer/components/PromotionDisplay';
 import { ProfileCard } from '../features/customer/components/ProfileCard';
 import { LoyaltyTierSection } from '../features/customer/components/LoyaltyTierSection';
+import { VoucherShop } from '../features/customer/components/VoucherShop';
 import { CustomerLayout } from '../layouts/CustomerLayout';
 import { bookingService } from '../services/customer/booking.service';
 import { mockStore } from '../services/mockStore';
@@ -18,6 +19,8 @@ type PageId = 'dashboard' | 'booking' | 'vehicles' | 'history' | 'promotions' | 
 export const AppRouter: React.FC = () => {
   const { currentUser } = useAuth();
   const [activePage, setActivePage] = useState<PageId>('dashboard');
+  const [, setRefreshKey] = useState(0);
+  const liveCustomer = currentUser ? mockStore.getCustomerById(currentUser.id) || currentUser : null;
 
   const handleNavigate = (page: string) => {
     setActivePage(page as PageId);
@@ -53,9 +56,16 @@ export const AppRouter: React.FC = () => {
       case 'points':
         return (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <LoyaltyTierSection currentTier={currentUser?.tier} currentPoints={currentUser?.accumulatedPoints} />
+            <LoyaltyTierSection currentTier={liveCustomer?.tier} currentPoints={liveCustomer?.accumulatedPoints} />
+            {liveCustomer && (
+              <VoucherShop
+                customerId={liveCustomer.id}
+                points={liveCustomer.accumulatedPoints}
+                onChanged={() => setRefreshKey(key => key + 1)}
+              />
+            )}
             <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '24px' }}>
-              {currentUser && <ProfileCard customer={currentUser} />}
+              {liveCustomer && <ProfileCard customer={liveCustomer} />}
             <div style={{
               background: '#ffffff',
               borderRadius: '12px',
@@ -67,7 +77,7 @@ export const AppRouter: React.FC = () => {
                 ⭐ Points History
               </h3>
               <PointsHistory
-                transactions={mockStore.getTransactionsByCustomer(currentUser?.id || '')}
+                transactions={mockStore.getTransactionsByCustomer(liveCustomer?.id || '')}
               />
             </div>
             </div>
