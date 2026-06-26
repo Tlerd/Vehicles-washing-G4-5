@@ -38,9 +38,9 @@ Hệ thống được chia thành 3 cổng thông tin (portals) chính tương t
 
 ## 🛠️ Công Nghệ Phát Triển (Tech Stack)
 
-### 1. Front-end (React + TS + Tailwind)
+### 1. Front-end (React + TS + CSS Modules / Tailwind)
 * **Framework**: React 18, TypeScript, Vite.
-* **Styling**: Tailwind CSS với phong cách thiết kế **Glassmorphism** cao cấp, tối ưu hóa giao diện chế độ tối (Dark Mode).
+* **Styling**: CSS Modules (Vanilla CSS) kết hợp Tailwind CSS với phong cách tối giản, hiện đại và tối ưu trên **Giao diện sáng (Light Mode)**.
 * **Thư viện icon**: Lucide React.
 * **Quản lý State**: Context API dùng chung.
 

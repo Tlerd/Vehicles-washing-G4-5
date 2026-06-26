@@ -145,3 +145,18 @@
 ## Technical Decisions & Trade-offs
 - **Legacy Peer Deps**: Configured the Dockerfile to run `npm install --legacy-peer-deps` to bypass local ERESOLVE dependency errors caused by Vite 8 vs React plugin conflicts.
 - **Anonymous node_modules Volume**: Mounted `/app/node_modules` inside the container to prevent local host `node_modules` (if existing or missing) from overriding container-specific packages.
+
+---
+
+# Development Journal: AutoWash Pro Frontend Rule & Theme Refinement
+
+- **Date**: 2026-06-26
+- **Author**: Agent (Antigravity) - Duc Anh (Planner / Reviewer)
+- **Story/Feature Reference**: Environment Setup & Guidelines Alignment
+
+## Summary of Changes
+- Updated [AGENTS.md](file:///d:/demoSWP/Vehicles-washing-G4-5/.agents/AGENTS.md) section 4.2 to replace outdated references to Tailwind Dark Mode Glassmorphism with actual Front-end specifications: **CSS Modules** (`*.module.css`) for layout encapsulation and a **Light Slate & Sky Blue theme** (`#f8fafc` background, `#0ea5e9` cyan accents).
+- Updated [README.md](file:///d:/demoSWP/Vehicles-washing-G4-5/README.md) to reflect the correct Front-end tech stack and Light Mode default interface.
+
+## Technical Decisions & Trade-offs
+- **Design Realignment**: Aligned instructions and documentation with the active Front-end codebase. The previous plan incorrectly referenced a dark glassmorphic mode that was not implemented in the actual code (which uses a default light mode with CSS Modules). Realignment avoids future agents breaking the UI layout by attempting to write Tailwind Glassmorphic classes when the project standard is CSS Modules.

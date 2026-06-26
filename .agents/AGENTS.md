@@ -76,12 +76,17 @@ src
 *   **Mock Data trước**: Thiết lập các Mock Data trong pages/components để kiểm tra giao diện trước khi kết nối API thật.
 *   **Demo Stitch trước**: Thực hiện demo giao diện bằng công cụ Stitch để thống nhất thiết kế với người dùng trước khi tiến hành viết mã nguồn (code) Front-end.
 
-### 4.2. Quy Tắc Viết Code HTML & CSS/Tailwind
-*   **Sử Sử Dụng Semantic HTML**: Bắt buộc dùng các thẻ ngữ nghĩa của HTML5 thay vì lạm dụng `<div>` lồng nhau: `<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, `<footer>`.
+### 4.2. Quy Tắc Viết Code HTML & CSS (CSS Modules & Tailwind CSS)
+*   **Sử Dụng Semantic HTML**: Bắt buộc dùng các thẻ ngữ nghĩa của HTML5 thay vì lạm dụng `<div>` lồng nhau: `<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, `<footer>`.
 *   **Cấm dùng Style nội tuyến (Inline Styles)**: Không dùng thuộc tính `style="..."` trực tiếp trên mã HTML, ngoại trừ các trường hợp giá trị cần tính toán động bằng JS (ví dụ: `style={{ width: `${progress}%` }}`).
-*   **Định nghĩa Design System trong `tailwind.config.js`**: Cấu hình các màu sắc chủ đạo (`primary`, `secondary`, `accent`, `neutral`) và font chữ chính trong file config.
-*   **Hạn chế Giá trị Tùy biến (Arbitrary Values)**: Hạn chế viết các class tự định nghĩa giá trị trực tiếp như `bg-[#1E3A8A]`, `text-[13px]`, `w-[342px]`. Sử dụng các class tiêu chuẩn dựa trên cấu hình: `bg-primary`, `text-sm`, `w-80`.
-*   **Tái sử dụng style bằng React Component**: Nếu một cụm CSS Tailwind lặp lại nhiều lần, hãy tạo một React Component chuyên biệt (như `<Button />`) thay vì copy-paste class Tailwind nhiều nơi.
+*   **Ưu tiên Sử Dụng CSS Modules**: Toàn bộ định dạng giao diện của Component nên được viết trong các tệp CSS Module (ví dụ: `[TênComponent].module.css`) để đóng gói CSS cục bộ, tránh xung đột style toàn cục.
+*   **Phong Cách Thiết Kế (Light Mode làm chủ đạo)**: 
+    *   *Màu chủ đạo (Primary)*: Sử dụng màu Xanh dương/Sky Blue làm tông màu chính (`#0ea5e9` - Sky Blue/Cyan).
+    *   *Màu nền (Background)*: Sử dụng tông sáng thanh lịch như `#f8fafc` (slate-50) hoặc gradient `#f0f9ff` ➔ `#e0f2fe`.
+    *   *Màu thẻ (Card/Container)*: Sử dụng màu nền trắng `#ffffff` với viền xám nhạt `#f1f5f9` (hoặc `#e2e8f0`) tạo cảm giác sạch sẽ, tối giản.
+    *   *Màu chữ (Typography)*: Sử dụng `#0f172a` (slate-900) cho tiêu đề chính và `#64748b` (slate-500) cho mô tả/văn bản phụ.
+*   **Giao Diện Chế Độ (Theme Mode)**: Giao diện mặc định là **Chế độ sáng (Light Mode)**. Tránh viết các class hay style tối màu kiểu Glassmorphism tối ngoại trừ khi có yêu cầu chuyển đổi rõ ràng.
+*   **Tái sử dụng style bằng React Component**: Đóng gói các cụm CSS lặp lại nhiều lần vào các Component dùng chung (như `<Button />`, `<Input />`) đặt trong thư mục `src/components/`.
 
 ### 4.3. Quy Tắc Viết JavaScript / TypeScript
 *   **Viết Code JS/TS Hiện Đại (ES6+)**: Sử dụng `const` và `let`, tuyệt đối không sử dụng `var`. Sử dụng Arrow Functions, Destructuring và Spread Operator. Sử dụng các hàm duyệt mảng ES6: `map()`, `filter()`, `reduce()`, `find()`.
