@@ -29,7 +29,7 @@ const getIconClass = (type: string, s: typeof styles): string => {
 
 export const PointsHistory: React.FC<PointsHistoryProps> = ({ transactions }) => {
   if (transactions.length === 0) {
-    return <div className={styles.empty}>Chưa có hoạt động điểm thưởng nào</div>;
+    return <div className={styles.empty}>No points activity yet</div>;
   }
 
   return (

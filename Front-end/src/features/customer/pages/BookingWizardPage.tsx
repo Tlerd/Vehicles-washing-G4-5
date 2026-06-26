@@ -7,15 +7,17 @@ import { StepServices } from '../components/StepServices';
 import { StepBranch } from '../components/StepBranch';
 import { StepDateTime } from '../components/StepDateTime';
 import { StepConfirmation } from '../components/StepConfirmation';
+import { StepPayment } from '../components/StepPayment';
 import { priceService } from '../../../services/customer/price.service';
 import styles from '../styles/BookingWizard.module.css';
 
 const STEPS = [
-  { label: 'Loại xe', icon: '🚗' },
-  { label: 'Dịch vụ', icon: '✨' },
-  { label: 'Chi nhánh', icon: '📍' },
-  { label: 'Thời gian', icon: '📅' },
-  { label: 'Xác nhận', icon: '✅' },
+  { label: 'Vehicle type', icon: '🚗' },
+  { label: 'Services', icon: '✨' },
+  { label: 'Branch', icon: '📍' },
+  { label: 'Time slot', icon: '📅' },
+  { label: 'Confirm', icon: '✅' },
+  { label: 'Payment', icon: '💳' },
 ];
 
 interface BookingWizardPageProps {
@@ -30,11 +32,12 @@ export const BookingWizardPage: React.FC<BookingWizardPageProps> = ({ onComplete
 
   const canProceed = (): boolean => {
     switch (draft.currentStep) {
-      case 1: return !!draft.carSize;
+      case 1: return !!draft.carSize || !!draft.vehicleId;
       case 2: return draft.selectedServices.length > 0;
       case 3: return !!draft.branchId;
       case 4: return !!draft.date && !!draft.time;
       case 5: return true;
+      case 6: return true;
       default: return false;
     }
   };
@@ -45,7 +48,8 @@ export const BookingWizardPage: React.FC<BookingWizardPageProps> = ({ onComplete
       case 2: return <StepServices />;
       case 3: return <StepBranch />;
       case 4: return <StepDateTime />;
-      case 5: return <StepConfirmation onSubmit={() => {}} onComplete={onComplete} />;
+      case 5: return <StepConfirmation onSubmit={nextStep} onComplete={onComplete} />;
+      case 6: return <StepPayment onComplete={onComplete} />;
       default: return null;
     }
   };
@@ -62,7 +66,7 @@ export const BookingWizardPage: React.FC<BookingWizardPageProps> = ({ onComplete
         {/* Price Preview */}
         {draft.selectedServices.length > 0 && draft.currentStep < 5 && (
           <div className={styles.pricePreview}>
-            <span className={styles.priceLabel}>Tổng cộng dự kiến</span>
+            <span className={styles.priceLabel}>Estimated total</span>
             <span className={styles.priceValue}>{priceService.formatPrice(estimatedPrice)}</span>
           </div>
         )}
@@ -77,18 +81,18 @@ export const BookingWizardPage: React.FC<BookingWizardPageProps> = ({ onComplete
           <div className={styles.navButtons}>
             {draft.currentStep > 1 ? (
               <Button variant="secondary" onClick={prevStep}>
-                ← Quay lại
+                ← Back
               </Button>
             ) : (
               <Button variant="ghost" onClick={onCancel}>
-                Huỷ
+                Cancel
               </Button>
             )}
             <Button
               onClick={nextStep}
               disabled={!canProceed()}
             >
-              Bước tiếp theo →
+              Next step →
             </Button>
           </div>
         )}

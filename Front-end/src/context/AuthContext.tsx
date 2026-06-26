@@ -5,7 +5,6 @@ import { authService } from '../services/customer/auth.service';
 interface AuthContextType {
   currentUser: Customer | null;
   isAuthenticated: boolean;
-  isAdmin: boolean;
   isGuest: boolean;
   login: (phone: string, password: string) => { success: boolean; error?: string };
   register: (name: string, phone: string, email: string, password: string) => { success: boolean; error?: string };
@@ -22,6 +21,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const result = authService.login(phone, password);
     if (result.success && result.customer) {
       setCurrentUser(result.customer);
+      // Simulate JWT token storage
+      const token = `mock_jwt_token_${result.customer.id}_${Date.now()}`;
+      localStorage.setItem('auth_token', token);
+      localStorage.setItem('user', JSON.stringify(result.customer));
       return { success: true };
     }
     return { success: false, error: result.error };
@@ -31,6 +34,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const result = authService.register(name, phone, email, password);
     if (result.success && result.customer) {
       setCurrentUser(result.customer);
+      // Simulate JWT token storage
+      const token = `mock_jwt_token_${result.customer.id}_${Date.now()}`;
+      localStorage.setItem('auth_token', token);
+      localStorage.setItem('user', JSON.stringify(result.customer));
       return { success: true };
     }
     return { success: false, error: result.error };
@@ -52,7 +59,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AuthContext.Provider value={{
       currentUser,
       isAuthenticated: currentUser !== null,
-      isAdmin: currentUser?.role === 'ADMIN',
       isGuest: currentUser?.id === 'guest',
       login,
       register,

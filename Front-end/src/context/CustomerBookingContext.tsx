@@ -38,7 +38,7 @@ export const CustomerBookingProvider: React.FC<{ children: React.ReactNode }> = 
   }, []);
 
   const nextStep = useCallback(() => {
-    setDraft(prev => ({ ...prev, currentStep: Math.min(prev.currentStep + 1, 5) }));
+    setDraft(prev => ({ ...prev, currentStep: Math.min(prev.currentStep + 1, 6) }));
   }, []);
 
   const prevStep = useCallback(() => {

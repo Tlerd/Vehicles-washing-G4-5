@@ -13,10 +13,10 @@ export const QuickStats: React.FC<QuickStatsProps> = ({
   points, totalBookings, completedWashes, totalSpent,
 }) => {
   const stats = [
-    { icon: '⭐', value: points.toLocaleString(), label: 'Điểm thưởng' },
-    { icon: '📅', value: totalBookings.toString(), label: 'Tổng lịch đặt' },
-    { icon: '✅', value: completedWashes.toString(), label: 'Đã hoàn thành' },
-    { icon: '💰', value: formatPrice(totalSpent), label: 'Tổng chi tiêu' },
+    { icon: '⭐', value: points.toLocaleString(), label: 'Points' },
+    { icon: '📅', value: totalBookings.toString(), label: 'Total bookings' },
+    { icon: '✅', value: completedWashes.toString(), label: 'Completed' },
+    { icon: '💰', value: formatPrice(totalSpent), label: 'Total spent' },
   ];
 
   return (

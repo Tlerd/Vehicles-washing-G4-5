@@ -10,12 +10,12 @@ interface CustomerLayoutProps {
 }
 
 const NAV_ITEMS = [
-  { id: 'dashboard', label: 'Tổng quan', icon: '📊' },
-  { id: 'booking', label: 'Đặt lịch mới', icon: '📅' },
-  { id: 'vehicles', label: 'Xe của tôi', icon: '🚗' },
-  { id: 'history', label: 'Lịch sử', icon: '📋' },
-  { id: 'promotions', label: 'Khuyến mãi', icon: '🎉' },
-  { id: 'points', label: 'Điểm thưởng', icon: '⭐' },
+  { id: 'dashboard', label: 'Overview', icon: '📊' },
+  { id: 'booking', label: 'New Booking', icon: '📅' },
+  { id: 'vehicles', label: 'My Vehicles', icon: '🚗' },
+  { id: 'history', label: 'History', icon: '📋' },
+  { id: 'promotions', label: 'Promotions', icon: '🎉' },
+  { id: 'points', label: 'Points', icon: '⭐' },
 ];
 
 export const CustomerLayout: React.FC<CustomerLayoutProps> = ({ children, activeNav, onNavChange }) => {
@@ -36,7 +36,7 @@ export const CustomerLayout: React.FC<CustomerLayoutProps> = ({ children, active
         <header className={styles.header}>
           <div className={styles.headerLeft}>
             <h2 className={styles.pageTitle}>
-              {NAV_ITEMS.find(i => i.id === activeNav)?.label || 'Tổng quan'}
+              {NAV_ITEMS.find(i => i.id === activeNav)?.label || 'Overview'}
             </h2>
           </div>
           <div className={styles.headerRight}>
@@ -45,12 +45,12 @@ export const CustomerLayout: React.FC<CustomerLayoutProps> = ({ children, active
                 {currentUser?.name?.charAt(0) || 'G'}
               </div>
               <div className={styles.userMeta}>
-                <span className={styles.userName}>{currentUser?.name || 'Khách vãng lai'}</span>
-                <span className={styles.userTier}>{currentUser?.tier || 'Thành viên'}</span>
+                <span className={styles.userName}>{currentUser?.name || 'Guest'}</span>
+                <span className={styles.userTier}>{currentUser?.tier || 'Member'}</span>
               </div>
             </div>
             <button className={styles.logoutBtn} onClick={logout}>
-              ↪ Đăng xuất
+              ↪ Logout
             </button>
           </div>
         </header>

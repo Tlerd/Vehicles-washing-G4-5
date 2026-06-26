@@ -9,13 +9,13 @@ export const AIAssistantInput: React.FC = () => {
       <div className={styles.icon}>🤖</div>
       <div className={styles.content}>
         <div className={styles.label}>
-          Trợ lý Đặt lịch AI
+          AI Booking Assistant
           <span className={styles.badge}>BETA</span>
         </div>
         <div className={styles.inputWrapper}>
           <input
             className={styles.input}
-            placeholder="Thử: 'Đặt rửa xe cao cấp cho xe sedan của tôi vào 10h sáng mai'"
+            placeholder="Try: 'Book a premium wash for my sedan tomorrow at 10am'"
             value={query}
             onChange={e => setQuery(e.target.value)}
           />
