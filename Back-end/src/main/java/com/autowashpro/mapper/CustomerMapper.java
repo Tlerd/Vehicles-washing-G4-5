@@ -3,42 +3,24 @@ package com.autowashpro.mapper;
 import com.autowashpro.dto.request.CustomerRequest;
 import com.autowashpro.dto.response.CustomerResponse;
 import com.autowashpro.entity.Customer;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.time.LocalDateTime;
 
-public class CustomerMapper {
+@Mapper(componentModel = "spring", imports = LocalDateTime.class)
+public interface CustomerMapper {
 
-    public static Customer toEntity(CustomerRequest request) {
-        Customer customer = new Customer();
+    @Mapping(target = "customerId", ignore = true)
+    @Mapping(target = "createdAt", expression = "java(LocalDateTime.now())")
+    @Mapping(target = "updatedAt", expression = "java(LocalDateTime.now())")
+    Customer toEntity(CustomerRequest request);
 
-        customer.setFullName(request.getFullName());
-        customer.setPhone(request.getPhone());
-        customer.setEmail(request.getEmail());
-        customer.setPasswordHash(request.getPasswordHash());
-        customer.setTier(request.getTier());
-        customer.setAccumulatedPoints(request.getAccumulatedPoints());
-        customer.setTotalSpent(request.getTotalSpent());
-        customer.setTotalWashes(request.getTotalWashes());
-        customer.setCreatedAt(LocalDateTime.now());
-        customer.setUpdatedAt(LocalDateTime.now());
+    CustomerResponse toResponse(Customer customer);
 
-        return customer;
-    }
-
-    public static CustomerResponse toResponse(Customer customer) {
-        CustomerResponse response = new CustomerResponse();
-
-        response.setCustomerId(customer.getCustomerId());
-        response.setFullName(customer.getFullName());
-        response.setPhone(customer.getPhone());
-        response.setEmail(customer.getEmail());
-        response.setTier(customer.getTier());
-        response.setAccumulatedPoints(customer.getAccumulatedPoints());
-        response.setTotalSpent(customer.getTotalSpent());
-        response.setTotalWashes(customer.getTotalWashes());
-        response.setCreatedAt(customer.getCreatedAt());
-        response.setUpdatedAt(customer.getUpdatedAt());
-
-        return response;
-    }
+    @Mapping(target = "customerId", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", expression = "java(LocalDateTime.now())")
+    void updateEntity(CustomerRequest request, @MappingTarget Customer customer);
 }

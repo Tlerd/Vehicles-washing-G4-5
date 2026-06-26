@@ -11,22 +11,22 @@ import lombok.Setter;
 @Setter
 public class RegisterRequest {
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "Họ tên không được để trống")
+    @Size(max = 100, message = "Họ tên không được vượt quá 100 ký tự")
     @Schema(description = "Customer full name", example = "John Doe")
     private String name;
 
-    @NotBlank
+    @NotBlank(message = "Số điện thoại không được để trống")
     @Schema(description = "Phone number in E.164 format", example = "+84901234567")
     private String phone;
 
-    @NotBlank
-    @Size(min = 6, max = 100)
+    @NotBlank(message = "Mật khẩu không được để trống")
+    @Size(min = 6, max = 100, message = "Mật khẩu phải từ 6 đến 100 ký tự")
     @Schema(description = "Account password", example = "secret123")
     private String password;
 
-    @Email
-    @Size(max = 100)
+    @Email(message = "Email không hợp lệ")
+    @Size(max = 100, message = "Email không được vượt quá 100 ký tự")
     @Schema(description = "Optional email address", example = "john@example.com")
     private String email;
 }

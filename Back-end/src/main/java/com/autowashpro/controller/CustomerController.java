@@ -5,6 +5,9 @@ import com.autowashpro.dto.response.CustomerResponse;
 import com.autowashpro.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,33 +28,36 @@ public class CustomerController {
 
     @Operation(summary = "Get all customers")
     @GetMapping
-    public List<CustomerResponse> getAllCustomers() {
-        return customerService.getAllCustomers();
+    public ResponseEntity<List<CustomerResponse>> getAllCustomers() {
+        return ResponseEntity.ok(customerService.getAllCustomers());
     }
 
     @Operation(summary = "Get customer by ID")
     @GetMapping("/{id}")
-    public CustomerResponse getCustomerById(@PathVariable Long id) {
-        return customerService.getCustomerById(id);
+    public ResponseEntity<CustomerResponse> getCustomerById(@PathVariable Long id) {
+        return ResponseEntity.ok(customerService.getCustomerById(id));
     }
 
     @Operation(summary = "Create a new customer")
     @PostMapping
-    public CustomerResponse createCustomer(@RequestBody CustomerRequest request) {
-        return customerService.createCustomer(request);
+    public ResponseEntity<CustomerResponse> createCustomer(@Valid @RequestBody CustomerRequest request) {
+        CustomerResponse response = customerService.createCustomer(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Operation(summary = "Update customer")
     @PutMapping("/{id}")
-    public CustomerResponse updateCustomer(
+    public ResponseEntity<CustomerResponse> updateCustomer(
             @PathVariable Long id,
-            @RequestBody CustomerRequest request) {
-        return customerService.updateCustomer(id, request);
+            @Valid @RequestBody CustomerRequest request) {
+        CustomerResponse response = customerService.updateCustomer(id, request);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Delete customer")
     @DeleteMapping("/{id}")
-    public void deleteCustomer(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
         customerService.deleteCustomer(id);
+        return ResponseEntity.noContent().build();
     }
 }
