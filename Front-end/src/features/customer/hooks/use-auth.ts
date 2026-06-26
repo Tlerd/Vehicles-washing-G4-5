@@ -10,10 +10,7 @@ export function useCustomerRegister() {
     setIsPending(true);
     setError(null);
     try {
-      // Delay for realistic feel
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      const { success, otpExpiresIn } = authService.sendOtp(data.email);
+      const { success, otpExpiresIn } = await authService.sendOtp(data.email);
       if (!success) {
         throw new Error('Failed to send OTP');
       }
@@ -41,8 +38,7 @@ export function useSendCustomerOtp() {
     setIsPending(true);
     setError(null);
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      const { success, otpExpiresIn } = authService.sendOtp(data.email);
+      const { success, otpExpiresIn } = await authService.sendOtp(data.email);
       if (!success) throw new Error('Failed to send OTP');
       return { otpExpiresIn: otpExpiresIn || 60 };
     } catch (err: any) {
@@ -65,8 +61,7 @@ export function useVerifyCustomerOtp() {
     setIsPending(true);
     setError(null);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      const verifyResult = authService.verifyOtp(data.email, data.otp);
+      const verifyResult = await authService.verifyOtp(data.email, data.otp);
       
       if (!verifyResult.success) {
         throw new Error(verifyResult.error || 'Invalid OTP');
@@ -79,7 +74,7 @@ export function useVerifyCustomerOtp() {
       }
       const regData = JSON.parse(stored);
       
-      const regResult = register(regData.fullName, regData.phone, regData.email, regData.password);
+      const regResult = await register(regData.fullName, regData.phone, regData.email, regData.password);
       if (!regResult.success) {
         throw new Error(regResult.error || 'Registration failed after OTP verify');
       }

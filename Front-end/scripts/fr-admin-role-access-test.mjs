@@ -41,7 +41,7 @@ assert.equal(roleAccess.canAccessAdminPortal(null), false);
 assert.equal(appSource.includes('portalMode'), false, 'App should not use manual portalMode bypass');
 assert.equal(appSource.includes('Open Admin FR010'), false, 'App should not expose an admin shortcut button');
 assert.equal(appSource.includes('getPortalForUser'), true, 'App should route by authenticated user role');
-assert.equal(authSource.includes("role: 'ADMIN'"), true, 'auth service should issue an ADMIN role for admin credentials');
-assert.equal(authSource.includes('0999999999'), true, 'auth service should include the demo admin phone');
+assert.equal(authSource.includes("role: 'ADMIN'"), false, 'auth service should not issue local demo admin credentials');
+assert.equal(authSource.includes('local admin credentials'), false, 'auth service should not include local admin credentials');
 
 console.log('FR admin role access tests passed');
