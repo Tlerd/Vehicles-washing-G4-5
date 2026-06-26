@@ -1,33 +1,14 @@
 import { Booking, Customer, Vehicle, PointsTransaction } from '../types';
 
-const mockCustomers: Customer[] = [
-  { id: 'c1', name: 'John Doe', phone: '0901234567', email: 'john@example.com', tier: 'Gold', accumulatedPoints: 2450, totalSpend: 7500000, createdAt: '2026-01-10T12:00:00Z' },
-  { id: 'c2', name: 'Bob Marvin', phone: '0912345678', email: 'bob@example.com', tier: 'Silver', accumulatedPoints: 800, totalSpend: 2800000, createdAt: '2026-02-15T12:00:00Z' },
-  { id: 'c3', name: 'Alice Cooper', phone: '0907654321', email: 'alice@example.com', tier: 'Platinum', accumulatedPoints: 4200, totalSpend: 16500000, createdAt: '2026-03-10T12:00:00Z' },
-];
+const mockCustomers: Customer[] = [];
 
-const mockVehicles: Vehicle[] = [
-  { id: 'v1', customerId: 'c1', licensePlate: '51G-123.45', brand: 'Toyota Camry', size: 'sedan', isDefault: true },
-  { id: 'v2', customerId: 'c1', licensePlate: '51A-777.77', brand: 'Honda CRV', size: 'suv', isDefault: false },
-  { id: 'v3', customerId: 'c2', licensePlate: '51A-999.99', brand: 'Mazda 3', size: 'hatchback', isDefault: true },
-  { id: 'v4', customerId: 'c3', licensePlate: '30F-888.88', brand: 'Ford Ranger', size: 'pickup', isDefault: true },
-];
+const mockVehicles: Vehicle[] = [];
 
 const today = new Date().toISOString().split('T')[0];
 
-const mockBookings: Booking[] = [
-  { id: 'b1', bookingRef: 'AWP-1001', customerId: 'c1', vehicleId: 'v1', services: ['wc1', 'ec8'], carSize: 'sedan', branchId: 'D1', date: today, time: '09:00', totalPrice: 220000, status: 'COMPLETED', pointsEarned: 220, createdAt: '2026-06-20T09:00:00Z' },
-  { id: 'b2', bookingRef: 'AWP-1002', customerId: 'c1', vehicleId: 'v1', services: ['wc2'], carSize: 'sedan', branchId: 'D7', date: today, time: '14:00', totalPrice: 280000, status: 'CONFIRMED', pointsEarned: 280, createdAt: '2026-06-22T10:00:00Z' },
-  { id: 'b3', bookingRef: 'AWP-1003', customerId: 'c1', vehicleId: 'v2', services: ['wc3'], carSize: 'suv', branchId: 'D1', date: '2026-06-18', time: '10:00', totalPrice: 780000, status: 'COMPLETED', pointsEarned: 780, createdAt: '2026-06-18T10:00:00Z' },
-  { id: 'b4', bookingRef: 'AWP-1004', customerId: 'c2', vehicleId: 'v3', services: ['wc4', 'ic5'], carSize: 'hatchback', branchId: 'D7', date: today, time: '15:30', totalPrice: 320000, status: 'PENDING', pointsEarned: 320, createdAt: '2026-06-23T11:30:00Z' },
-];
+const mockBookings: Booking[] = [];
 
-const mockTransactions: PointsTransaction[] = [
-  { id: 't1', customerId: 'c1', type: 'earn', points: 220, description: 'Earned from booking AWP-1001', createdAt: '2026-06-20T09:30:00Z' },
-  { id: 't2', customerId: 'c1', type: 'earn', points: 780, description: 'Earned from booking AWP-1003', createdAt: '2026-06-18T10:30:00Z' },
-  { id: 't3', customerId: 'c1', type: 'redeem', points: -500, description: 'Redeemed 50k Discount Voucher', createdAt: '2026-06-15T14:00:00Z' },
-  { id: 't4', customerId: 'c1', type: 'tier_change', points: 0, description: 'Upgraded to Gold Tier', createdAt: '2026-06-10T12:00:00Z' },
-];
+const mockTransactions: PointsTransaction[] = [];
 
 class MockStore {
   private customers: Customer[] = [...mockCustomers];
@@ -102,6 +83,28 @@ class MockStore {
       c.id === customerId ? { ...c, accumulatedPoints: c.accumulatedPoints + points } : c
     );
   }
+
+  // Missing methods for Admin Panel
+  getCustomers(): Customer[] { return this.customers; }
+  getVehicles(): Vehicle[] { return this.vehicles; }
+  getBookings(): Booking[] { return this.bookings; }
+  getTransactions(): PointsTransaction[] { return this.transactions; }
+  
+  updateCustomer(id: string, updates: Partial<Customer>): Customer | null {
+    let updated: Customer | null = null;
+    this.customers = this.customers.map(c => {
+      if (c.id === id) {
+        updated = { ...c, ...updates };
+        return updated;
+      }
+      return c;
+    });
+    return updated;
+  }
+
+  private promotions: any[] = [];
+  getPromotions(): any[] { return this.promotions; }
+  addPromotion(promo: any): void { this.promotions.push(promo); }
 }
 
 export const mockStore = new MockStore();

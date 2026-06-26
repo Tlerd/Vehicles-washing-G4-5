@@ -2,6 +2,8 @@ export type CarSize = 'hatchback' | 'sedan' | 'suv' | 'pickup';
 export type BookingStatus = 'PENDING' | 'CONFIRMED' | 'CHECKED_IN' | 'COMPLETED' | 'CANCELLED';
 export type CustomerTier = 'Member' | 'Silver' | 'Gold' | 'Platinum';
 
+export type UserRole = 'CUSTOMER' | 'ADMIN';
+
 export interface Customer {
   id: string;
   name: string;
@@ -11,6 +13,7 @@ export interface Customer {
   accumulatedPoints: number;
   totalSpend: number;
   createdAt: string;
+  role?: UserRole;
 }
 
 export interface Vehicle {
@@ -94,6 +97,9 @@ export interface Promotion {
   validUntil: string;
   bgGradient: string;
   icon: string;
+  targetTier?: string;
+  isActive?: boolean;
+  createdAt?: string;
 }
 
 export interface PointsTransaction {
