@@ -84,7 +84,6 @@ export interface BookingDraft {
   time: string | null;
   vehicleId: string | null;
   bookingId?: string;
-  appliedVoucherId?: string;
 }
 
 export interface Promotion {
