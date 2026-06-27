@@ -99,7 +99,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
             autoComplete="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            placeholder="0901234567"
+            placeholder="Phone number"
             className={styles.input}
           />
           <div className={styles.inputIcon}><Phone size={16} /></div>

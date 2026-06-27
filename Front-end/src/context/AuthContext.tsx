@@ -1,21 +1,28 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { Customer } from '../types';
+import { Customer, UserRole } from '../types';
 import { authService } from '../services/customer/auth.service';
 
 interface AuthContextType {
   currentUser: Customer | null;
   isAuthenticated: boolean;
-  isGuest: boolean;
+  role: UserRole | null;
   login: (phone: string, password: string) => Promise<{ success: boolean; error?: string }>;
   register: (name: string, phone: string, email: string, password: string, firebaseToken: string) => Promise<{ success: boolean; error?: string }>;
-  loginAsGuest: () => void;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<Customer | null>(null);
+  const [currentUser, setCurrentUser] = useState<Customer | null>(() => {
+    const stored = localStorage.getItem('user');
+    if (!stored) return null;
+    try {
+      return JSON.parse(stored) as Customer;
+    } catch {
+      return null;
+    }
+  });
 
   const login = useCallback(async (phone: string, password: string) => {
     const result = await authService.login(phone, password);
@@ -50,26 +57,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { success: false, error: result.error };
   }, []);
 
-  const loginAsGuest = useCallback(() => {
-    const guest = authService.loginAsGuest();
-    setCurrentUser(guest);
-  }, []);
-
   const logout = useCallback(() => {
     setCurrentUser(null);
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user');
     localStorage.removeItem('session');
+    localStorage.removeItem('counter_session');
   }, []);
 
   return (
     <AuthContext.Provider value={{
       currentUser,
       isAuthenticated: currentUser !== null,
-      isGuest: currentUser?.id === 'guest',
+      role: currentUser?.role || null,
       login,
       register,
-      loginAsGuest,
       logout,
     }}>
       {children}

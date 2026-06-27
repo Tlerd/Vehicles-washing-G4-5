@@ -48,7 +48,7 @@ export const BookingWizardPage: React.FC<BookingWizardPageProps> = ({ onComplete
       case 2: return <StepServices />;
       case 3: return <StepBranch />;
       case 4: return <StepDateTime />;
-      case 5: return <StepConfirmation onSubmit={nextStep} onComplete={onComplete} />;
+      case 5: return <StepConfirmation onSubmit={nextStep} />;
       case 6: return <StepPayment onComplete={onComplete} />;
       default: return null;
     }

@@ -17,7 +17,8 @@ interface DashboardPageProps {
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
   const { currentUser } = useAuth();
-  const customerId = currentUser?.id || '';
+  const liveCustomer = currentUser ? mockStore.getCustomerById(currentUser.id) || currentUser : null;
+  const customerId = liveCustomer?.id || '';
 
   const bookings = bookingService.getBookings(customerId);
 
@@ -42,7 +43,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
 
       {/* Quick Stats */}
       <QuickStats
-        points={currentUser?.accumulatedPoints || 0}
+        points={liveCustomer?.accumulatedPoints || 0}
         totalBookings={totalBookings}
         completedWashes={completedBookings}
         totalSpent={totalSpent}

@@ -6,15 +6,13 @@ import { bookingService } from '../../../services/customer/booking.service';
 import { Button } from '../../../components/Button/Button';
 import { CAR_TYPES, SERVICES, BRANCHES, LOYALTY_TIERS } from '../../../config/constants';
 import { formatDate, formatTime } from '../../../utils/formatters';
-import { Booking } from '../../../types';
 import styles from '../styles/StepConfirmation.module.css';
 
 interface StepConfirmationProps {
   onSubmit: () => void;
-  onComplete: () => void;
 }
 
-export const StepConfirmation: React.FC<StepConfirmationProps> = ({ onSubmit, onComplete }) => {
+export const StepConfirmation: React.FC<StepConfirmationProps> = ({ onSubmit }) => {
   const { draft, goToStep, prevStep, updateDraft } = useCustomerBooking();
   const { currentUser } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
