@@ -5,22 +5,14 @@ import com.autowashpro.dto.response.CustomerResponse;
 import com.autowashpro.entity.Customer;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 
-import java.time.LocalDateTime;
-
-@Mapper(componentModel = "spring", imports = LocalDateTime.class)
+@Mapper(componentModel = "spring")
 public interface CustomerMapper {
 
     @Mapping(target = "customerId", ignore = true)
-    @Mapping(target = "createdAt", expression = "java(LocalDateTime.now())")
-    @Mapping(target = "updatedAt", expression = "java(LocalDateTime.now())")
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     Customer toEntity(CustomerRequest request);
 
     CustomerResponse toResponse(Customer customer);
-
-    @Mapping(target = "customerId", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", expression = "java(LocalDateTime.now())")
-    void updateEntity(CustomerRequest request, @MappingTarget Customer customer);
 }

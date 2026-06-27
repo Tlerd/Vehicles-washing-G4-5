@@ -2,8 +2,6 @@ export type CarSize = 'hatchback' | 'sedan' | 'suv' | 'pickup';
 export type BookingStatus = 'PENDING' | 'CONFIRMED' | 'CHECKED_IN' | 'COMPLETED' | 'CANCELLED';
 export type CustomerTier = 'Member' | 'Silver' | 'Gold' | 'Platinum';
 
-export type UserRole = 'CUSTOMER' | 'ADMIN' | 'COUNTER';
-
 export interface Customer {
   id: string;
   name: string;
@@ -13,7 +11,6 @@ export interface Customer {
   accumulatedPoints: number;
   totalSpend: number;
   createdAt: string;
-  role?: UserRole;
 }
 
 export interface Vehicle {
@@ -78,17 +75,6 @@ export interface Booking {
   createdAt: string;
 }
 
-export interface RedeemedVoucher {
-  id: string;
-  customerId: string;
-  type: 'discount_50k' | 'free_basic' | 'free_detail';
-  title: string;
-  pointsCost: number;
-  status: 'active' | 'used';
-  code: string;
-  createdAt: string;
-}
-
 export interface BookingDraft {
   currentStep: number;
   carSize: CarSize;
@@ -108,9 +94,6 @@ export interface Promotion {
   validUntil: string;
   bgGradient: string;
   icon: string;
-  targetTier?: string;
-  isActive?: boolean;
-  createdAt?: string;
 }
 
 export interface PointsTransaction {
@@ -120,5 +103,4 @@ export interface PointsTransaction {
   points: number;
   description: string;
   createdAt: string;
-  expiresAt?: string;
 }

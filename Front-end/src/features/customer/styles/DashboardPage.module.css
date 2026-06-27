@@ -1,51 +1,39 @@
 .dashboard {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 22px;
+  gap: 24px;
 }
 
 .welcomeBanner {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, #0ea5e9, #6366f1);
   border-radius: 16px;
-  padding: 24px 28px;
-  color: #0f172a;
+  padding: 28px 32px;
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
-  position: relative;
-  overflow: hidden;
-}
-
-.welcomeBanner::before {
-  content: '';
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 5px;
-  background: #0ea5e9;
 }
 
 .welcomeText h2 {
-  font-size: 24px;
-  font-weight: 900;
+  font-size: 22px;
+  font-weight: 700;
   margin: 0 0 4px;
-  letter-spacing: -0.01em;
 }
 
 .welcomeText p {
   font-size: 14px;
-  color: #64748b;
+  opacity: 0.85;
   margin: 0;
 }
 
 .welcomeAction {
-  background: #0ea5e9;
-  border: 1px solid #0ea5e9;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   color: #ffffff;
-  padding: 11px 18px;
+  padding: 10px 24px;
   border-radius: 10px;
-  font-weight: 850;
+  font-weight: 600;
   font-size: 14px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -53,21 +41,20 @@
 }
 
 .welcomeAction:hover {
-  background: #0284c7;
-  border-color: #0284c7;
+  background: rgba(255, 255, 255, 0.35);
 }
 
 .mainGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 18px;
+  gap: 24px;
 }
 
 .section {
   background: #ffffff;
-  border-radius: 16px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   overflow: hidden;
 }
 
@@ -79,14 +66,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 18px;
+  padding: 16px 20px;
   border-bottom: 1px solid #f1f5f9;
-  background: #ffffff;
 }
 
 .sectionTitle {
-  font-size: 14px;
-  font-weight: 900;
+  font-size: 15px;
+  font-weight: 700;
   color: #0f172a;
   margin: 0;
   display: flex;
@@ -97,7 +83,7 @@
 .sectionAction {
   font-size: 12px;
   color: #0ea5e9;
-  font-weight: 800;
+  font-weight: 600;
   cursor: pointer;
   background: none;
   border: none;
@@ -109,7 +95,7 @@
 }
 
 .sectionBody {
-  padding: 16px 18px 18px;
+  padding: 16px 20px;
 }
 
 @media (max-width: 1024px) {

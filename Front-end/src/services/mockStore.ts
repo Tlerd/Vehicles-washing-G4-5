@@ -1,35 +1,43 @@
-import { Booking, Customer, CustomerTier, RedeemedVoucher, Vehicle, PointsTransaction } from '../types';
-import { LOYALTY_TIERS } from '../config/constants';
+import { Booking, Customer, Vehicle, PointsTransaction } from '../types';
 
-const addMonths = (isoDate: string, months: number) => {
-  const date = new Date(isoDate);
-  date.setMonth(date.getMonth() + months);
-  return date.toISOString();
-};
+const mockCustomers: Customer[] = [
+  { id: 'c1', name: 'John Doe', phone: '0901234567', email: 'john@example.com', tier: 'Gold', accumulatedPoints: 2450, totalSpend: 7500000, createdAt: '2026-01-10T12:00:00Z' },
+  { id: 'c2', name: 'Bob Marvin', phone: '0912345678', email: 'bob@example.com', tier: 'Silver', accumulatedPoints: 800, totalSpend: 2800000, createdAt: '2026-02-15T12:00:00Z' },
+  { id: 'c3', name: 'Alice Cooper', phone: '0907654321', email: 'alice@example.com', tier: 'Platinum', accumulatedPoints: 4200, totalSpend: 16500000, createdAt: '2026-03-10T12:00:00Z' },
+];
 
-const calculateTier = (points: number): CustomerTier => {
-  const tiers = [...LOYALTY_TIERS].sort((a, b) => b.requiredPoints - a.requiredPoints);
-  return tiers.find(tier => points >= tier.requiredPoints)?.name || 'Member';
-};
+const mockVehicles: Vehicle[] = [
+  { id: 'v1', customerId: 'c1', licensePlate: '51G-123.45', brand: 'Toyota Camry', size: 'sedan', isDefault: true },
+  { id: 'v2', customerId: 'c1', licensePlate: '51A-777.77', brand: 'Honda CRV', size: 'suv', isDefault: false },
+  { id: 'v3', customerId: 'c2', licensePlate: '51A-999.99', brand: 'Mazda 3', size: 'hatchback', isDefault: true },
+  { id: 'v4', customerId: 'c3', licensePlate: '30F-888.88', brand: 'Ford Ranger', size: 'pickup', isDefault: true },
+];
 
-const calculateEarnedPoints = (totalPrice: number, tier: CustomerTier) => {
-  const tierDef = LOYALTY_TIERS.find(item => item.name === tier);
-  return Math.floor((totalPrice / 1000) * (tierDef?.multiplier || 1));
-};
+const today = new Date().toISOString().split('T')[0];
 
-const mockCustomers: Customer[] = [];
-const mockVehicles: Vehicle[] = [];
-const mockBookings: Booking[] = [];
-const mockTransactions: PointsTransaction[] = [];
-const mockVouchers: RedeemedVoucher[] = [];
+const mockBookings: Booking[] = [
+  { id: 'b1', bookingRef: 'AWP-1001', customerId: 'c1', vehicleId: 'v1', services: ['wc1', 'ec8'], carSize: 'sedan', branchId: 'D1', date: today, time: '09:00', totalPrice: 220000, status: 'COMPLETED', pointsEarned: 220, createdAt: '2026-06-20T09:00:00Z' },
+  { id: 'b2', bookingRef: 'AWP-1002', customerId: 'c1', vehicleId: 'v1', services: ['wc2'], carSize: 'sedan', branchId: 'D7', date: today, time: '14:00', totalPrice: 280000, status: 'CONFIRMED', pointsEarned: 280, createdAt: '2026-06-22T10:00:00Z' },
+  { id: 'b3', bookingRef: 'AWP-1003', customerId: 'c1', vehicleId: 'v2', services: ['wc3'], carSize: 'suv', branchId: 'D1', date: '2026-06-18', time: '10:00', totalPrice: 780000, status: 'COMPLETED', pointsEarned: 780, createdAt: '2026-06-18T10:00:00Z' },
+  { id: 'b4', bookingRef: 'AWP-1004', customerId: 'c2', vehicleId: 'v3', services: ['wc4', 'ic5'], carSize: 'hatchback', branchId: 'D7', date: today, time: '15:30', totalPrice: 320000, status: 'PENDING', pointsEarned: 320, createdAt: '2026-06-23T11:30:00Z' },
+];
+
+const mockTransactions: PointsTransaction[] = [
+  { id: 't1', customerId: 'c1', type: 'earn', points: 220, description: 'Earned from booking AWP-1001', createdAt: '2026-06-20T09:30:00Z' },
+  { id: 't2', customerId: 'c1', type: 'earn', points: 780, description: 'Earned from booking AWP-1003', createdAt: '2026-06-18T10:30:00Z' },
+  { id: 't3', customerId: 'c1', type: 'redeem', points: -500, description: 'Redeemed 50k Discount Voucher', createdAt: '2026-06-15T14:00:00Z' },
+  { id: 't4', customerId: 'c1', type: 'tier_change', points: 0, description: 'Upgraded to Gold Tier', createdAt: '2026-06-10T12:00:00Z' },
+];
 
 class MockStore {
   private customers: Customer[] = [...mockCustomers];
   private vehicles: Vehicle[] = [...mockVehicles];
   private bookings: Booking[] = [...mockBookings];
   private transactions: PointsTransaction[] = [...mockTransactions];
-  private vouchers: RedeemedVoucher[] = [...mockVouchers];
-  private bookedSlots: Map<string, string[]> = new Map();
+  private bookedSlots: Map<string, string[]> = new Map([
+    [`D1_${today}`, ['09:00', '09:30', '14:00']],
+    [`D7_${today}`, ['11:00', '11:30', '15:00', '15:30']],
+  ]);
 
   // Customers
   getCustomerByPhone(phone: string): Customer | null {
@@ -37,7 +45,6 @@ class MockStore {
   }
 
   getCustomerById(id: string): Customer | null {
-    this.expireOldPoints(id);
     return this.customers.find(c => c.id === id) || null;
   }
 
@@ -82,7 +89,6 @@ class MockStore {
 
   // Transactions
   getTransactionsByCustomer(customerId: string): PointsTransaction[] {
-    this.expireOldPoints(customerId);
     return this.transactions.filter(t => t.customerId === customerId).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
@@ -95,155 +101,6 @@ class MockStore {
     this.customers = this.customers.map(c => 
       c.id === customerId ? { ...c, accumulatedPoints: c.accumulatedPoints + points } : c
     );
-  }
-
-  getVouchersByCustomer(customerId: string): RedeemedVoucher[] {
-    return this.vouchers.filter(v => v.customerId === customerId);
-  }
-
-  redeemVoucher(customerId: string, type: RedeemedVoucher['type'], pointsCost: number, title: string): RedeemedVoucher | null {
-    const customer = this.getCustomerById(customerId);
-    if (!customer || customer.accumulatedPoints < pointsCost) return null;
-
-    const voucher: RedeemedVoucher = {
-      id: `rv_${Date.now()}`,
-      customerId,
-      type,
-      title,
-      pointsCost,
-      status: 'active',
-      code: `${type.toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
-      createdAt: new Date().toISOString(),
-    };
-
-    this.vouchers.push(voucher);
-    this.customers = this.customers.map(c =>
-      c.id === customerId ? { ...c, accumulatedPoints: c.accumulatedPoints - pointsCost } : c
-    );
-    this.addTransaction({
-      id: `pt_redeem_${Date.now()}`,
-      customerId,
-      type: 'redeem',
-      points: -pointsCost,
-      description: `Redeemed ${title}`,
-      createdAt: new Date().toISOString(),
-    });
-    this.refreshCustomerTier(customerId);
-    return voucher;
-  }
-
-  updateBookingStatus(id: string, status: Booking['status']): Booking | null {
-    const booking = this.bookings.find(b => b.id === id);
-    if (!booking) return null;
-
-    const previousStatus = booking.status;
-    this.bookings = this.bookings.map(b => b.id === id ? { ...b, status } : b);
-
-    if (status === 'COMPLETED' && previousStatus !== 'COMPLETED') {
-      this.checkoutBooking(booking);
-    }
-
-    return this.bookings.find(b => b.id === id) || null;
-  }
-
-  // Missing methods for Admin Panel
-  getCustomers(): Customer[] { return this.customers; }
-  getVehicles(): Vehicle[] { return this.vehicles; }
-  getBookings(): Booking[] { return this.bookings; }
-  getTransactions(): PointsTransaction[] { return this.transactions; }
-  getVouchers(): RedeemedVoucher[] { return this.vouchers; }
-  
-  updateCustomer(id: string, updates: Partial<Customer>): Customer | null {
-    let updated: Customer | null = null;
-    this.customers = this.customers.map(c => {
-      if (c.id === id) {
-        updated = { ...c, ...updates };
-        return updated;
-      }
-      return c;
-    });
-    return updated;
-  }
-
-  private promotions: any[] = [];
-  getPromotions(): any[] { return this.promotions; }
-  addPromotion(promo: any): void { this.promotions.push(promo); }
-
-  private checkoutBooking(booking: Booking): void {
-    const customer = this.getCustomerById(booking.customerId);
-    if (!customer) return;
-
-    const pointsEarned = calculateEarnedPoints(booking.totalPrice, customer.tier);
-    this.bookings = this.bookings.map(b =>
-      b.id === booking.id ? { ...b, pointsEarned, status: 'COMPLETED' } : b
-    );
-    this.customers = this.customers.map(c =>
-      c.id === customer.id
-        ? {
-            ...c,
-            accumulatedPoints: c.accumulatedPoints + pointsEarned,
-            totalSpend: c.totalSpend + booking.totalPrice,
-          }
-        : c
-    );
-    this.addTransaction({
-      id: `pt_earn_${Date.now()}`,
-      customerId: customer.id,
-      type: 'earn',
-      points: pointsEarned,
-      description: `Earned from booking ${booking.bookingRef}: floor(${booking.totalPrice.toLocaleString('vi-VN')} / 1,000 x ${customer.tier})`,
-      createdAt: new Date().toISOString(),
-      expiresAt: addMonths(new Date().toISOString(), 12),
-    });
-    this.refreshCustomerTier(customer.id);
-  }
-
-  private refreshCustomerTier(customerId: string): void {
-    const customer = this.customers.find(c => c.id === customerId);
-    if (!customer) return;
-
-    const nextTier = calculateTier(customer.accumulatedPoints);
-    if (nextTier === customer.tier) return;
-
-    this.customers = this.customers.map(c => c.id === customerId ? { ...c, tier: nextTier } : c);
-    this.addTransaction({
-      id: `pt_tier_${Date.now()}`,
-      customerId,
-      type: 'tier_change',
-      points: 0,
-      description: `Tier updated to ${nextTier}`,
-      createdAt: new Date().toISOString(),
-    });
-  }
-
-  private expireOldPoints(customerId: string): void {
-    const now = Date.now();
-    const expirable = this.transactions.filter(tx =>
-      tx.customerId === customerId &&
-      tx.type === 'earn' &&
-      tx.points > 0 &&
-      tx.expiresAt &&
-      new Date(tx.expiresAt).getTime() <= now &&
-      !this.transactions.some(existing => existing.type === 'expire' && existing.description.includes(tx.id))
-    );
-
-    if (expirable.length === 0) return;
-
-    const expiredPoints = expirable.reduce((sum, tx) => sum + tx.points, 0);
-    this.customers = this.customers.map(c =>
-      c.id === customerId ? { ...c, accumulatedPoints: Math.max(0, c.accumulatedPoints - expiredPoints) } : c
-    );
-    expirable.forEach(tx => {
-      this.addTransaction({
-        id: `pt_expire_${tx.id}`,
-        customerId,
-        type: 'expire',
-        points: -tx.points,
-        description: `Expired points from ${tx.id} after 12 months`,
-        createdAt: new Date().toISOString(),
-      });
-    });
-    this.refreshCustomerTier(customerId);
   }
 }
 

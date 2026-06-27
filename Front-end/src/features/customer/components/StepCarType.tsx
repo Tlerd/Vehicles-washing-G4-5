@@ -10,12 +10,15 @@ export const StepCarType: React.FC = () => {
   const { draft, updateDraft } = useCustomerBooking();
   const { currentUser } = useAuth();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (currentUser && currentUser.id !== 'guest') {
+      setIsLoading(true);
       vehicleService.getVehicles(currentUser.id)
         .then(setVehicles)
-        .catch(console.error);
+        .catch(console.error)
+        .finally(() => setIsLoading(false));
     }
   }, [currentUser]);
 

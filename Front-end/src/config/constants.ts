@@ -1,4 +1,4 @@
-import { ServiceItem, Branch, LoyaltyTierDef } from '../types';
+import { ServiceItem, Branch, Promotion, LoyaltyTierDef } from '../types';
 export const LOYALTY_TIERS: LoyaltyTierDef[] = [
   { name: 'Member', multiplier: 1.0, bookingAdvanceLimit: 7, requiredPoints: 0 },
   { name: 'Silver', multiplier: 1.1, bookingAdvanceLimit: 10, requiredPoints: 1000 },
@@ -104,7 +104,11 @@ export const BRANCHES: Branch[] = [
   { id: 'D7', name: 'AutoWash Pro - District 7', address: '456 Nguyen Huu Tho, District 7, HCMC', phone: '028-8765-4321', openTime: '07:00', closeTime: '20:00' },
 ];
 
-
+export const MOCK_PROMOTIONS: Promotion[] = [
+  { id: 'promo1', title: 'Summer Splash Sale', description: 'Get 20% off on all Premium Wash combos this summer!', discount: '20% OFF', validUntil: '2026-08-31', bgGradient: 'linear-gradient(135deg, #0ea5e9, #6366f1)', icon: '☀️' },
+  { id: 'promo2', title: 'Refer & Earn', description: 'Refer a friend and both get 500 bonus points!', discount: '500 PTS', validUntil: '2026-12-31', bgGradient: 'linear-gradient(135deg, #10b981, #06b6d4)', icon: '🎁' },
+  { id: 'promo3', title: 'Weekend Warriors', description: 'Book on Saturday and enjoy free Tire & Rim Clean service', discount: 'FREE ADD-ON', validUntil: '2026-09-30', bgGradient: 'linear-gradient(135deg, #f59e0b, #ef4444)', icon: '🏆' },
+];
 
 export const TIME_SLOTS_START = '07:00';
 export const TIME_SLOTS_END = '20:00';

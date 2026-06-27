@@ -3,14 +3,13 @@ package com.autowashpro.mapper;
 import com.autowashpro.dto.request.CustomerRequest;
 import com.autowashpro.dto.response.CustomerResponse;
 import com.autowashpro.entity.Customer;
-import java.time.LocalDateTime;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-06-27T09:08:06+0700",
-    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.100.v20260624-0231, environment: Java 21.0.11 (Eclipse Adoptium)"
+    date = "2026-06-27T10:32:13+0700",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.12 (Oracle Corporation)"
 )
 @Component
 public class CustomerMapperImpl implements CustomerMapper {
@@ -23,17 +22,14 @@ public class CustomerMapperImpl implements CustomerMapper {
 
         Customer customer = new Customer();
 
-        customer.setAccumulatedPoints( request.getAccumulatedPoints() );
-        customer.setEmail( request.getEmail() );
         customer.setFullName( request.getFullName() );
-        customer.setPasswordHash( request.getPasswordHash() );
         customer.setPhone( request.getPhone() );
+        customer.setEmail( request.getEmail() );
+        customer.setPasswordHash( request.getPasswordHash() );
         customer.setTier( request.getTier() );
+        customer.setAccumulatedPoints( request.getAccumulatedPoints() );
         customer.setTotalSpent( request.getTotalSpent() );
         customer.setTotalWashes( request.getTotalWashes() );
-
-        customer.setCreatedAt( LocalDateTime.now() );
-        customer.setUpdatedAt( LocalDateTime.now() );
 
         return customer;
     }
@@ -46,35 +42,17 @@ public class CustomerMapperImpl implements CustomerMapper {
 
         CustomerResponse customerResponse = new CustomerResponse();
 
-        customerResponse.setAccumulatedPoints( customer.getAccumulatedPoints() );
-        customerResponse.setCreatedAt( customer.getCreatedAt() );
         customerResponse.setCustomerId( customer.getCustomerId() );
-        customerResponse.setEmail( customer.getEmail() );
         customerResponse.setFullName( customer.getFullName() );
         customerResponse.setPhone( customer.getPhone() );
+        customerResponse.setEmail( customer.getEmail() );
         customerResponse.setTier( customer.getTier() );
+        customerResponse.setAccumulatedPoints( customer.getAccumulatedPoints() );
         customerResponse.setTotalSpent( customer.getTotalSpent() );
         customerResponse.setTotalWashes( customer.getTotalWashes() );
+        customerResponse.setCreatedAt( customer.getCreatedAt() );
         customerResponse.setUpdatedAt( customer.getUpdatedAt() );
 
         return customerResponse;
-    }
-
-    @Override
-    public void updateEntity(CustomerRequest request, Customer customer) {
-        if ( request == null ) {
-            return;
-        }
-
-        customer.setAccumulatedPoints( request.getAccumulatedPoints() );
-        customer.setEmail( request.getEmail() );
-        customer.setFullName( request.getFullName() );
-        customer.setPasswordHash( request.getPasswordHash() );
-        customer.setPhone( request.getPhone() );
-        customer.setTier( request.getTier() );
-        customer.setTotalSpent( request.getTotalSpent() );
-        customer.setTotalWashes( request.getTotalWashes() );
-
-        customer.setUpdatedAt( LocalDateTime.now() );
     }
 }

@@ -6,15 +6,18 @@ import { RegisterForm } from '../components/RegisterForm';
 import { VerifyOtpForm } from '../components/VerifyOtpForm';
 import styles from '../styles/LoginPage.module.css';
 
-export const LoginPage: React.FC = () => {
-  const { login } = useAuth();
+interface LoginPageProps {
+  onLoginSuccess: () => void;
+}
+
+export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
+  const { login, loginAsGuest } = useAuth();
   const [activeTab, setActiveTab] = useState<'login' | 'register' | 'verify'>('login');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-  const [loginPhone, setLoginPhone] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
+  const [loginPhone, setLoginPhone] = useState('0901234567');
+  const [loginPassword, setLoginPassword] = useState('password');
 
   const [verifyPhone, setVerifyPhone] = useState('');
   const [confirmationResult, setConfirmationResult] = useState<any>(null);
@@ -22,16 +25,11 @@ export const LoginPage: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setIsLoggingIn(true);
-    try {
-      const result = await login(loginPhone, loginPassword);
-      if (result.success) {
-        window.location.href = '/';
-      } else {
-        setError(result.error || 'Login failed');
-      }
-    } finally {
-      setIsLoggingIn(false);
+    const result = await login(loginPhone, loginPassword);
+    if (result.success) {
+      onLoginSuccess();
+    } else {
+      setError(result.error || 'Login failed');
     }
   };
 
@@ -42,8 +40,13 @@ export const LoginPage: React.FC = () => {
   };
 
   const handleVerifySuccess = () => {
-    setSuccess('Account created and verified successfully! Welcome!');
-    setTimeout(() => { window.location.href = '/'; }, 1000);
+    setSuccess('Account created and verified successfully! Welcome 🎉');
+    setTimeout(() => onLoginSuccess(), 1000);
+  };
+
+  const handleGuest = () => {
+    loginAsGuest();
+    onLoginSuccess();
   };
 
   return (
@@ -54,7 +57,7 @@ export const LoginPage: React.FC = () => {
           <h1 className={styles.logoTitle}>
             AutoWash <span className={styles.logoHighlight}>PRO</span>
           </h1>
-          <p className={styles.logoSub}>Customer, Admin, and Counter Portal</p>
+          <p className={styles.logoSub}>Premium Car Wash Booking System</p>
         </div>
 
         <div className={styles.card}>
@@ -95,7 +98,7 @@ export const LoginPage: React.FC = () => {
                 onChange={e => setLoginPassword(e.target.value)}
               />
               <Button type="submit" fullWidth size="lg">
-                {isLoggingIn ? 'Logging in...' : 'Login'}
+                Login
               </Button>
             </form>
           )}
@@ -113,6 +116,20 @@ export const LoginPage: React.FC = () => {
               onSuccess={handleVerifySuccess}
             />
           )}
+
+          <div className={styles.divider}>
+            <span className={styles.dividerLine} />
+            <span className={styles.dividerText}>or</span>
+            <span className={styles.dividerLine} />
+          </div>
+
+          <button className={styles.guestBtn} onClick={handleGuest}>
+            👋 Continue as Guest
+          </button>
+
+          <p className={styles.hint}>
+            Demo: use phone number <span className={styles.hintLink}>0901234567</span> with any password
+          </p>
         </div>
       </div>
     </div>

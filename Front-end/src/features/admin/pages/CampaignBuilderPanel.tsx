@@ -139,7 +139,7 @@ export function CampaignBuilderPanel() {
             <div className={styles.emptyState}>
               <BrainCircuit size={28} aria-hidden="true" />
               <strong>No draft yet</strong>
-              <span>Enter a goal and generate an AI-assisted campaign.</span>
+              <span>Enter a goal and generate a mock-AI campaign.</span>
             </div>
           )}
         </aside>

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState, ClipboardEvent, KeyboardEvent } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState, ClipboardEvent, KeyboardEvent } from 'react';
 import { ArrowLeft, Loader2, ShieldCheck } from 'lucide-react';
 import { useSendCustomerOtp, useVerifyCustomerOtp } from '../hooks/use-auth';
 import styles from '../styles/VerifyOtpForm.module.css';

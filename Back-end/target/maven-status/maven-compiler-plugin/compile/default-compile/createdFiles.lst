@@ -1,5 +1,4 @@
 com\autowashpro\entity\Promotion.class
-com\autowashpro\entity\OtpToken.class
 com\autowashpro\repository\CustomerRepository.class
 com\autowashpro\repository\BookingRepository.class
 com\autowashpro\service\impl\AuthServiceImpl.class
@@ -23,11 +22,9 @@ com\autowashpro\config\JwtAuthenticationFilter.class
 com\autowashpro\repository\BranchRepository.class
 com\autowashpro\exception\handler\GlobalExceptionHandler.class
 com\autowashpro\entity\Vehicle.class
-com\autowashpro\repository\OtpTokenRepository.class
 com\autowashpro\repository\PointHistoryRepository.class
 com\autowashpro\mapper\AuthMapper.class
 com\autowashpro\repository\BookingServiceRepository.class
-com\autowashpro\dto\response\SendOtpResponse.class
 com\autowashpro\exception\custom\ResourceNotFoundException.class
 com\autowashpro\repository\PromotionRepository.class
 com\autowashpro\service\CustomerService.class
@@ -35,19 +32,16 @@ com\autowashpro\config\JwtTokenProvider.class
 com\autowashpro\dto\request\CustomerRequest.class
 com\autowashpro\mapper\CustomerMapperImpl.class
 com\autowashpro\mapper\AuthMapperImpl.class
-com\autowashpro\service\OtpService.class
 com\autowashpro\dto\response\RegisterResponse.class
 com\autowashpro\dto\request\LoginRequest.class
 com\autowashpro\config\SecurityConfig.class
 com\autowashpro\service\AuthService.class
 com\autowashpro\repository\ServiceRepository.class
-com\autowashpro\service\impl\OtpServiceImpl.class
 com\autowashpro\dto\response\LoginResponse.class
 com\autowashpro\controller\AuthController.class
 com\autowashpro\dto\request\RegisterRequest.class
 com\autowashpro\repository\VehicleRepository.class
 com\autowashpro\dto\request\SendOtpRequest.class
-com\autowashpro\dto\response\VerifyOtpResponse.class
 com\autowashpro\entity\Voucher.class
 com\autowashpro\dto\response\CustomerResponse.class
 com\autowashpro\dto\request\VerifyOtpRequest.class

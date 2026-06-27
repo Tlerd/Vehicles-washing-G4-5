@@ -11,7 +11,6 @@ yarn-error.log*
 # IDE configurations
 .idea/
 .vscode/
-.run/
 *.suo
 *.ntvs*
 *.njsproj
@@ -37,7 +36,3 @@ Thumbs.db
 *firebase-adminsdk*.json
 firebase-service-account.json
 
-# Maven Build outputs
-**/target/
-target/
-*.class

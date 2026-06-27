@@ -9,7 +9,9 @@ import com.autowashpro.repository.CustomerRepository;
 import com.autowashpro.service.CustomerService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -27,7 +29,7 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.findAll()
                 .stream()
                 .map(customerMapper::toResponse)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -41,6 +43,8 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public CustomerResponse createCustomer(CustomerRequest request) {
         Customer customer = customerMapper.toEntity(request);
+        customer.setCreatedAt(LocalDateTime.now());
+        customer.setUpdatedAt(LocalDateTime.now());
         Customer savedCustomer = customerRepository.save(customer);
 
         return customerMapper.toResponse(savedCustomer);
@@ -51,7 +55,16 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + id));
 
-        customerMapper.updateEntity(request, customer);
+        customer.setFullName(request.getFullName());
+        customer.setPhone(request.getPhone());
+        customer.setEmail(request.getEmail());
+        customer.setPasswordHash(request.getPasswordHash());
+        customer.setTier(request.getTier());
+        customer.setAccumulatedPoints(request.getAccumulatedPoints());
+        customer.setTotalSpent(request.getTotalSpent());
+        customer.setTotalWashes(request.getTotalWashes());
+        customer.setUpdatedAt(LocalDateTime.now());
+
         Customer updatedCustomer = customerRepository.save(customer);
 
         return customerMapper.toResponse(updatedCustomer);

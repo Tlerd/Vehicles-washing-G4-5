@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useCustomerBooking } from '../../../context/CustomerBookingContext';
 import { useAuth } from '../../../context/AuthContext';
-import { SERVICES, CAR_TYPES } from '../../../config/constants';
+import { SERVICES, LOYALTY_TIERS, CAR_TYPES } from '../../../config/constants';
 import { priceService } from '../../../services/customer/price.service';
 import { ServiceItem } from '../../../types';
 import { ChevronDown } from 'lucide-react';

@@ -1,9 +1,7 @@
 .layout {
   display: flex;
   min-height: 100vh;
-  background:
-    linear-gradient(180deg, rgba(240, 249, 255, 0.72) 0%, rgba(248, 250, 252, 0) 260px),
-    #f8fafc;
+  background: #f8fafc;
 }
 
 .mainArea {
@@ -17,11 +15,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 32px;
-  background: rgba(255, 255, 255, 0.92);
-  border-bottom: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
-  backdrop-filter: blur(14px);
+  padding: 16px 32px;
+  background: #ffffff;
+  border-bottom: 1px solid #f1f5f9;
   position: sticky;
   top: 0;
   z-index: 30;
@@ -34,11 +30,10 @@
 }
 
 .pageTitle {
-  font-size: 22px;
-  font-weight: 850;
+  font-size: 20px;
+  font-weight: 700;
   color: #0f172a;
   margin: 0;
-  letter-spacing: -0.01em;
 }
 
 .headerRight {
@@ -51,17 +46,13 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 10px 6px 6px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
 }
 
 .avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background: #0ea5e9;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0ea5e9, #6366f1);
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -77,24 +68,24 @@
 
 .userName {
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
   color: #0f172a;
 }
 
 .userTier {
   font-size: 11px;
   color: #0ea5e9;
-  font-weight: 800;
+  font-weight: 500;
 }
 
 .logoutBtn {
-  padding: 9px 14px;
-  border-radius: 10px;
+  padding: 6px 14px;
+  border-radius: 8px;
   border: 1px solid #e2e8f0;
   background: #ffffff;
-  color: #475569;
-  font-size: 12px;
-  font-weight: 800;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: 'Inter', sans-serif;
@@ -108,7 +99,7 @@
 
 .content {
   flex: 1;
-  padding: 28px 32px 36px;
+  padding: 24px 32px;
   overflow-y: auto;
 }
 
