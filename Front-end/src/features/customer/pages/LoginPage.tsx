@@ -5,18 +5,16 @@ import { useAuth } from '../../../context/AuthContext';
 import { RegisterForm } from '../components/RegisterForm';
 import { VerifyOtpForm } from '../components/VerifyOtpForm';
 import styles from '../styles/LoginPage.module.css';
-interface LoginPageProps {
-  onLoginSuccess: () => void;
-}
 
-export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
-  const { login, loginAsGuest } = useAuth();
+export const LoginPage: React.FC = () => {
+  const { login } = useAuth();
   const [activeTab, setActiveTab] = useState<'login' | 'register' | 'verify'>('login');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-  const [loginPhone, setLoginPhone] = useState('0901234567');
-  const [loginPassword, setLoginPassword] = useState('password');
+  const [loginPhone, setLoginPhone] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
 
   const [verifyPhone, setVerifyPhone] = useState('');
   const [confirmationResult, setConfirmationResult] = useState<any>(null);
@@ -24,11 +22,24 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+<<<<<<< HEAD
     const result = await login(loginPhone, loginPassword);
     if (result.success) {
       onLoginSuccess();
     } else {
       setError(result.error || 'Login failed');
+=======
+    setIsLoggingIn(true);
+    try {
+      const result = await login(loginPhone, loginPassword);
+      if (result.success) {
+        window.location.href = '/';
+      } else {
+        setError(result.error || 'Login failed');
+      }
+    } finally {
+      setIsLoggingIn(false);
+>>>>>>> e6b1bb0fb506b1595ce8b4ec6bbf431d092962da
     }
   };
 
@@ -39,24 +50,19 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   };
 
   const handleVerifySuccess = () => {
-    setSuccess('Account created and verified successfully! Welcome 🎉');
-    setTimeout(() => onLoginSuccess(), 1000);
-  };
-
-  const handleGuest = () => {
-    loginAsGuest();
-    onLoginSuccess();
+    setSuccess('Account created and verified successfully! Welcome!');
+    setTimeout(() => { window.location.href = '/'; }, 1000);
   };
 
   return (
     <div className={styles.container}>
       <div className={styles.wrapper}>
         <div className={styles.logoSection}>
-          <span className={styles.logoEmoji}>🚗</span>
+          <span className={styles.logoEmoji}>Auto</span>
           <h1 className={styles.logoTitle}>
             AutoWash <span className={styles.logoHighlight}>PRO</span>
           </h1>
-          <p className={styles.logoSub}>Premium Car Wash Booking System</p>
+          <p className={styles.logoSub}>Customer, Admin, and Counter Portal</p>
         </div>
 
         <div className={styles.card}>
@@ -83,9 +89,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           {activeTab === 'login' && (
             <form className={styles.form} onSubmit={handleLogin}>
               <Input
-                label="Phone number"
-                type="tel"
-                placeholder="0901234567"
+                label="Phone number or username"
+                type="text"
+                placeholder="customer, admin, or counter"
                 value={loginPhone}
                 onChange={e => setLoginPhone(e.target.value)}
               />
@@ -97,7 +103,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 onChange={e => setLoginPassword(e.target.value)}
               />
               <Button type="submit" fullWidth size="lg">
-                Login
+                {isLoggingIn ? 'Logging in...' : 'Login'}
               </Button>
             </form>
           )}
@@ -107,28 +113,20 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           )}
 
           {activeTab === 'verify' && (
+<<<<<<< HEAD
             <VerifyOtpForm 
               phone={verifyPhone} 
               confirmationResult={confirmationResult}
               setConfirmationResult={setConfirmationResult}
+=======
+            <VerifyOtpForm
+              email={verifyEmail}
+              expiresIn={verifyExpiresIn}
+>>>>>>> e6b1bb0fb506b1595ce8b4ec6bbf431d092962da
               onBack={() => setActiveTab('register')}
               onSuccess={handleVerifySuccess}
             />
           )}
-
-          <div className={styles.divider}>
-            <span className={styles.dividerLine} />
-            <span className={styles.dividerText}>or</span>
-            <span className={styles.dividerLine} />
-          </div>
-
-          <button className={styles.guestBtn} onClick={handleGuest}>
-            👋 Continue as Guest
-          </button>
-
-          <p className={styles.hint}>
-            Demo: use phone number <span className={styles.hintLink}>0901234567</span> with any password
-          </p>
         </div>
       </div>
     </div>

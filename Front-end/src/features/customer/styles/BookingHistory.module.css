@@ -1,11 +1,11 @@
-.list { display: flex; flex-direction: column; gap: 12px; }
-.item { display: flex; align-items: center; gap: 16px; padding: 14px 16px; background: #f8fafc; border-radius: 10px; transition: all 0.2s ease; }
-.item:hover { background: #f1f5f9; }
-.refBadge { background: #e0f2fe; color: #0284c7; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; font-family: monospace; white-space: nowrap; }
+.list { display: flex; flex-direction: column; gap: 10px; }
+.item { display: flex; align-items: center; gap: 14px; padding: 14px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; transition: all 0.2s ease; }
+.item:hover { border-color: #bae6fd; box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06); }
+.refBadge { background: #f0f9ff; color: #0284c7; padding: 6px 10px; border-radius: 999px; font-size: 11px; font-weight: 900; font-family: monospace; white-space: nowrap; }
 .info { flex: 1; min-width: 0; }
-.infoTop { font-size: 14px; font-weight: 600; color: #0f172a; margin-bottom: 2px; }
+.infoTop { font-size: 14px; font-weight: 850; color: #0f172a; margin-bottom: 2px; }
 .infoBottom { font-size: 12px; color: #64748b; }
 .meta { text-align: right; flex-shrink: 0; }
-.price { font-size: 14px; font-weight: 700; color: #0f172a; display: block; }
+.price { font-size: 14px; font-weight: 900; color: #0f172a; display: block; margin-bottom: 6px; }
 .empty { text-align: center; padding: 32px 16px; color: #94a3b8; font-size: 14px; }
 .emptyIcon { font-size: 36px; margin-bottom: 8px; display: block; }

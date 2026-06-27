@@ -11,6 +11,7 @@ yarn-error.log*
 # IDE configurations
 .idea/
 .vscode/
+.run/
 *.suo
 *.ntvs*
 *.njsproj

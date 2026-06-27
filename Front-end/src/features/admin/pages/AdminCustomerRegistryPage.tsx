@@ -39,10 +39,6 @@ const tiers: CustomerTierFilter[] = ['ALL', 'Member', 'Silver', 'Gold', 'Platinu
 const bookingStatuses: BookingStatusFilter[] = ['ALL', 'PENDING', 'CONFIRMED', 'CHECKED_IN', 'COMPLETED', 'CANCELLED'];
 const bookingPageSize = 10;
 
-interface AdminCustomerRegistryPageProps {
-  onBackToCustomerPortal: () => void;
-}
-
 interface ProfileFormState {
   name: string;
   phone: string;
@@ -52,7 +48,7 @@ interface ProfileFormState {
 const getTierClassName = (tier: CustomerTier) => `${styles.tierBadge} ${styles[`tier${tier}`]}`;
 const getStatusClassName = (status: Booking['status']) => `${styles.statusBadge} ${styles[`status${status}`]}`;
 
-export function AdminCustomerRegistryPage({ onBackToCustomerPortal }: AdminCustomerRegistryPageProps) {
+export function AdminCustomerRegistryPage() {
   const [customers, setCustomers] = useState<Customer[]>(() => mockStore.getCustomers());
   const [vehicles] = useState<Vehicle[]>(() => mockStore.getVehicles());
   const [bookings] = useState<Booking[]>(() => mockStore.getBookings());
@@ -237,12 +233,9 @@ export function AdminCustomerRegistryPage({ onBackToCustomerPortal }: AdminCusto
             {activeAdminTab === 'revenue' &&
               'Filter completed wash revenue by day, month, year, and branch, then inspect points audit logs.'}
             {activeAdminTab === 'campaigns' &&
-              'Draft targeted campaign promotions with mock-AI and publish them to the customer portal.'}
+              'Draft targeted campaign promotions with AI assistance and publish them to the customer portal.'}
           </p>
         </div>
-        <button className={styles.secondaryButton} onClick={onBackToCustomerPortal}>
-          Sign out
-        </button>
       </header>
 
       <nav className={styles.adminTabs} aria-label="Admin feature tabs">
