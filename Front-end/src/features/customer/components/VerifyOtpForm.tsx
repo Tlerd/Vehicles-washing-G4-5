@@ -2,33 +2,40 @@ import React, { useCallback, useEffect, useMemo, useRef, useState, ClipboardEven
 import { ArrowLeft, Loader2, ShieldCheck } from 'lucide-react';
 import { useSendCustomerOtp, useVerifyCustomerOtp } from '../hooks/use-auth';
 import styles from '../styles/VerifyOtpForm.module.css';
+import { RecaptchaVerifier } from 'firebase/auth';
+import { auth } from '../../../config/firebase-config';
 
 const OTP_LENGTH = 6;
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const otpPattern = /^\d{6}$/;
 
 interface VerifyOtpFormProps {
-  email: string;
-  expiresIn: number;
+  phone: string;
+  confirmationResult: any;
+  setConfirmationResult: (result: any) => void;
   onBack: () => void;
   onSuccess: () => void;
 }
 
-export const VerifyOtpForm: React.FC<VerifyOtpFormProps> = ({ email: initialEmail, expiresIn, onBack, onSuccess }) => {
-  const [email, setEmail] = useState(initialEmail);
+export const VerifyOtpForm: React.FC<VerifyOtpFormProps> = ({ phone, confirmationResult, setConfirmationResult, onBack, onSuccess }) => {
   const [digits, setDigits] = useState<string[]>(Array(OTP_LENGTH).fill(''));
-  const [secondsLeft, setSecondsLeft] = useState(initialEmail ? expiresIn : 0);
-  const [lastOtpExpiry, setLastOtpExpiry] = useState<number | null>(
-    initialEmail ? Date.now() + expiresIn * 1000 : null
-  );
+  const [secondsLeft, setSecondsLeft] = useState(60);
+  const [lastOtpExpiry, setLastOtpExpiry] = useState<number | null>(Date.now() + 60 * 1000);
+  const [recaptchaVerifier, setRecaptchaVerifier] = useState<any>(null);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const sendOtpMutation = useSendCustomerOtp();
   const verifyOtpMutation = useVerifyCustomerOtp();
 
   useEffect(() => {
-    setEmail(initialEmail);
-  }, [initialEmail]);
+    const verifier = new RecaptchaVerifier(auth, 'recaptcha-container-resend', {
+      size: 'invisible'
+    });
+    setRecaptchaVerifier(verifier);
+
+    return () => {
+      verifier.clear();
+    };
+  }, []);
 
   useEffect(() => {
     if (!lastOtpExpiry) return;
@@ -43,9 +50,7 @@ export const VerifyOtpForm: React.FC<VerifyOtpFormProps> = ({ email: initialEmai
 
   const otp = digits.join('');
   const expired = secondsLeft === 0 && lastOtpExpiry !== null;
-  const ready = otpPattern.test(otp) && emailPattern.test(email) && !expired;
-
-  const emailError = email.length > 0 && !emailPattern.test(email) ? 'Invalid email format.' : null;
+  const ready = otpPattern.test(otp) && !expired;
 
   const handleDigitChange = (index: number, value: string) => {
     const nextDigit = value.replace(/\D/g, '').slice(-1);
@@ -53,6 +58,7 @@ export const VerifyOtpForm: React.FC<VerifyOtpFormProps> = ({ email: initialEmai
       const next = [...prev];
       next[index] = nextDigit;
       return next;
+      
     });
     if (nextDigit && index < OTP_LENGTH - 1) {
       inputRefs.current[index + 1]?.focus();
@@ -84,19 +90,20 @@ export const VerifyOtpForm: React.FC<VerifyOtpFormProps> = ({ email: initialEmai
   };
 
   const handleSendOtp = useCallback(async () => {
-    if (!emailPattern.test(email)) return;
+    if (!recaptchaVerifier) return;
     try {
-      const response = await sendOtpMutation.mutateAsync({ email });
+      const response = await sendOtpMutation.mutateAsync({ phone, recaptchaVerifier });
+      setConfirmationResult(response.confirmationResult);
       setLastOtpExpiry(Date.now() + response.otpExpiresIn * 1000);
       setDigits(Array(OTP_LENGTH).fill(''));
       inputRefs.current[0]?.focus();
     } catch (err) {}
-  }, [email, sendOtpMutation]);
+  }, [phone, sendOtpMutation, recaptchaVerifier, setConfirmationResult]);
 
   const handleVerify = async () => {
     if (!ready) return;
     try {
-      await verifyOtpMutation.mutateAsync({ email, otp });
+      await verifyOtpMutation.mutateAsync({ otp, confirmationResult });
       onSuccess();
     } catch (err) {}
   };
@@ -112,22 +119,8 @@ export const VerifyOtpForm: React.FC<VerifyOtpFormProps> = ({ email: initialEmai
       <div className={styles.headerText}>
         <h3 className={styles.title}>Enter OTP Code</h3>
         <p className={styles.subtitle}>
-          Enter the 6-digit OTP sent to <span>{email || 'your email'}</span> to activate the account.
+          Enter the 6-digit OTP sent to <span>{phone || 'your phone'}</span> to activate the account.
         </p>
-      </div>
-
-      <div className={styles.inputGroup}>
-        <label htmlFor="verifyEmail" className={styles.label}>Email</label>
-        <input
-          id="verifyEmail"
-          autoComplete="email"
-          inputMode="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value.trim())}
-          className={styles.emailInput}
-          placeholder="name@example.com"
-        />
-        {emailError && <p className={styles.errorText}>{emailError}</p>}
       </div>
 
       <div className={styles.inputGroup}>
@@ -159,7 +152,7 @@ export const VerifyOtpForm: React.FC<VerifyOtpFormProps> = ({ email: initialEmai
         <button
           type="button"
           onClick={handleSendOtp}
-          disabled={sendOtpMutation.isPending || !emailPattern.test(email)}
+          disabled={sendOtpMutation.isPending || !recaptchaVerifier}
           className={styles.resendBtn}
         >
           {sendOtpMutation.isPending ? 'Sending...' : 'Resend code'}
@@ -183,6 +176,8 @@ export const VerifyOtpForm: React.FC<VerifyOtpFormProps> = ({ email: initialEmai
           )}
         </button>
       </div>
+
+      <div id="recaptcha-container-resend"></div>
 
       {sendOtpMutation.error && (
         <div className={styles.errorBox}>{sendOtpMutation.error.message}</div>

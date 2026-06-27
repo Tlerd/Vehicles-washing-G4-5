@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useCustomerBooking } from '../../../context/CustomerBookingContext';
 import { useAuth } from '../../../context/AuthContext';
-import { useBooking } from '../../../context/BookingContext';
 import { SERVICES, LOYALTY_TIERS, CAR_TYPES } from '../../../config/constants';
 import { priceService } from '../../../services/customer/price.service';
 import { ServiceItem } from '../../../types';
@@ -11,9 +10,6 @@ import styles from '../styles/StepServices.module.css';
 export const StepServices: React.FC = () => {
   const { draft, updateDraft } = useCustomerBooking();
   const { currentUser } = useAuth();
-  const { vouchers } = useBooking();
-  
-  const userVouchers = vouchers.filter(v => v.customerId === currentUser?.id && v.status === 'active');
   
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
     'Wash & Combo': true, // Open by default
@@ -161,22 +157,6 @@ export const StepServices: React.FC = () => {
           );
         })}
       </div>
-
-      {currentUser && userVouchers.length > 0 && (
-        <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: 'rgba(15, 23, 42, 0.4)', border: '1px solid rgba(30, 41, 59, 1)', borderRadius: '1rem' }}>
-          <h4 style={{ fontSize: '0.875rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '0.5rem' }}>Apply Voucher</h4>
-          <select 
-            value={draft.appliedVoucherId || ''} 
-            onChange={e => updateDraft({ appliedVoucherId: e.target.value || undefined })}
-            style={{ width: '100%', backgroundColor: '#020617', border: '1px solid #1e293b', padding: '0.5rem 0.75rem', fontSize: '0.75rem', borderRadius: '0.5rem', color: '#e2e8f0', outline: 'none' }}
-          >
-            <option value="">-- No Voucher Selected --</option>
-            {userVouchers.map(v => (
-              <option key={v.id} value={v.id}>{v.title} ({v.code})</option>
-            ))}
-          </select>
-        </div>
-      )}
 
       {/* Points Summary Sticky Panel */}
       <div className={styles.pointsPanel}>

@@ -5,6 +5,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { RegisterForm } from '../components/RegisterForm';
 import { VerifyOtpForm } from '../components/VerifyOtpForm';
 import styles from '../styles/LoginPage.module.css';
+
 interface LoginPageProps {
   onLoginSuccess: () => void;
 }
@@ -18,13 +19,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   const [loginPhone, setLoginPhone] = useState('0901234567');
   const [loginPassword, setLoginPassword] = useState('password');
 
-  const [verifyEmail, setVerifyEmail] = useState('');
-  const [verifyExpiresIn, setVerifyExpiresIn] = useState(0);
+  const [verifyPhone, setVerifyPhone] = useState('');
+  const [confirmationResult, setConfirmationResult] = useState<any>(null);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    const result = login(loginPhone, loginPassword);
+    const result = await login(loginPhone, loginPassword);
     if (result.success) {
       onLoginSuccess();
     } else {
@@ -32,9 +33,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
     }
   };
 
-  const handleRegisterSuccess = (email: string, expiresIn: number) => {
-    setVerifyEmail(email);
-    setVerifyExpiresIn(expiresIn);
+  const handleRegisterSuccess = (phone: string, confirmationRes: any) => {
+    setVerifyPhone(phone);
+    setConfirmationResult(confirmationRes);
     setActiveTab('verify');
   };
 
@@ -108,8 +109,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
           {activeTab === 'verify' && (
             <VerifyOtpForm 
-              email={verifyEmail} 
-              expiresIn={verifyExpiresIn}
+              phone={verifyPhone} 
+              confirmationResult={confirmationResult}
+              setConfirmationResult={setConfirmationResult}
               onBack={() => setActiveTab('register')}
               onSuccess={handleVerifySuccess}
             />

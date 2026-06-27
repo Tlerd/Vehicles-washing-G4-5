@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useCustomerBooking } from '../../../context/CustomerBookingContext';
-import { useBooking } from '../../../context/BookingContext';
 import { useAuth } from '../../../context/AuthContext';
 import { priceService } from '../../../services/customer/price.service';
 import { bookingService } from '../../../services/customer/booking.service';
@@ -18,7 +17,6 @@ interface StepConfirmationProps {
 export const StepConfirmation: React.FC<StepConfirmationProps> = ({ onSubmit, onComplete }) => {
   const { draft, goToStep, prevStep, updateDraft } = useCustomerBooking();
   const { currentUser } = useAuth();
-  const { vouchers } = useBooking();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const carType = CAR_TYPES.find(c => c.id === draft.carSize);
@@ -26,23 +24,9 @@ export const StepConfirmation: React.FC<StepConfirmationProps> = ({ onSubmit, on
     .map(id => SERVICES.find(s => s.id === id))
     .filter(Boolean);
   const branch = BRANCHES.find(b => b.id === draft.branchId);
-  
-  const baseTotalPrice = priceService.calculateFinalPrice(draft.selectedServices, draft.carSize);
-  
-  // Voucher Logic
-  const appliedVoucher = vouchers.find(v => v.id === draft.appliedVoucherId);
-  let discountAmount = 0;
-  if (appliedVoucher) {
-    if (appliedVoucher.type === 'discount_50k') discountAmount = 50000;
-    else if (appliedVoucher.type === 'free_basic') discountAmount = 180000;
-    else if (appliedVoucher.type === 'free_detail') discountAmount = 280000;
-  }
-  
-  const totalPrice = Math.max(0, baseTotalPrice - discountAmount);
-
+  const totalPrice = priceService.calculateFinalPrice(draft.selectedServices, draft.carSize);
   const tierMultiplier = LOYALTY_TIERS.find(t => t.name === currentUser?.tier)?.multiplier || 1.0;
-  const campaignMultiplier = 1.0; // Default K_km
-  const pointsEarned = Math.floor((totalPrice / 1000) * tierMultiplier * campaignMultiplier);
+  const pointsEarned = Math.floor((totalPrice / 1000) * tierMultiplier);
 
   const handleConfirm = () => {
     setIsSubmitting(true);
@@ -103,16 +87,8 @@ export const StepConfirmation: React.FC<StepConfirmationProps> = ({ onSubmit, on
       </div>
 
       <div className={styles.totalSection}>
-        {appliedVoucher && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginBottom: '8px', fontSize: '14px', color: '#10b981' }}>
-            <span>Voucher applied ({appliedVoucher.title}):</span>
-            <span>-{priceService.formatPrice(discountAmount)}</span>
-          </div>
-        )}
-        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'flex-end' }}>
-          <span className={styles.totalLabel}>Total amount</span>
-          <span className={styles.totalPrice}>{priceService.formatPrice(totalPrice)}</span>
-        </div>
+        <span className={styles.totalLabel}>Total amount</span>
+        <span className={styles.totalPrice}>{priceService.formatPrice(totalPrice)}</span>
       </div>
 
       {currentUser && (
