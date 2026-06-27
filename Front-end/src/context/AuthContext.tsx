@@ -5,16 +5,9 @@ import { authService } from '../services/customer/auth.service';
 interface AuthContextType {
   currentUser: Customer | null;
   isAuthenticated: boolean;
-<<<<<<< HEAD
-  isGuest: boolean;
-  login: (phone: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  register: (name: string, phone: string, email: string, password: string, firebaseToken: string) => Promise<{ success: boolean; error?: string }>;
-  loginAsGuest: () => void;
-=======
   role: UserRole | null;
   login: (phone: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  register: (name: string, phone: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
->>>>>>> e6b1bb0fb506b1595ce8b4ec6bbf431d092962da
+  register: (name: string, phone: string, email: string, password: string, firebaseToken: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 }
 
@@ -24,13 +17,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [currentUser, setCurrentUser] = useState<Customer | null>(() => {
     const stored = localStorage.getItem('user');
     if (!stored) return null;
-
-<<<<<<< HEAD
-=======
-    return JSON.parse(stored) as Customer;
+    try {
+      return JSON.parse(stored) as Customer;
+    } catch {
+      return null;
+    }
   });
 
->>>>>>> e6b1bb0fb506b1595ce8b4ec6bbf431d092962da
   const login = useCallback(async (phone: string, password: string) => {
     const result = await authService.login(phone, password);
     if (result.success && result.customer) {
@@ -44,13 +37,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { success: false, error: result.error };
   }, []);
 
-<<<<<<< HEAD
   const register = useCallback(async (name: string, phone: string, email: string, password: string, firebaseToken: string) => {
     const result = await authService.register(name, phone, email, password, firebaseToken);
-=======
-  const register = useCallback(async (name: string, phone: string, email: string, password: string) => {
-    const result = await authService.register(name, phone, email, password);
->>>>>>> e6b1bb0fb506b1595ce8b4ec6bbf431d092962da
     if (result.success && result.customer) {
       // Auto-login after successful registration to retrieve real JWT token
       const loginResult = await authService.login(phone, password);
@@ -63,12 +51,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { success: true };
       }
       setCurrentUser(result.customer);
-<<<<<<< HEAD
-=======
-      if (result.token) {
-        localStorage.setItem('auth_token', result.token);
-      }
->>>>>>> e6b1bb0fb506b1595ce8b4ec6bbf431d092962da
       localStorage.setItem('user', JSON.stringify(result.customer));
       return { success: true };
     }

@@ -27,11 +27,7 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.findAll()
                 .stream()
                 .map(customerMapper::toResponse)
-<<<<<<< HEAD
-                .collect(Collectors.toList());
-=======
                 .toList();
->>>>>>> e6b1bb0fb506b1595ce8b4ec6bbf431d092962da
     }
 
     @Override
@@ -45,11 +41,6 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public CustomerResponse createCustomer(CustomerRequest request) {
         Customer customer = customerMapper.toEntity(request);
-<<<<<<< HEAD
-        customer.setCreatedAt(LocalDateTime.now());
-        customer.setUpdatedAt(LocalDateTime.now());
-=======
->>>>>>> e6b1bb0fb506b1595ce8b4ec6bbf431d092962da
         Customer savedCustomer = customerRepository.save(customer);
 
         return customerMapper.toResponse(savedCustomer);
@@ -59,19 +50,6 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerResponse updateCustomer(Long id, CustomerRequest request) {
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + id));
-<<<<<<< HEAD
-
-        customer.setFullName(request.getFullName());
-        customer.setPhone(request.getPhone());
-        customer.setEmail(request.getEmail());
-        customer.setPasswordHash(request.getPasswordHash());
-        customer.setTier(request.getTier());
-        customer.setAccumulatedPoints(request.getAccumulatedPoints());
-        customer.setTotalSpent(request.getTotalSpent());
-        customer.setTotalWashes(request.getTotalWashes());
-        customer.setUpdatedAt(LocalDateTime.now());
-=======
->>>>>>> e6b1bb0fb506b1595ce8b4ec6bbf431d092962da
 
         customerMapper.updateEntity(request, customer);
         Customer updatedCustomer = customerRepository.save(customer);

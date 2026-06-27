@@ -29,23 +29,13 @@ public class CustomerController {
     @Operation(summary = "Get all customers")
     @GetMapping
     public ResponseEntity<List<CustomerResponse>> getAllCustomers() {
-<<<<<<< HEAD
-        List<CustomerResponse> responses = customerService.getAllCustomers();
-        return ResponseEntity.ok(responses);
-=======
         return ResponseEntity.ok(customerService.getAllCustomers());
->>>>>>> e6b1bb0fb506b1595ce8b4ec6bbf431d092962da
     }
 
     @Operation(summary = "Get customer by ID")
     @GetMapping("/{id}")
     public ResponseEntity<CustomerResponse> getCustomerById(@PathVariable Long id) {
-<<<<<<< HEAD
-        CustomerResponse response = customerService.getCustomerById(id);
-        return ResponseEntity.ok(response);
-=======
         return ResponseEntity.ok(customerService.getCustomerById(id));
->>>>>>> e6b1bb0fb506b1595ce8b4ec6bbf431d092962da
     }
 
     @Operation(summary = "Create a new customer")

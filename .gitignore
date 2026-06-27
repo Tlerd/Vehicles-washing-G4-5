@@ -37,3 +37,7 @@ Thumbs.db
 *firebase-adminsdk*.json
 firebase-service-account.json
 
+# Maven Build outputs
+**/target/
+target/
+*.class

@@ -12,15 +12,9 @@ export function useCustomerRegister() {
     setIsPending(true);
     setError(null);
     try {
-<<<<<<< HEAD
       let phoneNormalized = data.phone.trim();
       if (phoneNormalized.startsWith('0')) {
         phoneNormalized = '+84' + phoneNormalized.substring(1);
-=======
-      const { success, otpExpiresIn } = await authService.sendOtp(data.email);
-      if (!success) {
-        throw new Error('Failed to send OTP');
->>>>>>> e6b1bb0fb506b1595ce8b4ec6bbf431d092962da
       }
       
       // Trigger Firebase Phone Auth
@@ -54,18 +48,12 @@ export function useSendCustomerOtp() {
     setIsPending(true);
     setError(null);
     try {
-<<<<<<< HEAD
       let phoneNormalized = data.phone.trim();
       if (phoneNormalized.startsWith('0')) {
         phoneNormalized = '+84' + phoneNormalized.substring(1);
       }
       const confirmationResult = await signInWithPhoneNumber(auth, phoneNormalized, data.recaptchaVerifier);
       return { confirmationResult, otpExpiresIn: 60 };
-=======
-      const { success, otpExpiresIn } = await authService.sendOtp(data.email);
-      if (!success) throw new Error('Failed to send OTP');
-      return { otpExpiresIn: otpExpiresIn || 60 };
->>>>>>> e6b1bb0fb506b1595ce8b4ec6bbf431d092962da
     } catch (err: any) {
       setError({ message: err.message || 'Failed to resend OTP' });
       throw err;
@@ -86,15 +74,8 @@ export function useVerifyCustomerOtp() {
     setIsPending(true);
     setError(null);
     try {
-<<<<<<< HEAD
       if (!data.confirmationResult) {
         throw new Error('Không tìm thấy phiên xác thực OTP. Vui lòng gửi lại.');
-=======
-      const verifyResult = await authService.verifyOtp(data.email, data.otp);
-      
-      if (!verifyResult.success) {
-        throw new Error(verifyResult.error || 'Invalid OTP');
->>>>>>> e6b1bb0fb506b1595ce8b4ec6bbf431d092962da
       }
       
       // Confirm the OTP code via Firebase SDK
@@ -108,11 +89,7 @@ export function useVerifyCustomerOtp() {
       }
       const regData = JSON.parse(stored);
       
-<<<<<<< HEAD
       const regResult = await register(regData.fullName, regData.phone, regData.email, regData.password, firebaseToken);
-=======
-      const regResult = await register(regData.fullName, regData.phone, regData.email, regData.password);
->>>>>>> e6b1bb0fb506b1595ce8b4ec6bbf431d092962da
       if (!regResult.success) {
         throw new Error(regResult.error || 'Registration failed after OTP verify');
       }

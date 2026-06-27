@@ -22,13 +22,6 @@ export const LoginPage: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-<<<<<<< HEAD
-    const result = await login(loginPhone, loginPassword);
-    if (result.success) {
-      onLoginSuccess();
-    } else {
-      setError(result.error || 'Login failed');
-=======
     setIsLoggingIn(true);
     try {
       const result = await login(loginPhone, loginPassword);
@@ -39,7 +32,6 @@ export const LoginPage: React.FC = () => {
       }
     } finally {
       setIsLoggingIn(false);
->>>>>>> e6b1bb0fb506b1595ce8b4ec6bbf431d092962da
     }
   };
 
@@ -58,7 +50,7 @@ export const LoginPage: React.FC = () => {
     <div className={styles.container}>
       <div className={styles.wrapper}>
         <div className={styles.logoSection}>
-          <span className={styles.logoEmoji}>Auto</span>
+          <span className={styles.logoEmoji}>🚗</span>
           <h1 className={styles.logoTitle}>
             AutoWash <span className={styles.logoHighlight}>PRO</span>
           </h1>
@@ -89,9 +81,9 @@ export const LoginPage: React.FC = () => {
           {activeTab === 'login' && (
             <form className={styles.form} onSubmit={handleLogin}>
               <Input
-                label="Phone number or username"
-                type="text"
-                placeholder="customer, admin, or counter"
+                label="Phone number"
+                type="tel"
+                placeholder="0901234567"
                 value={loginPhone}
                 onChange={e => setLoginPhone(e.target.value)}
               />
@@ -113,16 +105,10 @@ export const LoginPage: React.FC = () => {
           )}
 
           {activeTab === 'verify' && (
-<<<<<<< HEAD
             <VerifyOtpForm 
               phone={verifyPhone} 
               confirmationResult={confirmationResult}
               setConfirmationResult={setConfirmationResult}
-=======
-            <VerifyOtpForm
-              email={verifyEmail}
-              expiresIn={verifyExpiresIn}
->>>>>>> e6b1bb0fb506b1595ce8b4ec6bbf431d092962da
               onBack={() => setActiveTab('register')}
               onSuccess={handleVerifySuccess}
             />
