@@ -7,7 +7,7 @@ This document defines the requirements for AutoWash Pro in the standard User Sto
 ## 1. Customer User Stories
 
 *   **US-101: Account Registration with OTP**  
-    As a **Customer**, I want to **register my profile and verify my phone number via Twilio SMS OTP**, so that **I can secure my account and prevent duplicate profile registration**.
+    As a **Customer**, I want to **register my profile and verify my phone number via Firebase SMS OTP**, so that **I can secure my account and prevent duplicate profile registration**.
 *   **US-102: Account Login**  
     As a **Customer**, I want to **log in using my phone number and password**, so that **I can access my personal dashboard, vehicle profiles, and point balances**.
 *   **US-103: Multi-Vehicle CRUD Management**  

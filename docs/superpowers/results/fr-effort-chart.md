@@ -8,7 +8,7 @@ This document details the estimated effort (in developer days) for each Function
 
 | ID | Functional Requirement | Functional Area | Estimate (Days) | Priority (Wiegers) |
 | :--- | :--- | :--- | :--- | :--- |
-| **FR-001** | Customer Registration & Twilio OTP | `area:foundation` | 3 | `priority:high` |
+| **FR-001** | Customer Registration & Firebase OTP | `area:foundation` | 3 | `priority:high` |
 | **FR-002** | Customer Login & Password Auth | `area:foundation` | 2 | `priority:high` |
 | **FR-003** | Vehicle CRUD Management | `area:foundation` | 3 | `priority:medium` |
 | **FR-004** | 6-Step Booking Wizard Navigation | `area:foundation` | 5 | `priority:high` |

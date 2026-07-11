@@ -514,3 +514,25 @@
 
 ## Technical Decisions & Trade-offs
 - **Flagging instead of Deletion**: Since the sandbox environment denies PowerShell execution (`run_command` fails due to sandboxing permissions), native file deletion command is unavailable. The file `WashingCounterPage.module.css` was flagged/emptied with an unused comment, which maintains clean compiler checks and instructs the developer that it can be safely deleted.
+
+---
+
+# Development Journal: AutoWash Pro Booking Wizard Step Reordering & UX Detailing Brainstorm
+
+- **Date**: 2026-07-11
+- **Author**: Anh (Planner / Lead Developer)
+- **Story/Feature Reference**: [2026-06-24-autowash-pro-booking.md](file:///d:/demoSWP/demomain/Vehicles-washing-G4-5/docs/superpowers/plans/2026-06-24-autowash-pro-booking.md)
+
+## Summary of Changes
+- Brainstormed and resolved a critical design conflict in the car wash Booking Wizard flow. 
+- Swapped the step order of "Services Selection" (now Step 2) and "Date & Time Selection" (now Step 3) so that the system calculates the total execution duration *before* displaying available calendar slots.
+- Redesigned the Services selection UI to split into two tabs: **Express Wash & Add-ons** (for quick single/multiple services) and **Detailing & Premium Combos** (for long-duration dọn nội thất, polishing, ceramic, etc.) to keep the layout scalable and clutter-free.
+- Modified the design specifications in [2026-06-24-autowash-pro-design.md](file:///d:/demoSWP/demomain/Vehicles-washing-G4-5/docs/superpowers/specs/2026-06-24-autowash-pro-design.md) and the Front-end implementation plan in [2026-06-24-autowash-pro-booking.md](file:///d:/demoSWP/demomain/Vehicles-washing-G4-5/docs/superpowers/plans/2026-06-24-autowash-pro-booking.md) to reflect this new step order, tabbed layout structure, and consecutive time slot blocking logic.
+- Updated task assignments in [2026-06-26-autowash-pro-stitch-design-plan.md](file:///d:/demoSWP/demomain/Vehicles-washing-G4-5/docs/superpowers/plans/2026-06-26-autowash-pro-stitch-design-plan.md).
+
+## Technical Decisions & Trade-offs
+- **Swapping Wizard Steps**: Swapping steps 2 and 3 provides a much cleaner UX. Instead of letting the user pick a date & time slot and then warning them if their chosen services exceed that slot's capacity, the calendar step now dynamically blocks out unavailable starting times by validating consecutive free slots based on the exact services duration.
+- **Service Classification**: Introduced `categoryType: 'EXPRESS' | 'DETAILING'` and `group` schema fields to separate services. Adding new services only requires specifying these fields, and the UI dynamically renders them in the proper tab/accordion.
+
+## Next Steps
+- Implement the actual Front-end code modifications in [BookingHeader.tsx](file:///d:/demoSWP/demomain/Vehicles-washing-G4-5/Front-end/src/pages/booking/components/BookingHeader.tsx), [StepServices.tsx](file:///d:/demoSWP/demomain/Vehicles-washing-G4-5/Front-end/src/pages/booking/components/StepServices.tsx), [StepSchedule.tsx](file:///d:/demoSWP/demomain/Vehicles-washing-G4-5/Front-end/src/pages/booking/components/StepSchedule.tsx), and [BookingPage.tsx](file:///d:/demoSWP/demomain/Vehicles-washing-G4-5/Front-end/src/pages/booking/BookingPage.tsx) following this approved plan.

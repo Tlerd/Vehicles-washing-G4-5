@@ -17,7 +17,7 @@ Báo cáo tiến độ chi tiết của cả hai phần Front-end (FE) và Back-
 
 | FR ID | Chức năng chi tiết | Trạng thái Front-end (FE) | Trạng thái Back-end (BE) | Trạng thái Tích hợp |
 | :--- | :--- | :--- | :--- | :--- |
-| **FR-001** | Đăng ký & Xác thực OTP | **Hoàn thành** (Form nhập + Gửi mock OTP) | **Hoàn thành** (Tích hợp Twilio SMS gửi mã OTP thực tế) | Chưa tích hợp |
+| **FR-001** | Đăng ký & Xác thực OTP | **Hoàn thành** (Form nhập + Gửi mock OTP) | **Hoàn thành** (Tích hợp Firebase Phone Authentication xác thực OTP) | Chưa tích hợp |
 | **FR-002** | Đăng nhập & Quản lý phiên | **Hoàn thành** (Giao diện Member/Guest + Axios config) | **Hoàn thành** (BCrypt + Sinh JWT + filter bảo mật) | Chưa tích hợp |
 | **FR-003** | Quản lý phương tiện CRUD | **Hoàn thành** (Giao diện CRUD + Modal Thêm Xe) | **Chưa bắt đầu** (Đã có Entity/Repo, chưa có Service/Controller) | Chưa tích hợp |
 | **FR-004** | Luồng đặt lịch 6 bước | **Hoàn thành** (Stepper 6 bước hoàn chỉnh) | **Chưa bắt đầu** (Đã có Entity/Repo, chưa có Service/Controller) | Chưa tích hợp |
@@ -46,7 +46,7 @@ Báo cáo tiến độ chi tiết của cả hai phần Front-end (FE) và Back-
 *   **Nghiệp vụ Đăng ký & Đăng nhập**:
     *   [AuthController.java](file:///d:/demoSWP/Vehicles-washing-G4-5/Back-end/src/main/java/com/autowashpro/controller/AuthController.java): Tiếp nhận API authentication.
     *   [AuthServiceImpl.java](file:///d:/demoSWP/Vehicles-washing-G4-5/Back-end/src/main/java/com/autowashpro/service/impl/AuthServiceImpl.java): Xử lý mã hóa mật khẩu và đăng nhập.
-    *   [OtpServiceImpl.java](file:///d:/demoSWP/Vehicles-washing-G4-5/Back-end/src/main/java/com/autowashpro/service/impl/OtpServiceImpl.java): Logic sinh mã OTP và lưu tạm thời để xác thực.
+    *   [FirebaseConfig.java](file:///d:/demoSWP/Vehicles-washing-G4-5/Back-end/src/main/java/com/autowashpro/config/FirebaseConfig.java): Khởi tạo Firebase Admin SDK để giải mã ID Token.
 
 ### 3.2. Các file mã nguồn Front-end quan trọng đã triển khai:
 *   **Tâm điểm quản lý dữ liệu (Mock DB)**:
@@ -63,8 +63,6 @@ Báo cáo tiến độ chi tiết của cả hai phần Front-end (FE) và Back-
 ## 4. KẾ HOẠCH TRIỂN KHAI TIẾP THEO (NEXT STEPS)
 
 1.  **Phát**:
-    *   Thêm thư viện Twilio vào [pom.xml](file:///d:/demoSWP/Vehicles-washing-G4-5/Back-end/pom.xml).
-    *   Tích hợp dịch vụ SMS thực tế thay thế cho local mock log hiện tại.
     *   Hỗ trợ Bình viết API cho Booking (FR-004) và cập nhật trạng thái đơn (FR-009).
 2.  **Bình**:
     *   Tiến hành code phân hệ **FR-003 (Vehicle CRUD)** trên Back-end (tạo Controller, Service xử lý CRUD phương tiện cho khách hàng).

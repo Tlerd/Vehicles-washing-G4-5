@@ -124,21 +124,22 @@ This document specifies the technical design, requirements, and BDD verification
 ### AC-2: Calendar Range Slicing by Tier (Happy Path)
 
 * **Given** a logged-in user belongs to the "Platinum" membership tier.
-* **When** they open the wizard at Step 3 (Schedule).
+* **When** they open the wizard at Step 4 (Schedule).
 * **Then** the horizontal date slider must display `14` active calendar dates.
 * **And** if they were a standard Guest user, it would only display `7` calendar dates.
 
-### AC-3: Slot Collision Block (Edge Case)
+### AC-3: Slot Collision Block & Dynamic Duration (Edge Case)
 
-* **Given** the slot `10:00 AM` on District 1 branch is fully booked.
-* **When** the user loads Step 3 (Schedule).
-* **Then** the `10:00` button in the time grid must display with an inactive background and be set as `disabled`.
+* **Given** the user has selected services in Step 3 totaling 90 minutes (requiring 3 consecutive slots).
+* **And** the slot `10:30 AM` on District 1 branch is fully booked.
+* **When** the user loads Step 4 (Schedule).
+* **Then** the starting time button `10:00` must be `disabled` because there is not a block of 3 contiguous slots available (10:00, 10:30 is booked, 11:00).
 
 ### AC-4: Backward State Editing (Edge Case)
 
 * **Given** the user is on Step 5 (Contact Info).
 * **When** they click "Services" in the stepper header.
-* **Then** the wizard must return to Step 4, keeping all previously selected services checked.
+* **Then** the wizard must return to Step 3, keeping all previously selected services checked.
 
 ---
 
@@ -153,7 +154,7 @@ This document specifies the technical design, requirements, and BDD verification
 
 * **Front-end Development (Nguyen & Phong)**:
   * `[ ]` Code Wizard framework navigation (Stepper, state management, and Back/Continue buttons): **Nguyen** (Lead) & **Phong** (Support/Review)
-  * `[ ]` Build Step 1 (select vehicle size), Step 2 (select branch D1/D7), and Step 3 (select Date/Time): **Phong** (Lead) & **Nguyen** (Support/Review)
+  * `[ ]` Build Step 1 (select vehicle size), Step 2 (select branch D1/D7), Step 3 (select Services in tabbed UI), and Step 4 (select Date/Time with dynamic consecutive slots check): **Phong** (Lead) & **Nguyen** (Support/Review)
 * **Back-end Development (Phat & Binh)**:
   * `[ ]` Design Database schema & Entity `Booking` with detailed fields: **Binh** (Lead) & **Phat** (Support/Review)
   * `[ ]` Write service to handle booking reservation, check time slot conflicts, and enforce 1-booking-per-customer constraint: **Binh** (Lead) & **Phat** (Support/Review)

@@ -36,3 +36,5 @@ Thumbs.db
 *firebase-adminsdk*.json
 firebase-service-account.json
 
+/Back-end/target/
+*.jar

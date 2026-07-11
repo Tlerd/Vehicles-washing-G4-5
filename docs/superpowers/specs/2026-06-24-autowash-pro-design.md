@@ -28,7 +28,7 @@ The application provides 3 main portals selectable at the top navigation bar for
 
 ### 2.2. State Management Single Source of Truth
 `BookingContext` maintains:
-*   `currentStep`: `1 | 2 | 3 | 4 | 5 | 6` (Car Size, Branch, Date & Time, Services, Contact, Confirmation).
+*   `currentStep`: `1 | 2 | 3 | 4 | 5 | 6` (Car Size, Branch, Services, Date & Time, Contact, Confirmation).
 *   `vehicleSize`: `'small' | 'medium' | 'large'`.
 *   `branchId`: `string | null` (selected branch).
 *   `selectedDate`: `string | null` (format `YYYY-MM-DD`).
@@ -81,10 +81,14 @@ The application provides 3 main portals selectable at the top navigation bar for
 #### 3.1.2. 6-Step Booking Wizard
 1.  **Car Size Selection**: Prompts the user to select their car size group (Small, Medium, Large) right at the beginning of the flow. Selecting this size adjusts pricing for all services in subsequent steps.
 2.  **Select Branch**: Choose branch (District 1 / District 7) with availability badges.
-3.  **Date & Time**: Slider showing dates (7 to 14 days based on tier) and 30-minute interval grid.
-    *   *Reminders*: Automatically sends a reminder notification to the member 1 day before the scheduled time. Also sends a confirmation notification upon booking.
-4.  **Services**: Choose combo packages or individual services displayed as a pop-up window. Base prices are automatically adjusted by the car size selected in Step 1 (Small x0.9, Medium x1.0, Large x1.2/x1.4). Includes detailed service descriptions on a Kem/Yellow background (`#fffbeb`).
+3.  **Services**: Choose combo packages or individual services, visually divided into two tabs:
+    *   *Tab 1: Express Wash & Add-ons (Rửa nhanh & Dịch vụ đơn lẻ)*: Basic washes and quick add-ons (under-carriage, exterior wash). Allows multi-selection.
+    *   *Tab 2: Detailing & Premium Combos (Chăm sóc chuyên sâu & Combo lớn)*: Premium dọn nội thất, polishing, ceramic coating.
+    *   Base prices are automatically adjusted by the car size selected in Step 1 (Small x0.9, Medium x1.0, Large x1.2/x1.4). Includes detailed service descriptions on a Kem/Yellow background (`#fffbeb`).
     *   *Promotions*: Displays available system promotions on the customer UI, enabling users to view and select promotion campaigns.
+4.  **Date & Time**: Slider showing dates (7 to 14 days based on tier) and 30-minute interval grid.
+    *   *Dynamic Slot Blocking*: Sums the duration of all selected services and calculates the number of contiguous 30-minute slots required. Disables/blocks start times that do not have enough consecutive free slots.
+    *   *Reminders*: Automatically sends a reminder notification to the member 1 day before the scheduled time. Also sends a confirmation notification upon booking.
 5.  **Contact Info**: Customer details (Name, Phone, Email, License Plate, Vehicle Make), option to create a password to save history.
 6.  **Confirmation & Payment (Summary & Edit)**:
     *   **Review & Edit**: Displays a detailed summary of all selections from previous steps. Each section has an **"Edit" (Sửa)** button, allowing users to return immediately to that step to modify their selection.

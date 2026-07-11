@@ -11,7 +11,7 @@ This document serves as the central index and governance dashboard for all Funct
 
 | ID | Functional Requirement | Functional Area | Estimate (Days) | Priority (Wiegers) | Detailed Issue File Link |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **FR-001** | Customer Registration & Twilio OTP verification | `area:foundation` | 3 | `priority:high` | [FR-001-customer-registration-otp.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/FR-001-customer-registration-otp.md) |
+| **FR-001** | Customer Registration & Firebase OTP verification | `area:foundation` | 3 | `priority:high` | [FR-001-customer-registration-otp.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/FR-001-customer-registration-otp.md) |
 | **FR-002** | Customer Login & Password Authentication | `area:foundation` | 2 | `priority:high` | [FR-002-customer-login.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/FR-002-customer-login.md) |
 | **FR-003** | Vehicle CRUD Profile Management | `area:foundation` | 3 | `priority:medium` | [FR-003-vehicle-crud-management.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/FR-003-vehicle-crud-management.md) |
 | **FR-004** | 6-Step Booking Wizard Navigation Flow | `area:foundation` | 5 | `priority:high` | [FR-004-booking-wizard-navigation.md](file:///d:/demoSWP/Vehicles-washing-G4-5/docs/superpowers/results/FR-004-booking-wizard-navigation.md) |
