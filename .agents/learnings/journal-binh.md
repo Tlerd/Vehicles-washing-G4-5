@@ -145,7 +145,7 @@ Sửa mã Back-end của Bình cho đúng quy chuẩn AGENTS.md theo checklist c
 
 **1. Cài đặt Database local (không dùng Docker)**
 - Máy có sẵn SQL Server instance local tên **`OOOBINH`**, đã bật TCP/IP port `1433` từ trước. Docker Desktop cài nhưng daemon không chạy nên chọn dùng instance local thay vì `docker compose up`.
-- Mật khẩu `sa` thực tế trên máy này là `12345` (khớp `application.properties`), khác với chuẩn `AutoWash@123456` ghi trong AGENTS.md — chỉ áp dụng cho máy này, không phải quy ước chung.
+- Mật khẩu `sa` thực tế trên máy này khớp với giá trị đang có sẵn trong `application.properties` (không phải chuẩn `AutoWash@123456` ghi trong AGENTS.md) — chỉ áp dụng cho máy này, không phải quy ước chung. **Không ghi giá trị mật khẩu thật vào log này** vì repo là public.
 - Tạo database `autowash_pro`, chạy `Back-end/database/AutoWashPro_Fixed.sql` để dựng schema (9 bảng + FK). **Phát hiện lỗi trong file**: có 2 dòng `ALTER TABLE otp_tokens ...` (dòng 247–249) tham chiếu bảng `otp_tokens` chưa từng được `CREATE TABLE` trong file — rác còn sót lại từ thời còn OTP nội bộ, trước khi chuyển sang Firebase Phone Auth (không còn `OtpToken` entity nào trong code Java). Đã bỏ qua 2 dòng đó khi chạy; **chưa sửa file gốc trong repo** (cần nhóm thống nhất trước khi dọn file dùng chung).
 - Lưu ý: `Back-end/database/AutoWashPro.sql` (bản gốc, không phải `_Fixed`) tạo DB tên `AutoWashPro` với đường dẫn hardcode `D:\SQL\MSSQL16.SQLEXPRESS\...` — không dùng được trên máy khác, nên dùng `AutoWashPro_Fixed.sql`.
 - Chạy thử `mvn spring-boot:run` → Backend start OK, `http://localhost:8080/swagger-ui/index.html` trả 200.
