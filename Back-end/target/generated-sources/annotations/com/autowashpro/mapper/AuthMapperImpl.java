@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-07-11T15:25:45+0700",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 25.0.3 (Eclipse Adoptium)"
+    date = "2026-07-11T15:56:02+0700",
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.100.v20260624-0231, environment: Java 21.0.11 (Eclipse Adoptium)"
 )
 @Component
 public class AuthMapperImpl implements AuthMapper {
@@ -61,9 +61,9 @@ public class AuthMapperImpl implements AuthMapper {
         LoginCustomerResponse loginCustomerResponse = new LoginCustomerResponse();
 
         loginCustomerResponse.setName( customer.getFullName() );
+        loginCustomerResponse.setAccumulatedPoints( customer.getAccumulatedPoints() );
         loginCustomerResponse.setPhone( customer.getPhone() );
         loginCustomerResponse.setTier( customer.getTier() );
-        loginCustomerResponse.setAccumulatedPoints( customer.getAccumulatedPoints() );
 
         loginCustomerResponse.setId( String.valueOf(customer.getCustomerId()) );
         loginCustomerResponse.setTotalSpend( customer.getTotalSpent().longValue() );
