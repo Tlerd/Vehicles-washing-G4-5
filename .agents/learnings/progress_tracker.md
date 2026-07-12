@@ -19,10 +19,10 @@ Báo cáo tiến độ chi tiết của cả hai phần Front-end (FE) và Back-
 | :--- | :--- | :--- | :--- | :--- |
 | **FR-001** | Đăng ký & Xác thực OTP | **Hoàn thành** (Form nhập + Gửi mock OTP) | **Hoàn thành** (Tích hợp Firebase Phone Authentication xác thực OTP) | Chưa tích hợp |
 | **FR-002** | Đăng nhập & Quản lý phiên | **Hoàn thành** (Giao diện Member/Guest + Axios config) | **Hoàn thành** (BCrypt + Sinh JWT + filter bảo mật) | Chưa tích hợp |
-| **FR-003** | Quản lý phương tiện CRUD | **Hoàn thành** (Giao diện CRUD + Modal Thêm Xe) | **Hoàn thành** (Controller/Service/Repo đầy đủ) | Chưa tích hợp |
-| **FR-004** | Luồng đặt lịch 6 bước | **Hoàn thành** (Stepper 6 bước hoàn chỉnh) | **Hoàn thành** (Booking API: create/list/available-slots, verify với DB thật 2026-07-12, nhánh `ooobinh`) | Chưa tích hợp |
-| **FR-005** | Thanh toán VietQR thủ công | **Hoàn thành** (VietQR UI + Sao chép thông tin) | **Chưa bắt đầu** (Chưa có dịch vụ sinh link QR động, chưa khóa voucher khi đặt) | Chưa tích hợp |
-| **FR-006** | Công thức tính điểm tích lũy | **Hoàn thành** (Tính điểm theo công thức thực tế tại client) | **Phần lớn hoàn thành** (`PointServiceImpl` tính điểm + ghi `PointHistory`, nhánh `ooobinh`; chưa có endpoint/luồng gọi khi booking Completed) | Chưa tích hợp |
+| **FR-003** | Quản lý phương tiện CRUD | **Hoàn thành** (Giao diện CRUD + Modal Thêm Xe) | **Chưa bắt đầu** (Đã có Entity/Repo, chưa có Service/Controller) | Chưa tích hợp |
+| **FR-004** | Luồng đặt lịch 6 bước | **Hoàn thành** (Stepper 6 bước hoàn chỉnh) | **Chưa bắt đầu** (Đã có Entity/Repo, chưa có Service/Controller) | Chưa tích hợp |
+| **FR-005** | Thanh toán VietQR thủ công | **Hoàn thành** (VietQR UI + Sao chép thông tin) | **Chưa bắt đầu** (Chưa có dịch vụ sinh link QR động) | Chưa tích hợp |
+| **FR-006** | Công thức tính điểm tích lũy | **Hoàn thành** (Tính điểm theo công thức thực tế tại client) | **Chưa bắt đầu** (Chưa có logic cộng điểm khi Completed) | Chưa tích hợp |
 | **FR-007** | Thăng hạng & Hết hạn điểm | **Hoàn thành** (Thanh tiến trình thăng hạng + cảnh báo) | **Chưa bắt đầu** (Chưa có Scheduler quét nâng/hạ hạng) | Chưa tích hợp |
 | **FR-008** | Cửa hàng đổi voucher | **Hoàn thành** (Giao diện đổi điểm lấy voucher + áp dụng) | **Chưa bắt đầu** (Chưa có logic trừ điểm sinh mã voucher) | Chưa tích hợp |
 | **FR-009** | Quản lý hàng chờ (Counter) | **Hoàn thành** (Màn hình Approve / Check-in / Checkout) | **Chưa bắt đầu** (Chưa có API chuyển trạng thái booking) | Chưa tích hợp |
