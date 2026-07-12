@@ -120,7 +120,7 @@ public class BookingServiceImpl implements com.autowashpro.service.BookingServic
         boolean hasCollision = requiredSlots.stream().anyMatch(occupiedSlots::contains);
 
         if (hasCollision) {
-            throw new ConflictException(
+            throw new BadRequestException(
                     "Khung giờ đã chọn không đủ chỗ trống liên tục cho tổng thời lượng dịch vụ."
             );
         }
