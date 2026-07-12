@@ -16,27 +16,22 @@ public class Vehicle {
     @Column(name = "vehicle_id")
     private Long vehicleId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
     @Column(name = "license_plate", nullable = false, length = 20)
     private String licensePlate;
 
-    @Column(name = "brand", length = 50)
+    @Column(name = "brand", nullable = false, length = 50)
     private String brand;
 
-    @Column(name = "model", length = 50)
-    private String model;
-
+    @Enumerated(EnumType.STRING)
     @Column(name = "vehicle_size", nullable = false, length = 20)
-    private String vehicleSize;
+    private VehicleSize vehicleSize;
 
-    @Column(name = "color", length = 30)
-    private String color;
-
-    @Column(name = "is_default")
-    private Boolean isDefault;
+    @Column(name = "is_default", nullable = false)
+    private Boolean isDefault = false;
 
     @Column(name = "notes", length = 255)
     private String notes;
