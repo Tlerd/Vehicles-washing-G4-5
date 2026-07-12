@@ -3,6 +3,7 @@ com\autowashpro\repository\CustomerRepository.class
 com\autowashpro\repository\BookingRepository.class
 com\autowashpro\service\impl\AuthServiceImpl.class
 com\autowashpro\entity\Branch.class
+com\autowashpro\service\PointService.class
 com\autowashpro\exception\custom\BadRequestException.class
 com\autowashpro\controller\VehicleController.class
 com\autowashpro\dto\response\LoginCustomerResponse.class
@@ -20,6 +21,7 @@ com\autowashpro\service\VehicleService.class
 com\autowashpro\dto\response\BookingResponse.class
 com\autowashpro\entity\BookingService.class
 com\autowashpro\controller\BookingController.class
+com\autowashpro\service\impl\PointServiceImpl.class
 com\autowashpro\entity\Customer.class
 com\autowashpro\exception\custom\UnauthorizedException.class
 com\autowashpro\entity\PointHistory.class
