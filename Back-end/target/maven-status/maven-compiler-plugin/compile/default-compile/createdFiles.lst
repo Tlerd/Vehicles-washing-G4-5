@@ -42,6 +42,7 @@ com\autowashpro\controller\AuthController.class
 com\autowashpro\dto\request\RegisterRequest.class
 com\autowashpro\repository\VehicleRepository.class
 com\autowashpro\dto\request\SendOtpRequest.class
+com\autowashpro\config\FirebaseConfig.class
 com\autowashpro\entity\Voucher.class
 com\autowashpro\dto\response\CustomerResponse.class
 com\autowashpro\dto\request\VerifyOtpRequest.class
