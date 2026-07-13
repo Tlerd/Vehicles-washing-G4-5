@@ -8,35 +8,10 @@ interface VoucherShopProps {
   onChanged: () => void;
 }
 
-const voucherCatalog: Array<{
-  type: RedeemedVoucher['type'];
-  title: string;
-  pointsCost: number;
-  description: string;
-}> = [
-  {
-    type: 'discount_50k',
-    title: '50k Discount Voucher',
-    pointsCost: 500,
-    description: 'Use on any wash bill from 200k.',
-  },
-  {
-    type: 'free_basic',
-    title: 'Free Basic Wash',
-    pointsCost: 1200,
-    description: 'Redeem one standard exterior and interior basic wash.',
-  },
-  {
-    type: 'free_detail',
-    title: 'Free Detail Upgrade',
-    pointsCost: 2400,
-    description: 'Upgrade a basic wash to detail wash at checkout.',
-  },
-];
-
 export const VoucherShop: React.FC<VoucherShopProps> = ({ customerId, points, onChanged }) => {
   const [message, setMessage] = useState('');
   const vouchers = mockStore.getVouchersByCustomer(customerId);
+  const voucherCatalog = mockStore.getVoucherCatalog();
 
   const handleRedeem = (item: (typeof voucherCatalog)[number]) => {
     const voucher = mockStore.redeemVoucher(customerId, item.type, item.pointsCost, item.title);

@@ -1,4 +1,4 @@
-import { Booking, Customer, Vehicle, PointsTransaction } from '../types';
+import { Booking, Customer, Vehicle, PointsTransaction, Promotion, RedeemedVoucher, VoucherCatalogItem } from '../types';
 
 const mockCustomers: Customer[] = [
   { id: 'c1', name: 'John Doe', phone: '0901234567', email: 'john@example.com', tier: 'Gold', accumulatedPoints: 2450, totalSpend: 7500000, createdAt: '2026-01-10T12:00:00Z' },
@@ -34,10 +34,16 @@ class MockStore {
   private vehicles: Vehicle[] = [...mockVehicles];
   private bookings: Booking[] = [...mockBookings];
   private transactions: PointsTransaction[] = [...mockTransactions];
+  private vouchers: RedeemedVoucher[] = [];
   private bookedSlots: Map<string, string[]> = new Map([
     [`D1_${today}`, ['09:00', '09:30', '14:00']],
     [`D7_${today}`, ['11:00', '11:30', '15:00', '15:30']],
   ]);
+  private voucherCatalog: VoucherCatalogItem[] = [
+    { id: 'vc1', type: 'discount_50k', title: '50k Discount Voucher', pointsCost: 500, description: 'Use on any wash bill from 200k.' },
+    { id: 'vc2', type: 'free_basic', title: 'Free Basic Wash', pointsCost: 1200, description: 'Redeem one standard exterior and interior basic wash.' },
+    { id: 'vc3', type: 'free_detail', title: 'Free Detail Upgrade', pointsCost: 2400, description: 'Upgrade a basic wash to detail wash at checkout.' },
+  ];
 
   // Customers
   getCustomerByPhone(phone: string): Customer | null {
@@ -101,6 +107,98 @@ class MockStore {
     this.customers = this.customers.map(c => 
       c.id === customerId ? { ...c, accumulatedPoints: c.accumulatedPoints + points } : c
     );
+  }
+
+  // --- Admin Methods ---
+  getCustomers(): Customer[] {
+    return [...this.customers];
+  }
+
+  getVehicles(): Vehicle[] {
+    return [...this.vehicles];
+  }
+
+  getBookings(): Booking[] {
+    return [...this.bookings];
+  }
+
+  getTransactions(): PointsTransaction[] {
+    return [...this.transactions];
+  }
+
+  updateCustomer(id: string, updates: Partial<Customer>): Customer | null {
+    let updatedCustomer: Customer | null = null;
+    this.customers = this.customers.map(c => {
+      if (c.id === id) {
+        updatedCustomer = { ...c, ...updates };
+        return updatedCustomer;
+      }
+      return c;
+    });
+    return updatedCustomer;
+  }
+
+  getPromotions(): Promotion[] {
+    return []; // Empty for now, we can add mock data later if needed
+  }
+
+  addPromotion(promotion: Promotion): void {
+    // In a real app this would add to the store
+  }
+
+  getVouchersByCustomer(customerId: string): RedeemedVoucher[] {
+    return this.vouchers.filter(v => v.customerId === customerId);
+  }
+
+  redeemVoucher(customerId: string, type: RedeemedVoucher['type'], pointsCost: number, title: string): RedeemedVoucher | null {
+    const customer = this.getCustomerById(customerId);
+    if (!customer || customer.accumulatedPoints < pointsCost) return null;
+    
+    this.updateCustomerPoints(customerId, -pointsCost);
+    
+    this.addTransaction({
+      id: `t${Date.now()}`,
+      customerId,
+      type: 'redeem',
+      points: -pointsCost,
+      description: `Redeemed ${title}`,
+      createdAt: new Date().toISOString()
+    });
+
+    const voucher: RedeemedVoucher = {
+      id: `v${Date.now()}`,
+      customerId,
+      type,
+      title,
+      pointsCost,
+      code: `AWP-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+      isUsed: false,
+      createdAt: new Date().toISOString()
+    };
+    this.vouchers.push(voucher);
+    return voucher;
+  }
+
+  markVoucherUsed(id: string): void {
+    this.vouchers = this.vouchers.map(v => v.id === id ? { ...v, isUsed: true } : v);
+  }
+
+  // Voucher Catalog Methods
+  getVoucherCatalog(): VoucherCatalogItem[] {
+    return [...this.voucherCatalog];
+  }
+
+  addVoucherCatalogItem(item: Omit<VoucherCatalogItem, 'id'>): void {
+    const newItem: VoucherCatalogItem = { ...item, id: `vc_${Date.now()}` };
+    this.voucherCatalog.push(newItem);
+  }
+
+  updateVoucherCatalogItem(id: string, updates: Partial<VoucherCatalogItem>): void {
+    this.voucherCatalog = this.voucherCatalog.map(vc => vc.id === id ? { ...vc, ...updates } : vc);
+  }
+
+  deleteVoucherCatalogItem(id: string): void {
+    this.voucherCatalog = this.voucherCatalog.filter(vc => vc.id !== id);
   }
 }
 

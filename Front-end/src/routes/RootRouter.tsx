@@ -27,7 +27,7 @@ export const RootRouter: React.FC = () => {
         
         {/* Public Routes */}
         <Route path="/landing" element={<LandingPage onNavigateToAuth={() => { window.location.href = '/login'; }} />} />
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login" element={<LoginPage onLoginSuccess={() => {}} />} />
         <Route path="/counter-login" element={<Navigate to="/login" replace />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
         

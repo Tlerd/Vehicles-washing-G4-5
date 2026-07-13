@@ -100,8 +100,8 @@ export const SERVICES: ServiceItem[] = [
 ];
 
 export const BRANCHES: Branch[] = [
-  { id: 'D1', name: 'AutoWash Pro - District 1', address: '123 Le Loi Street, District 1, HCMC', phone: '028-1234-5678', openTime: '07:00', closeTime: '20:00' },
-  { id: 'D7', name: 'AutoWash Pro - District 7', address: '456 Nguyen Huu Tho, District 7, HCMC', phone: '028-8765-4321', openTime: '07:00', closeTime: '20:00' },
+  { id: 'D1', name: 'AutoWash Pro - District 1', address: '123 Le Loi Street, District 1, HCMC', phone: '028-1234-5678', openTime: '07:00', closeTime: '20:00', isAvailable: true },
+  { id: 'D7', name: 'AutoWash Pro - District 7', address: '456 Nguyen Huu Tho, District 7, HCMC', phone: '028-8765-4321', openTime: '07:00', closeTime: '20:00', isAvailable: true },
 ];
 
 export const MOCK_PROMOTIONS: Promotion[] = [

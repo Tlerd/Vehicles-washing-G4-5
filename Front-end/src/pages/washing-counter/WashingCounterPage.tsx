@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useBooking, Booking } from '../../context/BookingContext';
-import { Play, Check, X, ShieldAlert, Car, Clock, RefreshCw, UserCheck } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { Play, Check, X, ShieldAlert, Car, Clock, RefreshCw, UserCheck, LogOut } from 'lucide-react';
 
 export const WashingCounterPage: React.FC = () => {
   const { bookings, customers, vehicles, updateBookingStatus } = useBooking();
+  const { logout } = useAuth();
   const [filterBranch, setFilterBranch] = useState<'ALL' | 'D1' | 'D7'>('ALL');
 
   // Filter bookings based on active branch selection
@@ -26,30 +28,40 @@ export const WashingCounterPage: React.FC = () => {
           <p className="text-slate-400 text-xs mt-1">Manage check-in, approvals, and point redemptions in real-time.</p>
         </div>
 
-        <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 p-1 rounded-lg">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 p-1 rounded-lg">
+            <button 
+              onClick={() => setFilterBranch('ALL')}
+              className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${
+                filterBranch === 'ALL' ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              All Branches
+            </button>
+            <button 
+              onClick={() => setFilterBranch('D1')}
+              className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${
+                filterBranch === 'D1' ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              District 1
+            </button>
+            <button 
+              onClick={() => setFilterBranch('D7')}
+              className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${
+                filterBranch === 'D7' ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              District 7
+            </button>
+          </div>
+          
           <button 
-            onClick={() => setFilterBranch('ALL')}
-            className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${
-              filterBranch === 'ALL' ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
-            }`}
+            onClick={logout}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-red-900/50 text-slate-300 hover:text-red-400 border border-slate-700 hover:border-red-900/50 rounded-lg text-sm font-semibold transition-all"
           >
-            All Branches
-          </button>
-          <button 
-            onClick={() => setFilterBranch('D1')}
-            className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${
-              filterBranch === 'D1' ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            District 1
-          </button>
-          <button 
-            onClick={() => setFilterBranch('D7')}
-            className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${
-              filterBranch === 'D7' ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            District 7
+            <LogOut className="w-4 h-4" />
+            Logout
           </button>
         </div>
       </div>

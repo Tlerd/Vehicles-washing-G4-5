@@ -42,17 +42,44 @@
   box-shadow: 0 4px 16px rgba(14, 165, 233, 0.15);
 }
 
-.cardIcon {
-  font-size: 36px;
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 12px;
-  display: block;
+}
+
+.cardTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cardIcon {
+  font-size: 24px;
 }
 
 .cardName {
   font-size: 16px;
   font-weight: 700;
   color: #0f172a;
-  margin-bottom: 8px;
+}
+
+.badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 9999px;
+}
+
+.badgeAvailable {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badgeBusy {
+  background: #fee2e2;
+  color: #991b1b;
 }
 
 .cardAddress {

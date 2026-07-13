@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useBooking, Customer, Vehicle, RedeemedVoucher } from '../../context/BookingContext';
-import { 
-  Car, Calendar, CreditCard, Gift, Award, Plus, Trash2, Edit, Check, ShieldAlert, Sparkles, AlertCircle, Upload 
+import {
+  Car, Calendar, CreditCard, Gift, Award, Plus, Trash2, Edit, Check, ShieldAlert, Sparkles, AlertCircle, Upload
 } from 'lucide-react';
 
 interface CustomerDashboardProps {
@@ -9,9 +9,9 @@ interface CustomerDashboardProps {
 }
 
 export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onStartBooking }) => {
-  const { 
+  const {
     currentUser, customers, vehicles, bookings, vouchers, transactionLogs, promotions,
-    addVehicle, updateVehicle, deleteVehicle, redeemVoucher 
+    addVehicle, updateVehicle, deleteVehicle, redeemVoucher
   } = useBooking();
 
   const [activeTab, setActiveTab] = useState<'info' | 'history' | 'loyalty' | 'redeem' | 'promotions'>('info');
@@ -37,7 +37,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onStartBoo
   // Next Tier calculation
   const completedWashes = userBookings.filter(b => b.status === 'COMPLETED').length;
   const currentTier = currentUser.tier;
-  
+
   let nextTierName = '';
   let washesNeeded = 0;
   let spendNeeded = 0;
@@ -126,19 +126,18 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onStartBoo
       <div className="w-full md:w-80 shrink-0 space-y-6">
         <div className="bg-slate-900/60 border border-slate-800 p-6 rounded-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 rounded-full blur-xl pointer-events-none" />
-          
+
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 bg-blue-600/20 text-blue-400 rounded-xl flex items-center justify-center border border-blue-500/30">
               <Award className="w-6 h-6" />
             </div>
             <div>
               <h2 className="font-extrabold text-lg text-white leading-tight">{currentUser.name}</h2>
-              <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full inline-block mt-1 ${
-                currentTier === 'Platinum' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' :
+              <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full inline-block mt-1 ${currentTier === 'Platinum' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' :
                 currentTier === 'Gold' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
-                currentTier === 'Silver' ? 'bg-slate-400/10 text-slate-300 border border-slate-400/20' :
-                'bg-slate-850 text-slate-400 border border-slate-800'
-              }`}>
+                  currentTier === 'Silver' ? 'bg-slate-400/10 text-slate-300 border border-slate-400/20' :
+                    'bg-slate-850 text-slate-400 border border-slate-800'
+                }`}>
                 {currentTier} Member
               </span>
             </div>
@@ -169,7 +168,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onStartBoo
             </div>
           </div>
 
-          <button 
+          <button
             onClick={onStartBooking}
             className="w-full bg-orange-500 hover:bg-orange-450 text-white font-bold py-2.5 rounded-xl transition-all shadow-md mt-6 flex justify-center items-center gap-1.5"
           >
@@ -182,41 +181,36 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onStartBoo
         <div className="bg-slate-900/40 border border-slate-850 p-2 rounded-2xl flex flex-col gap-1">
           <button
             onClick={() => setActiveTab('info')}
-            className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2.5 ${
-              activeTab === 'info' ? 'bg-blue-600/15 text-blue-400 font-semibold' : 'text-slate-400 hover:text-slate-200'
-            }`}
+            className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2.5 ${activeTab === 'info' ? 'bg-blue-600/15 text-blue-400 font-semibold' : 'text-slate-400 hover:text-slate-200'
+              }`}
           >
             <Car className="w-4 h-4" /> Profile & Vehicles
           </button>
           <button
             onClick={() => setActiveTab('history')}
-            className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2.5 ${
-              activeTab === 'history' ? 'bg-blue-600/15 text-blue-400 font-semibold' : 'text-slate-400 hover:text-slate-200'
-            }`}
+            className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2.5 ${activeTab === 'history' ? 'bg-blue-600/15 text-blue-400 font-semibold' : 'text-slate-400 hover:text-slate-200'
+              }`}
           >
             <Calendar className="w-4 h-4" /> Booking History
           </button>
           <button
             onClick={() => setActiveTab('loyalty')}
-            className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2.5 ${
-              activeTab === 'loyalty' ? 'bg-blue-600/15 text-blue-400 font-semibold' : 'text-slate-400 hover:text-slate-200'
-            }`}
+            className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2.5 ${activeTab === 'loyalty' ? 'bg-blue-600/15 text-blue-400 font-semibold' : 'text-slate-400 hover:text-slate-200'
+              }`}
           >
             <Award className="w-4 h-4" /> Loyalty Progress
           </button>
           <button
             onClick={() => setActiveTab('redeem')}
-            className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2.5 ${
-              activeTab === 'redeem' ? 'bg-blue-600/15 text-blue-400 font-semibold' : 'text-slate-400 hover:text-slate-200'
-            }`}
+            className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2.5 ${activeTab === 'redeem' ? 'bg-blue-600/15 text-blue-400 font-semibold' : 'text-slate-400 hover:text-slate-200'
+              }`}
           >
             <Gift className="w-4 h-4" /> Redeem Rewards
           </button>
           <button
             onClick={() => setActiveTab('promotions')}
-            className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2.5 ${
-              activeTab === 'promotions' ? 'bg-blue-600/15 text-blue-400 font-semibold' : 'text-slate-400 hover:text-slate-200'
-            }`}
+            className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2.5 ${activeTab === 'promotions' ? 'bg-blue-600/15 text-blue-400 font-semibold' : 'text-slate-400 hover:text-slate-200'
+              }`}
           >
             <Sparkles className="w-4 h-4" /> System Campaigns
           </button>
@@ -225,14 +219,14 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onStartBoo
 
       {/* Main Panel Content */}
       <div className="flex-1 space-y-6">
-        
+
         {/* TAB 1: Profile & Vehicles */}
         {activeTab === 'info' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold text-white">Registered Vehicles</h2>
               {!showAddVeh && (
-                <button 
+                <button
                   onClick={() => setShowAddVeh(true)}
                   className="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold px-3 py-1.5 rounded-xl text-blue-400 flex items-center gap-1"
                 >
@@ -246,12 +240,12 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onStartBoo
                 <h3 className="font-bold text-sm text-slate-200 uppercase tracking-wider">
                   {editingVeh ? 'Edit Vehicle Info' : 'Register New Vehicle'}
                 </h3>
-                
+
                 {/* LPR Image Upload Simulation */}
                 {!editingVeh && (
                   <div className="bg-slate-950/80 border border-dashed border-slate-800 p-4 rounded-xl text-center flex flex-col items-center justify-center relative">
-                    <input 
-                      type="file" 
+                    <input
+                      type="file"
                       accept="image/*"
                       id="lpr-upload"
                       onChange={handleLPRPhotoUpload}
@@ -269,23 +263,23 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onStartBoo
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1">
                     <label className="text-xs text-slate-400 font-semibold">License Plate</label>
-                    <input 
-                      type="text" 
-                      required 
-                      value={plate} 
+                    <input
+                      type="text"
+                      required
+                      value={plate}
                       onChange={e => setPlate(e.target.value)}
-                      placeholder="e.g. 51G-123.45" 
+                      placeholder="e.g. 51G-123.45"
                       className="bg-slate-950 border border-slate-800 px-3 py-2 text-xs rounded-lg text-slate-200 focus:outline-none focus:border-blue-500"
                     />
                   </div>
                   <div className="flex flex-col gap-1">
                     <label className="text-xs text-slate-400 font-semibold">Car Brand / Model</label>
-                    <input 
-                      type="text" 
-                      required 
-                      value={brand} 
+                    <input
+                      type="text"
+                      required
+                      value={brand}
                       onChange={e => setBrand(e.target.value)}
-                      placeholder="e.g. Toyota Camry" 
+                      placeholder="e.g. Toyota Camry"
                       className="bg-slate-950 border border-slate-800 px-3 py-2 text-xs rounded-lg text-slate-200 focus:outline-none focus:border-blue-500"
                     />
                   </div>
@@ -307,19 +301,19 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onStartBoo
                   </div>
                   <div className="flex flex-col gap-1">
                     <label className="text-xs text-slate-400 font-semibold">Notes / Special Instructions</label>
-                    <input 
-                      type="text" 
-                      value={notes} 
+                    <input
+                      type="text"
+                      value={notes}
                       onChange={e => setNotes(e.target.value)}
-                      placeholder="e.g. Low clearance, ceramic coated" 
+                      placeholder="e.g. Low clearance, ceramic coated"
                       className="bg-slate-950 border border-slate-800 px-3 py-2 text-xs rounded-lg text-slate-200 focus:outline-none focus:border-blue-500"
                     />
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 pt-2">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     id="set-default"
                     checked={isDefault}
                     onChange={e => setIsDefault(e.target.checked)}
@@ -329,15 +323,15 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onStartBoo
                 </div>
 
                 <div className="flex justify-end gap-2 pt-2">
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={() => { setShowAddVeh(false); setEditingVeh(null); }}
                     className="bg-slate-850 hover:bg-slate-800 text-xs px-4 py-2 border border-slate-800 rounded-xl"
                   >
                     Cancel
                   </button>
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-5 py-2 rounded-xl shadow-md"
                   >
                     Save Vehicle
@@ -372,14 +366,14 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onStartBoo
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                      <button 
+                      <button
                         onClick={() => handleEditClick(v)}
                         className="p-1.5 bg-slate-800 hover:bg-slate-700 text-blue-400 rounded-lg transition-colors border border-slate-700"
                         title="Edit Vehicle"
                       >
                         <Edit className="w-3.5 h-3.5" />
                       </button>
-                      <button 
+                      <button
                         onClick={() => deleteVehicle(v.id)}
                         className="p-1.5 bg-slate-800 hover:bg-slate-700 text-red-400 rounded-lg transition-colors border border-slate-700"
                         title="Delete Vehicle"
@@ -398,7 +392,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onStartBoo
         {activeTab === 'history' && (
           <div className="space-y-4">
             <h2 className="text-xl font-bold text-white mb-2">My Booking History</h2>
-            
+
             <div className="p-4 bg-orange-500/5 text-orange-400 border border-orange-500/10 rounded-xl text-xs leading-relaxed flex gap-2 mb-3">
               <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5" />
               <span>
@@ -415,19 +409,18 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onStartBoo
               <div className="space-y-3">
                 {userBookings.map(b => {
                   const vehicle = vehicles.find(v => v.id === b.vehicleId);
-                  
+
                   return (
                     <div key={b.id} className="bg-slate-900/40 border border-slate-850 p-5 rounded-2xl flex flex-col md:flex-row justify-between md:items-center gap-4">
                       <div>
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <span className="font-bold text-sm text-slate-300">Ref: <span className="font-mono text-white text-base">{b.bookingRef || b.id}</span></span>
-                          <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
-                            b.status === 'COMPLETED' ? 'bg-green-500/15 text-green-400 border border-green-500/25' :
+                          <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${b.status === 'COMPLETED' ? 'bg-green-500/15 text-green-400 border border-green-500/25' :
                             b.status === 'CHECKED_IN' ? 'bg-blue-500/15 text-blue-400 border border-blue-500/25' :
-                            b.status === 'CONFIRMED' ? 'bg-orange-500/15 text-orange-400 border border-orange-500/25' :
-                            b.status === 'PENDING' ? 'bg-yellow-500/15 text-yellow-400 border border-yellow-500/25' :
-                            'bg-red-500/15 text-red-400 border border-red-500/25'
-                          }`}>
+                              b.status === 'CONFIRMED' ? 'bg-orange-500/15 text-orange-400 border border-orange-500/25' :
+                                b.status === 'PENDING' ? 'bg-yellow-500/15 text-yellow-400 border border-yellow-500/25' :
+                                  'bg-red-500/15 text-red-400 border border-red-500/25'
+                            }`}>
                             {b.status}
                           </span>
                         </div>
@@ -458,38 +451,31 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onStartBoo
 
             {/* Progress bar */}
             {nextTierName && (
-              <div className="bg-slate-900/40 border border-slate-850 p-6 rounded-2xl space-y-4">
-                <div className="flex justify-between items-end flex-wrap gap-2">
-                  <div>
-                    <span className="text-xs text-slate-400 uppercase tracking-wider font-bold">Tier Progress</span>
-                    <h3 className="text-lg font-bold text-white mt-1">Path to {nextTierName} Tier</h3>
-                  </div>
-                  <span className="text-xs text-slate-400">
-                    Currently completed: <strong className="text-white">{completedWashes}</strong> washes
-                  </span>
+              <section className="bg-slate-900/40 border border-slate-850 p-6 rounded-2xl space-y-5">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-bold text-white">{currentTier} Tier Member</h3>
+                  <span className="text-sm font-bold text-blue-400">{Math.round(progressPercent)}%</span>
                 </div>
-                
+
                 {/* Visual Bar */}
-                <div className="space-y-1.5">
-                  <div className="w-full bg-slate-950 h-3 rounded-full overflow-hidden border border-slate-850">
-                    <div 
-                      className="bg-gradient-to-r from-blue-500 to-orange-500 h-full rounded-full transition-all duration-500" 
+                <div className="space-y-2">
+                  <div className="w-full bg-slate-950 h-3 rounded-full overflow-hidden border border-slate-850 relative">
+                    <div
+                      className="bg-gradient-to-r from-blue-500 to-sky-400 h-full rounded-full transition-all duration-500"
                       style={{ width: `${progressPercent}%` }}
                     />
                   </div>
-                  <div className="flex justify-between text-[10px] text-slate-500 font-bold uppercase">
-                    <span>{currentTier}</span>
-                    <span>{nextTierName}</span>
-                  </div>
                 </div>
 
-                <div className="p-3.5 bg-blue-950/20 border border-blue-900/30 text-blue-400 text-xs rounded-xl flex gap-2.5 leading-relaxed mt-2">
-                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                  <span>
-                    To upgrade, you need <strong>{washesNeeded} more washes</strong> OR <strong>{spendNeeded.toLocaleString('vi-VN')} VND spend</strong> within the rolling 12 months.
-                  </span>
+                <div className="text-sm text-slate-300">
+                  Need <strong className="text-white">{washesNeeded} washes</strong> or <strong className="text-white">{spendNeeded.toLocaleString('vi-VN')} VND</strong> spent to reach {nextTierName}.
                 </div>
-              </div>
+
+                <div className="text-sm text-orange-400 font-medium flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4" />
+                  Points Expiring Next Month: 120 points
+                </div>
+              </section>
             )}
 
             {/* Point Transaction Logs */}
@@ -505,8 +491,8 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onStartBoo
                         <p className="font-bold text-slate-200">{l.description}</p>
                         <span className="text-[10px] text-slate-500 block mt-1">{new Date(l.createdAt).toLocaleString()}</span>
                       </div>
-                      <span className={`font-extrabold text-sm ${l.pointsChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                        {l.pointsChange >= 0 ? `+${l.pointsChange}` : l.pointsChange} pts
+                      <span className={`font-extrabold text-sm ${l.points >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        {l.points >= 0 ? `+${l.points}` : l.points} pts
                       </span>
                     </div>
                   ))}
@@ -541,9 +527,9 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onStartBoo
                     <h4 className="font-extrabold text-base text-white">50k Discount Voucher</h4>
                     <p className="text-[11px] text-slate-400">Subtracts 50,000 VND from your total bill.</p>
                   </div>
-                  <button 
+                  <button
                     disabled={currentUser.accumulatedPoints < 500}
-                    onClick={() => handleRedeem('DISCOUNT_50K', 500, '50,000 VND Discount Voucher')}
+                    onClick={() => handleRedeem('discount_50k', 500, '50,000 VND Discount Voucher')}
                     className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-2 rounded-xl text-xs transition-all shadow"
                   >
                     Redeem Reward
@@ -557,9 +543,9 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onStartBoo
                     <h4 className="font-extrabold text-base text-white">Free Basic Wash</h4>
                     <p className="text-[11px] text-slate-400">Gets a completely free VW Basic Wash combo.</p>
                   </div>
-                  <button 
+                  <button
                     disabled={currentUser.accumulatedPoints < 1800}
-                    onClick={() => handleRedeem('FREE_BASIC', 1800, 'Free Basic Wash Voucher')}
+                    onClick={() => handleRedeem('free_basic', 1800, 'Free Basic Wash Voucher')}
                     className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-2 rounded-xl text-xs transition-all shadow"
                   >
                     Redeem Reward
@@ -573,9 +559,9 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onStartBoo
                     <h4 className="font-extrabold text-base text-white">Free Detail Wash</h4>
                     <p className="text-[11px] text-slate-400">Gets a completely free deep-cleaning Detail Wash.</p>
                   </div>
-                  <button 
+                  <button
                     disabled={currentUser.accumulatedPoints < 2800}
-                    onClick={() => handleRedeem('FREE_DETAIL', 2800, 'Free Detail Wash Voucher')}
+                    onClick={() => handleRedeem('free_detail', 2800, 'Free Detail Wash Voucher')}
                     className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-2 rounded-xl text-xs transition-all shadow"
                   >
                     Redeem Reward
@@ -597,11 +583,10 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onStartBoo
                         <p className="font-bold text-slate-200">{v.title}</p>
                         <span className="text-[10px] text-slate-500 block mt-1">Code: {v.id}</span>
                       </div>
-                      <span className={`font-bold px-2 py-0.5 rounded text-[10px] ${
-                        v.status === 'ACTIVE' ? 'bg-green-500/10 text-green-400 border border-green-500/20' :
-                        v.status === 'LOCKED' ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20' :
-                        'bg-slate-850 text-slate-500 border border-slate-800'
-                      }`}>
+                      <span className={`font-bold px-2 py-0.5 rounded text-[10px] ${v.status === 'active' ? 'bg-green-500/10 text-green-400 border border-green-500/20' :
+                        v.status === 'used' ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20' :
+                          'bg-slate-850 text-slate-500 border border-slate-800'
+                        }`}>
                         {v.status}
                       </span>
                     </div>
@@ -617,7 +602,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onStartBoo
           <div className="space-y-4">
             <h2 className="text-xl font-bold text-white mb-2">Active System Campaigns</h2>
             <div className="grid grid-cols-1 gap-4">
-              {promotions.filter(p => p.isActive).map(p => (
+              {promotions.filter(p => p.status === 'ACTIVE').map(p => (
                 <div key={p.id} className="bg-slate-900/40 border border-slate-850 p-5 rounded-2xl flex gap-4">
                   <div className="p-3 bg-slate-850 text-orange-400 rounded-xl border border-slate-800 flex items-center justify-center shrink-0">
                     <Gift className="w-6 h-6" />

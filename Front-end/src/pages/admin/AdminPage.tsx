@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useBooking, Customer, Booking, RedeemedVoucher, TransactionLog, Promotion } from '../../context/BookingContext';
 import { 
-  Users, Calendar, BarChart3, Search, Filter, ArrowUpDown, Eye, X, Edit, Plus, BrainCircuit, CreditCard 
+  Users, Calendar, BarChart3, Search, Filter, ArrowUpDown, Eye, X, Edit, Plus, BrainCircuit, CreditCard, Check, Gift, Trash2
 } from 'lucide-react';
+import { mockStore } from '../../services/mockStore';
+import { VoucherCatalogItem } from '../../types';
 
 export const AdminPage: React.FC = () => {
   const { 
@@ -10,7 +12,33 @@ export const AdminPage: React.FC = () => {
     updateBookingStatus, addPromotion 
   } = useBooking();
 
-  const [activeTab, setActiveTab] = useState<'customers' | 'bookings' | 'stats'>('customers');
+  const [activeTab, setActiveTab] = useState<'customers' | 'bookings' | 'stats' | 'tiers' | 'vouchers'>('customers');
+
+  // Vouchers Tab States
+  const [voucherCatalog, setVoucherCatalog] = useState<VoucherCatalogItem[]>([]);
+  const [editingVoucherId, setEditingVoucherId] = useState<string | null>(null);
+  const [vcForm, setVcForm] = useState<Partial<VoucherCatalogItem>>({});
+
+  useEffect(() => {
+    setVoucherCatalog(mockStore.getVoucherCatalog());
+  }, []);
+
+  const handleSaveVoucher = () => {
+    if (!vcForm.type || !vcForm.title || !vcForm.pointsCost || !vcForm.description) return;
+    if (editingVoucherId) {
+      mockStore.updateVoucherCatalogItem(editingVoucherId, vcForm);
+    } else {
+      mockStore.addVoucherCatalogItem(vcForm as any);
+    }
+    setVoucherCatalog(mockStore.getVoucherCatalog());
+    setEditingVoucherId(null);
+    setVcForm({});
+  };
+
+  const handleDeleteVoucher = (id: string) => {
+    mockStore.deleteVoucherCatalogItem(id);
+    setVoucherCatalog(mockStore.getVoucherCatalog());
+  };
 
   // Customer Tab States
   const [custSearch, setCustSearch] = useState('');
@@ -172,6 +200,22 @@ export const AdminPage: React.FC = () => {
             }`}
           >
             <BarChart3 className="w-4 h-4" /> Statistics & Campaigns
+          </button>
+          <button 
+            onClick={() => setActiveTab('tiers')}
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${
+              activeTab === 'tiers' ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <CreditCard className="w-4 h-4" /> Tier Management
+          </button>
+          <button 
+            onClick={() => setActiveTab('vouchers')}
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${
+              activeTab === 'vouchers' ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Gift className="w-4 h-4" /> Vouchers
           </button>
         </div>
       </div>
@@ -496,13 +540,124 @@ export const AdminPage: React.FC = () => {
                       </p>
                       <span className="text-[9px] text-slate-500 block mt-1">{new Date(l.createdAt).toLocaleString()}</span>
                     </div>
-                    <span className={`font-extrabold text-sm ${l.pointsChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                      {l.pointsChange >= 0 ? `+${l.pointsChange}` : l.pointsChange} pts
+                    <span className={`font-extrabold text-sm ${l.points >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {l.points >= 0 ? `+${l.points}` : l.points} pts
                     </span>
                   </div>
                 );
               })}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 4: Tier Management */}
+      {activeTab === 'tiers' && (
+        <div className="space-y-6">
+          <div className="flex justify-between items-center bg-slate-900/40 border border-slate-800 p-4 rounded-xl">
+            <div>
+              <h2 className="text-lg font-bold text-white">Loyalty Tier Configuration</h2>
+              <p className="text-xs text-slate-400 mt-1">Configure multiplier rates and thresholds for member upgrades.</p>
+            </div>
+            <button className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-2 rounded-lg shadow-md transition-all flex items-center gap-2">
+              <Check className="w-4 h-4" /> Save Configuration
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Member Tier */}
+            <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl flex flex-col gap-4 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-slate-500/10 rounded-full blur-xl pointer-events-none" />
+              <div className="flex justify-between items-start">
+                <span className="px-2.5 py-1 bg-slate-800 text-slate-300 border border-slate-700 rounded text-[10px] font-extrabold uppercase tracking-wider">Member</span>
+                <span className="text-slate-400 text-[10px] font-semibold">Default</span>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Point Multiplier (Kh)</label>
+                  <input type="number" step="0.1" defaultValue={1.0} className="bg-slate-950 border border-slate-800 px-3 py-2 text-xs rounded-lg text-slate-200 focus:outline-none focus:border-blue-500 font-mono" />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Washes Required</label>
+                  <input type="number" defaultValue={0} disabled className="bg-slate-950/50 border border-slate-800/50 px-3 py-2 text-xs rounded-lg text-slate-500 cursor-not-allowed font-mono" />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Spend Required (VND)</label>
+                  <input type="text" defaultValue="0" disabled className="bg-slate-950/50 border border-slate-800/50 px-3 py-2 text-xs rounded-lg text-slate-500 cursor-not-allowed font-mono" />
+                </div>
+              </div>
+            </div>
+
+            {/* Silver Tier */}
+            <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl flex flex-col gap-4 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-slate-400/20 rounded-full blur-xl pointer-events-none" />
+              <div className="flex justify-between items-start">
+                <span className="px-2.5 py-1 bg-slate-400/10 text-slate-300 border border-slate-400/20 rounded text-[10px] font-extrabold uppercase tracking-wider">Silver</span>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Point Multiplier (Kh)</label>
+                  <input type="number" step="0.1" defaultValue={1.1} className="bg-slate-950 border border-slate-800 px-3 py-2 text-xs rounded-lg text-slate-200 focus:outline-none focus:border-blue-500 font-mono" />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Washes Required</label>
+                  <input type="number" defaultValue={5} className="bg-slate-950 border border-slate-800 px-3 py-2 text-xs rounded-lg text-slate-200 focus:outline-none focus:border-blue-500 font-mono" />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Spend Required (VND)</label>
+                  <input type="text" defaultValue="2,000,000" className="bg-slate-950 border border-slate-800 px-3 py-2 text-xs rounded-lg text-slate-200 focus:outline-none focus:border-blue-500 font-mono" />
+                </div>
+              </div>
+            </div>
+
+            {/* Gold Tier */}
+            <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl flex flex-col gap-4 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-amber-500/10 rounded-full blur-xl pointer-events-none" />
+              <div className="flex justify-between items-start">
+                <span className="px-2.5 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded text-[10px] font-extrabold uppercase tracking-wider">Gold</span>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Point Multiplier (Kh)</label>
+                  <input type="number" step="0.1" defaultValue={1.2} className="bg-slate-950 border border-slate-800 px-3 py-2 text-xs rounded-lg text-slate-200 focus:outline-none focus:border-blue-500 font-mono" />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Washes Required</label>
+                  <input type="number" defaultValue={15} className="bg-slate-950 border border-slate-800 px-3 py-2 text-xs rounded-lg text-slate-200 focus:outline-none focus:border-blue-500 font-mono" />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Spend Required (VND)</label>
+                  <input type="text" defaultValue="6,000,000" className="bg-slate-950 border border-slate-800 px-3 py-2 text-xs rounded-lg text-slate-200 focus:outline-none focus:border-blue-500 font-mono" />
+                </div>
+              </div>
+            </div>
+
+            {/* Platinum Tier */}
+            <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl flex flex-col gap-4 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-cyan-500/10 rounded-full blur-xl pointer-events-none" />
+              <div className="flex justify-between items-start">
+                <span className="px-2.5 py-1 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded text-[10px] font-extrabold uppercase tracking-wider">Platinum</span>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Point Multiplier (Kh)</label>
+                  <input type="number" step="0.1" defaultValue={1.3} className="bg-slate-950 border border-slate-800 px-3 py-2 text-xs rounded-lg text-slate-200 focus:outline-none focus:border-blue-500 font-mono" />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Washes Required</label>
+                  <input type="number" defaultValue={30} className="bg-slate-950 border border-slate-800 px-3 py-2 text-xs rounded-lg text-slate-200 focus:outline-none focus:border-blue-500 font-mono" />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Spend Required (VND)</label>
+                  <input type="text" defaultValue="15,000,000" className="bg-slate-950 border border-slate-800 px-3 py-2 text-xs rounded-lg text-slate-200 focus:outline-none focus:border-blue-500 font-mono" />
+                </div>
+              </div>
+            </div>
+            
           </div>
         </div>
       )}
@@ -575,6 +730,82 @@ export const AdminPage: React.FC = () => {
               </div>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* TAB 5: Vouchers Management */}
+      {activeTab === 'vouchers' && (
+        <div className="space-y-6">
+          <div className="flex justify-between items-center bg-slate-900/40 border border-slate-800 p-4 rounded-xl">
+            <div>
+              <h2 className="text-lg font-bold text-white">Voucher Catalog</h2>
+              <p className="text-xs text-slate-400 mt-1">Manage vouchers customers can exchange with their points.</p>
+            </div>
+            <button 
+              onClick={() => { setEditingVoucherId(null); setVcForm({ type: 'discount_50k' }); }}
+              className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-2 rounded-lg shadow-md transition-all flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" /> Add Voucher
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {voucherCatalog.map(vc => (
+              <div key={vc.id} className="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl flex flex-col gap-3 relative overflow-hidden">
+                <div className="flex justify-between items-start">
+                  <span className="px-2.5 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded text-[10px] font-extrabold uppercase tracking-wider">{vc.type}</span>
+                  <div className="flex gap-2">
+                    <button onClick={() => { setEditingVoucherId(vc.id); setVcForm(vc); }} className="text-slate-400 hover:text-blue-400 transition">
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => handleDeleteVoucher(vc.id)} className="text-slate-400 hover:text-red-400 transition">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                <h3 className="font-bold text-white text-base">{vc.title}</h3>
+                <p className="text-xs text-slate-400 leading-relaxed flex-1">{vc.description}</p>
+                <div className="font-mono text-orange-400 font-extrabold text-sm pt-2 border-t border-slate-800">
+                  {vc.pointsCost} pts
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Voucher Editor Modal */}
+      {vcForm && Object.keys(vcForm).length > 0 && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="bg-slate-900 border border-slate-800 text-slate-100 rounded-2xl max-w-lg w-full shadow-2xl p-6 relative">
+            <h3 className="text-xl font-bold text-white mb-4">{editingVoucherId ? 'Edit Voucher' : 'Add New Voucher'}</h3>
+            <div className="space-y-4">
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Type</label>
+                <select value={vcForm.type} onChange={e => setVcForm({...vcForm, type: e.target.value as any})} className="bg-slate-950 border border-slate-800 px-3 py-1.5 text-xs rounded text-slate-200">
+                  <option value="discount_50k">50k Discount</option>
+                  <option value="free_basic">Free Basic Wash</option>
+                  <option value="free_detail">Free Detail Upgrade</option>
+                </select>
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Title</label>
+                <input type="text" value={vcForm.title || ''} onChange={e => setVcForm({...vcForm, title: e.target.value})} className="bg-slate-950 border border-slate-800 px-3 py-1.5 text-xs rounded text-slate-200" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Cost (Points)</label>
+                <input type="number" value={vcForm.pointsCost || 0} onChange={e => setVcForm({...vcForm, pointsCost: parseInt(e.target.value) || 0})} className="bg-slate-950 border border-slate-800 px-3 py-1.5 text-xs rounded text-slate-200" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Description</label>
+                <input type="text" value={vcForm.description || ''} onChange={e => setVcForm({...vcForm, description: e.target.value})} className="bg-slate-950 border border-slate-800 px-3 py-1.5 text-xs rounded text-slate-200" />
+              </div>
+              <div className="flex justify-end gap-2 pt-4">
+                <button onClick={() => { setEditingVoucherId(null); setVcForm({}); }} className="bg-slate-850 text-xs px-3 py-1.5 rounded border border-slate-800">Cancel</button>
+                <button onClick={handleSaveVoucher} className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-1.5 rounded shadow">Save Voucher</button>
+              </div>
+            </div>
           </div>
         </div>
       )}

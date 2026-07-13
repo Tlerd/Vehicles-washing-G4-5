@@ -67,6 +67,7 @@ export interface RedeemedVoucher {
 }
 
 export interface TransactionLog {
+  pointsChange: number;
   id: string;
   customerId: string;
   type: 'earn' | 'redeem' | 'expire' | 'tier_change';
@@ -76,6 +77,8 @@ export interface TransactionLog {
 }
 
 export interface Promotion {
+  discountPercent?: number;
+  status: string;
   id: string;
   title: string;
   description: string;
@@ -89,13 +92,13 @@ interface BookingContextType {
   updateState: (updates: Partial<BookingData> | ((prev: BookingData) => Partial<BookingData>)) => void;
   resetBooking: () => void;
   multiplier: number;
-  
+
   // Minimal Role switching properties
   activeRole: 'customer' | 'washing_counter' | 'admin';
   setActiveRole: (role: 'customer' | 'washing_counter' | 'admin') => void;
   userSession: { name: string; phone: string; role: 'customer' | 'washing_counter' | 'admin' } | null;
   setUserSession: (session: { name: string; phone: string; role: 'customer' | 'washing_counter' | 'admin' } | null) => void;
-  
+
   // Mock Database State & Methods
   currentUser: Customer | null;
   setCurrentUser: (user: Customer | null) => void;
@@ -227,12 +230,22 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   ]);
 
   const [transactionLogs, setTransactionLogs] = useState<TransactionLog[]>([
-    { id: 't1', customerId: 'c1', type: 'earn', points: 280, description: 'Earned from booking AWP-1001', createdAt: new Date().toISOString() },
-    { id: 't2', customerId: 'c1', type: 'tier_change', points: 0, description: 'Upgraded to Gold Tier', createdAt: new Date().toISOString() }
+    {
+      id: 't1', customerId: 'c1', type: 'earn', points: 280, description: 'Earned from booking AWP-1001', createdAt: new Date().toISOString(),
+      pointsChange: 0
+    },
+    {
+      id: 't2', customerId: 'c1', type: 'tier_change', points: 0, description: 'Upgraded to Gold Tier', createdAt: new Date().toISOString(),
+      pointsChange: 0
+    }
   ]);
 
   const [promotions, setPromotions] = useState<Promotion[]>([
-    { id: 'p1', title: 'Summer Shine Extra Points', description: 'Get x1.2 points on all washes this summer', multiplier: 1.2, targetTier: 'All', createdAt: new Date().toISOString() }
+    {
+      id: 'p1', title: 'Summer Shine Extra Points', description: 'Get x1.2 points on all washes this summer', multiplier: 1.2, targetTier: 'All', createdAt: new Date().toISOString(),
+      discountPercent: undefined,
+      status: ''
+    }
   ]);
 
   // Methods
@@ -288,7 +301,8 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         type: 'redeem',
         points: -points,
         description: `Redeemed ${title}`,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        pointsChange: 0
       };
       setTransactionLogs(prev => [...prev, newLog]);
     }
@@ -311,7 +325,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
             // Determine new tier
             let newTier = customer.tier;
             const washesCount = prev.filter(bk => bk.customerId === customer.id && (bk.status === 'COMPLETED' || bk.id === id)).length;
-            
+
             if (washesCount >= 30 || newSpend >= 15000000) {
               newTier = 'Platinum';
             } else if (washesCount >= 15 || newSpend >= 6000000) {
@@ -335,9 +349,10 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
               type: 'earn',
               points: pointsEarned,
               description: `Earned from booking ${b.bookingRef || b.id}`,
-              createdAt: new Date().toISOString()
+              createdAt: new Date().toISOString(),
+              pointsChange: 0
             };
-            
+
             const logsToAdd = [earnLog];
             if (newTier !== customer.tier) {
               logsToAdd.push({
@@ -346,7 +361,8 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 type: 'tier_change',
                 points: 0,
                 description: `Upgraded to ${newTier} Tier`,
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                pointsChange: 0
               });
             }
 
@@ -366,7 +382,9 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       description,
       multiplier: discountOrMultiplier > 10 ? 1 + discountOrMultiplier / 100 : discountOrMultiplier,
       targetTier,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      discountPercent: undefined,
+      status: ''
     };
     setPromotions(prev => [...prev, newPromo]);
   };
@@ -382,10 +400,10 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const multiplier = multipliers[state.vehicleSize];
 
   return (
-    <BookingContext.Provider value={{ 
-      state, 
-      updateState, 
-      resetBooking, 
+    <BookingContext.Provider value={{
+      state,
+      updateState,
+      resetBooking,
       multiplier,
       activeRole,
       setActiveRole,
