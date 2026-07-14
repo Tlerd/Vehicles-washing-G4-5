@@ -1,8 +1,5 @@
 import { useState } from 'react';
-import { authService } from '../../../services/customer/auth.service';
 import { useAuth } from '../../../context/AuthContext';
-import { signInWithPhoneNumber } from 'firebase/auth';
-import { auth } from '../../../config/firebase-config';
 
 export function useCustomerRegister() {
   const [isPending, setIsPending] = useState(false);
@@ -16,8 +13,7 @@ export function useCustomerRegister() {
       if (phoneNormalized.startsWith('0')) {
         phoneNormalized = '+84' + phoneNormalized.substring(1);
       }
-      
-      // Trigger Firebase Phone Auth (Mocking to bypass billing-not-enabled error)
+
       console.warn('Bypassing Firebase Phone Auth due to missing billing config');
       const confirmationResult = {
         verificationId: 'mock-id',
@@ -25,11 +21,10 @@ export function useCustomerRegister() {
           if (otp === '123456') {
              return { user: { getIdToken: async () => 'mock-token' } };
           }
-          throw new Error('Mã OTP không hợp lệ. Vui lòng nhập 123456');
+          throw new Error('Invalid OTP. Please enter 123456.');
         }
       };
 
-      // Store temp registration data in session storage for verification step
       sessionStorage.setItem('temp_reg_data', JSON.stringify({
         fullName: data.fullName,
         phone: data.phone,
@@ -61,7 +56,6 @@ export function useSendCustomerOtp() {
       if (phoneNormalized.startsWith('0')) {
         phoneNormalized = '+84' + phoneNormalized.substring(1);
       }
-      // Mocking Firebase Phone Auth for resend
       console.warn('Bypassing Firebase Phone Auth due to missing billing config');
       const confirmationResult = {
         verificationId: 'mock-id',
@@ -69,7 +63,7 @@ export function useSendCustomerOtp() {
           if (otp === '123456') {
              return { user: { getIdToken: async () => 'mock-token' } };
           }
-          throw new Error('Mã OTP không hợp lệ. Vui lòng nhập 123456');
+          throw new Error('Invalid OTP. Please enter 123456.');
         }
       };
       return { confirmationResult, otpExpiresIn: 60 };
@@ -94,20 +88,18 @@ export function useVerifyCustomerOtp() {
     setError(null);
     try {
       if (!data.confirmationResult) {
-        throw new Error('Không tìm thấy phiên xác thực OTP. Vui lòng gửi lại.');
+        throw new Error('OTP verification session was not found. Please send the code again.');
       }
-      
-      // Confirm the OTP code via Firebase SDK
+
       const userCredential = await data.confirmationResult.confirm(data.otp);
       const firebaseToken = await userCredential.user.getIdToken();
 
-      // Retrieve temp data and actually register
       const stored = sessionStorage.getItem('temp_reg_data');
       if (!stored) {
         throw new Error('Registration data lost. Please register again.');
       }
       const regData = JSON.parse(stored);
-      
+
       const regResult = await register(regData.fullName, regData.phone, regData.email, regData.password, firebaseToken);
       if (!regResult.success) {
         throw new Error(regResult.error || 'Registration failed after OTP verify');
