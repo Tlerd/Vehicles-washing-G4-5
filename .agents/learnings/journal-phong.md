@@ -43,3 +43,10 @@
 - **Sửa lỗi Trạng thái Đăng nhập & Dữ liệu khách hàng (Auth & Session State):**
   - Khắc phục lỗi tải lại trang (reload/F5) bị văng ngược về màn hình chính. Logic quản lý Session và Private Routing đã được điều chỉnh để đọc đúng `localStorage`, giúp giữ người dùng ở lại đúng màn hình Dashboard/Admin sau khi reload.
   - Sửa lỗi rò rỉ trạng thái (State leak) khiến hai tài khoản khách hàng khác nhau bị dùng chung một trạng thái Booking. Đã xử lý reset lại dữ liệu Booking Context (xóa giỏ hàng, thông tin xe, v.v.) mỗi khi thực hiện thao tác chuyển tài khoản hoặc đăng xuất/đăng nhập, đảm bảo tiến trình đặt lịch của mỗi tài khoản là hoàn toàn độc lập.
+
+### Cập nhật 2026-07-15 (Phiên làm việc tiếp theo)
+* **Sửa lỗi lưu Xe (Vehicle):** Thêm khối \	ry...catch\ vào \ehicle.service.ts\ để tự động lưu vào Mock Data khi không gọi được API thật.
+* **Sửa lỗi trắng màn hình (White Screen) khi đặt lịch mới:** Bọc thêm \<CustomerBookingProvider>\ vào \AppRouter.tsx\ (do quá trình cập nhật cấu trúc Router của Phát bị sót).
+* **Sửa lỗi UI giỏ hàng che nút Next:** Thêm \padding-bottom: 100px\ cho \.wizard\ trong \BookingWizard.module.css\ để cuộn qua khỏi nút giỏ hàng nổi.
+* **Đồng bộ code:** Gộp và đẩy toàn bộ thư mục \Front-end/\, \.agents/\, và \docs/superpowers/\ sang nhánh \phong26\ theo yêu cầu.
+
