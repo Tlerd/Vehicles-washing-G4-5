@@ -1,50 +1,80 @@
 import { Booking, BookingDraft, TimeSlot } from '../../types';
-import apiClient from '../../config/axios';
+import { SLOT_INTERVAL_MINUTES, TIME_SLOTS_START, TIME_SLOTS_END, LOYALTY_TIERS } from '../../config/constants';
+import { mockStore } from '../mockStore';
+import { priceService } from './price.service';
 
 export const bookingService = {
-  async createBooking(draft: BookingDraft, customerId: string): Promise<Booking & { vietQrUrl?: string }> {
+  createBooking(draft: BookingDraft, customerId: string): Booking {
     if (!draft.branchId || !draft.date || !draft.time) {
       throw new Error('Missing required booking information');
     }
 
-    if (customerId === 'guest') throw new Error('Please login before booking');
-    const serviceCodes = draft.selectedServices;
-    const branchId = draft.branchId === 'D1' ? 1 : draft.branchId === 'D7' ? 2 : Number(draft.branchId);
-    const response = await apiClient.post('/bookings', {
-      customerId: Number(customerId), vehicleId: draft.vehicleId ? Number(draft.vehicleId) : null,
-      licensePlate: draft.vehiclePlate, brand: draft.vehicleBrand, vehicleSize: draft.carSize.toUpperCase(), branchId,
-      serviceCodes, bookingDate: draft.date, bookingTime: draft.time,
-      voucherId: draft.voucherId ? Number(draft.voucherId) : null,
-    });
-    const data = response.data;
-    return {
-      id: String(data.id), bookingRef: data.bookingRef, customerId: String(data.customerId),
-      vehicleId: String(data.vehicleId), services: draft.selectedServices, carSize: draft.carSize,
-      branchId: draft.branchId, date: data.bookingDate, time: data.bookingTime,
-      totalPrice: Number(data.totalPrice), status: data.status, pointsEarned: data.pointsEarned,
-      createdAt: data.createdAt, vietQrUrl: data.vietQrUrl,
+    const totalPrice = priceService.calculateFinalPrice(draft.selectedServices, draft.carSize);
+    
+    let pointsEarned = 0;
+    if (customerId !== 'guest') {
+      let tierMultiplier = 1.0;
+      const customer = mockStore.getCustomerById(customerId);
+      if (customer) {
+        const tierDef = LOYALTY_TIERS.find(t => t.name === customer.tier);
+        if (tierDef) tierMultiplier = tierDef.multiplier;
+      }
+      pointsEarned = Math.floor((totalPrice / 1000) * tierMultiplier);
+    }
+    
+    const bookingRef = `AWP-${Math.floor(2000 + Math.random() * 8000)}`;
+
+    const booking: Booking = {
+      id: `b_${Date.now()}`,
+      bookingRef,
+      customerId,
+      vehicleId: draft.vehicleId || '',
+      services: [...draft.selectedServices],
+      carSize: draft.carSize,
+      branchId: draft.branchId,
+      date: draft.date,
+      time: draft.time,
+      totalPrice,
+      status: 'PENDING',
+      pointsEarned,
+      createdAt: new Date().toISOString(),
     };
+
+    mockStore.addBooking(booking);
+    return booking;
   },
 
-  async hasActiveBooking(customerId:string):Promise<boolean>{
-    const bookings=await this.getBookings(customerId);
-    return bookings.some(item=>item.status==='PENDING'||item.status==='CONFIRMED');
+  getBookings(customerId: string): Booking[] {
+    return mockStore.getBookingsByCustomer(customerId);
   },
 
-  async getBookings(customerId: string): Promise<Booking[]> {
-    if (!customerId) return [];
-    const response = await apiClient.get(`/bookings/customer/${customerId}`);
-    return response.data.map((data: Record<string, unknown>) => ({
-      id: String(data.id), bookingRef: String(data.bookingRef), customerId: String(data.customerId),
-      vehicleId: String(data.vehicleId), services: [], carSize: 'sedan', branchId: String(data.branchId) === '1' ? 'D1' : 'D7',
-      date: String(data.bookingDate), time: String(data.bookingTime), totalPrice: Number(data.totalPrice),
-      status: data.status, pointsEarned: Number(data.pointsEarned), createdAt: String(data.createdAt),
-    })) as Booking[];
-  },
+  getAvailableSlots(branchId: string, date: string): TimeSlot[] {
+    const bookedSlots = mockStore.getBookedSlots(branchId, date);
+    const slots: TimeSlot[] = [];
+    
+    const [startH, startM] = TIME_SLOTS_START.split(':').map(Number);
+    const [endH, endM] = TIME_SLOTS_END.split(':').map(Number);
+    const startMinutes = startH * 60 + startM;
+    const endMinutes = endH * 60 + endM;
 
-  async getAvailableSlots(branchId: string, date: string, serviceCodes: string[]): Promise<TimeSlot[]> {
-    const numericBranch = branchId === 'D1' ? 1 : branchId === 'D7' ? 2 : Number(branchId);
-    return (await apiClient.get('/bookings/availability', { params: { branchId: numericBranch, date, serviceCodes }, paramsSerializer: { indexes: null } })).data;
+    for (let m = startMinutes; m < endMinutes; m += SLOT_INTERVAL_MINUTES) {
+      const hours = Math.floor(m / 60);
+      const mins = m % 60;
+      const timeStr = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+      
+      // Check if the date is in the past
+      const now = new Date();
+      const slotDate = new Date(date);
+      const isToday = slotDate.toDateString() === now.toDateString();
+      const isPast = isToday && (hours < now.getHours() || (hours === now.getHours() && mins <= now.getMinutes()));
+
+      slots.push({
+        time: timeStr,
+        available: !bookedSlots.includes(timeStr) && !isPast,
+      });
+    }
+
+    return slots;
   },
 
   validateBooking(draft: BookingDraft): { valid: boolean; errors: string[] } {
@@ -59,12 +89,17 @@ export const bookingService = {
     return { valid: errors.length === 0, errors };
   },
 
-  getNextDays(limit=7): { date: string; dayName: string; dayNum: number; monthName: string; isToday: boolean }[] {
+  getBookingWindowDays(tier: string = 'Member'): { date: string; dayName: string; dayNum: number; monthName: string; isToday: boolean }[] {
+    let numDays = 7;
+    if (tier === 'Silver') numDays = 10;
+    else if (tier === 'Gold') numDays = 12;
+    else if (tier === 'Platinum') numDays = 14;
+
     const days = [];
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     
-    for (let i = 0; i < limit; i++) {
+    for (let i = 0; i < numDays; i++) {
       const d = new Date();
       d.setDate(d.getDate() + i);
       days.push({

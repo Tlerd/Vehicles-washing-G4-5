@@ -1,23 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { platformService } from '../../../services/platform.service';
+import React from 'react';
+import { MOCK_PROMOTIONS } from '../../../config/constants';
 import styles from '../styles/PromotionDisplay.module.css';
 
 export const PromotionDisplay: React.FC = () => {
-  const [promotions,setPromotions]=useState<Array<Record<string,unknown>>>([]);useEffect(()=>{platformService.campaigns().then(setPromotions)},[]);
   return (
     <div className={styles.list}>
-      {promotions.map(promo => (
+      {MOCK_PROMOTIONS.map(promo => (
         <div
-          key={String(promo.promotionId)}
+          key={promo.id}
           className={styles.card}
-          style={{ background: 'linear-gradient(135deg, #0ea5e9, #6366f1)' }}
+          style={{ background: promo.bgGradient }}
         >
-          <span className={styles.cardIcon}>🎉</span>
+          <span className={styles.cardIcon}>{promo.icon}</span>
           <div className={styles.cardContent}>
-            <div className={styles.cardTitle}>{String(promo.promotionName)}</div>
-            <div className={styles.cardDesc}>{String(promo.description)}</div>
+            <div className={styles.cardTitle}>{promo.title}</div>
+            <div className={styles.cardDesc}>{promo.description}</div>
           </div>
-          <span className={styles.cardBadge}>×{String(promo.discountPercent)} points</span>
+          <span className={styles.cardBadge}>{promo.discount}</span>
         </div>
       ))}
     </div>

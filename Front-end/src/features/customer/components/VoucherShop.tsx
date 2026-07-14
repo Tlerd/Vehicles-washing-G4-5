@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { platformService } from '../../../services/platform.service';
+import React, { useState } from 'react';
+import { RedeemedVoucher } from '../../../types';
+import { mockStore } from '../../../services/mockStore';
 
 interface VoucherShopProps {
   customerId: string;
@@ -7,38 +8,19 @@ interface VoucherShopProps {
   onChanged: () => void;
 }
 
-const voucherCatalog: Array<{
-  type: 'DISCOUNT_50K'|'FREE_BASIC'|'FREE_DETAIL';
-  title: string;
-  pointsCost: number;
-  description: string;
-}> = [
-  {
-    type: 'DISCOUNT_50K',
-    title: '50k Discount Voucher',
-    pointsCost: 500,
-    description: 'Use on any wash bill from 200k.',
-  },
-  {
-    type: 'FREE_BASIC',
-    title: 'Free Basic Wash',
-    pointsCost: 1200,
-    description: 'Redeem one standard exterior and interior basic wash.',
-  },
-  {
-    type: 'FREE_DETAIL',
-    title: 'Free Detail Upgrade',
-    pointsCost: 2400,
-    description: 'Upgrade a basic wash to detail wash at checkout.',
-  },
-];
-
 export const VoucherShop: React.FC<VoucherShopProps> = ({ customerId, points, onChanged }) => {
   const [message, setMessage] = useState('');
-  const [vouchers,setVouchers]=useState<Array<Record<string,unknown>>>([]);const load=()=>platformService.vouchers(customerId).then(setVouchers);useEffect(()=>{void load()},[customerId]);
+  const vouchers = mockStore.getVouchersByCustomer(customerId);
+  const voucherCatalog = mockStore.getVoucherCatalog();
 
-  const handleRedeem = async (item: (typeof voucherCatalog)[number]) => {
-    try { const voucher=await platformService.redeem(customerId,item.type,item.pointsCost);setMessage(`Redeemed ${item.title}. Code: ${voucher.voucherCode}`);await load();onChanged(); } catch { setMessage('Not enough points or voucher could not be redeemed.'); }
+  const handleRedeem = (item: (typeof voucherCatalog)[number]) => {
+    const voucher = mockStore.redeemVoucher(customerId, item.type, item.pointsCost, item.title);
+    if (!voucher) {
+      setMessage('Not enough points for this voucher.');
+      return;
+    }
+    setMessage(`Redeemed ${voucher.title}. Code: ${voucher.code}`);
+    onChanged();
   };
 
   return (
@@ -110,7 +92,7 @@ export const VoucherShop: React.FC<VoucherShopProps> = ({ customerId, points, on
         ) : (
           <div style={{ display: 'grid', gap: 8 }}>
             {vouchers.map(voucher => (
-              <div key={String(voucher.voucherId)} style={{
+              <div key={voucher.id} style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 gap: 10,
@@ -119,8 +101,8 @@ export const VoucherShop: React.FC<VoucherShopProps> = ({ customerId, points, on
                 padding: '9px 10px',
                 fontSize: 12,
               }}>
-                <span style={{ color: '#0f172a', fontWeight: 700 }}>{String(voucher.voucherType)}</span>
-                <span style={{ color: '#0284c7', fontWeight: 800 }}>{String(voucher.voucherCode)}</span>
+                <span style={{ color: '#0f172a', fontWeight: 700 }}>{voucher.title}</span>
+                <span style={{ color: '#0284c7', fontWeight: 800 }}>{voucher.code}</span>
               </div>
             ))}
           </div>
