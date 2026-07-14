@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { bookingService } from '../../../services/customer/booking.service';
 
-import { mockStore } from '../../../services/mockStore';
+import { platformService } from '../../../services/platform.service';
+import { Booking, PointsTransaction } from '../../../types';
 
 import { BookingHistory } from '../components/BookingHistory';
 import { PromotionDisplay } from '../components/PromotionDisplay';
@@ -19,9 +20,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
   const { currentUser } = useAuth();
   const customerId = currentUser?.id || '';
 
-  const bookings = bookingService.getBookings(customerId);
-
-  const transactions = mockStore.getTransactionsByCustomer(customerId);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [transactions, setTransactions] = useState<PointsTransaction[]>([]);
+  useEffect(() => { if (customerId) { bookingService.getBookings(customerId).then(setBookings); platformService.points(customerId).then(setTransactions); } }, [customerId]);
 
   const totalBookings = bookings.length;
   const completedBookings = bookings.filter(b => b.status === 'COMPLETED').length;

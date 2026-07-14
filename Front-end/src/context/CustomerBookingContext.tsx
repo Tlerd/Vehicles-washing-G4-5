@@ -18,6 +18,9 @@ const initialDraft: BookingDraft = {
   date: null,
   time: null,
   vehicleId: null,
+  vehiclePlate: '',
+  vehicleBrand: '',
+  voucherId: null,
 };
 
 const CustomerBookingContext = createContext<CustomerBookingContextType | undefined>(undefined);

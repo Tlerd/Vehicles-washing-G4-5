@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { useCustomerBooking } from '../../../context/CustomerBookingContext';
-import { useAuth } from '../../../context/AuthContext';
 import { Button } from '../../../components/Button/Button';
 import { Copy, Check, QrCode } from 'lucide-react';
 import { CAR_TYPES, SERVICES, BRANCHES } from '../../../config/constants';
 import { priceService } from '../../../services/customer/price.service';
-import { mockStore } from '../../../services/mockStore';
 import { formatDate, formatTime } from '../../../utils/formatters';
 import styles from '../styles/StepPayment.module.css';
 
@@ -14,8 +12,7 @@ interface StepPaymentProps {
 }
 
 export const StepPayment: React.FC<StepPaymentProps> = ({ onComplete }) => {
-  const { draft, resetDraft, updateDraft } = useCustomerBooking();
-  const { currentUser } = useAuth();
+  const { draft, resetDraft } = useCustomerBooking();
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const carType = CAR_TYPES.find(c => c.id === draft.carSize);
@@ -23,45 +20,22 @@ export const StepPayment: React.FC<StepPaymentProps> = ({ onComplete }) => {
     .map(id => SERVICES.find(s => s.id === id))
     .filter(Boolean);
   const branch = BRANCHES.find(b => b.id === draft.branchId);
-  const basePrice = priceService.calculateFinalPrice(draft.selectedServices, draft.carSize);
-  
-  // Available vouchers
-  const myVouchers = currentUser ? mockStore.getVouchersByCustomer(currentUser.id).filter(v => !v.isUsed) : [];
-  const selectedVoucher = myVouchers.find(v => v.id === draft.appliedVoucherId);
-
-  // Calculate discount
-  let discountAmount = 0;
-  if (selectedVoucher) {
-    if (selectedVoucher.type === 'discount_50k') discountAmount = 50000;
-    else if (selectedVoucher.type === 'free_basic') {
-      const basicWash = SERVICES.find(s => s.id === 'wc1');
-      discountAmount = basicWash ? basicWash.basePrice * (carType?.multiplier || 1) : 0;
-    }
-    else if (selectedVoucher.type === 'free_detail') {
-      const detailWash = SERVICES.find(s => s.id === 'wc2');
-      const basicWash = SERVICES.find(s => s.id === 'wc1');
-      if (detailWash && basicWash) {
-        discountAmount = (detailWash.basePrice - basicWash.basePrice) * (carType?.multiplier || 1);
-      }
-    }
-  }
-  
-  const totalPrice = Math.max(0, basePrice - discountAmount);
+  const totalPrice = draft.confirmedTotalPrice ?? priceService.calculateFinalPrice(draft.selectedServices, draft.carSize);
   
   // Mock booking reference based on draft (since we don't have the real object here unless fetched)
   // Usually this comes from the backend. We'll use the ID we stored in draft earlier.
-  const bookingRef = draft.bookingId ? `AWP-${draft.bookingId.split('_')[1]}` : 'AWP-123456';
+  const bookingRef = draft.bookingRef || `AWP-${draft.bookingId || 'PENDING'}`;
   
   const paymentDetails = {
     bank: 'Vietcombank',
-    accountName: 'AUTO WASH PRO',
-    accountNumber: '0123456789',
+    accountName: 'VINAWASH CO. LTD',
+    accountNumber: '1234567890',
     amount: totalPrice.toString(),
     content: bookingRef,
   };
 
   // Mock VietQR URL (Using a generic placeholder for the UI)
-  const qrUrl = `https://api.vietqr.io/image/970436-0123456789-U9Wkq3N.jpg?amount=${totalPrice}&addInfo=${bookingRef}&accountName=AUTO%20WASH%20PRO`;
+  const qrUrl = draft.vietQrUrl || `https://img.vietqr.io/image/VCB-1234567890-compact2.png?amount=${totalPrice}&addInfo=${encodeURIComponent(bookingRef)}&accountName=VINAWASH%20CO.%20LTD`;
 
   const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
@@ -84,9 +58,6 @@ export const StepPayment: React.FC<StepPaymentProps> = ({ onComplete }) => {
   };
 
   const handleFinish = () => {
-    if (selectedVoucher) {
-      mockStore.markVoucherUsed(selectedVoucher.id);
-    }
     resetDraft();
     onComplete();
   };
@@ -123,41 +94,12 @@ export const StepPayment: React.FC<StepPaymentProps> = ({ onComplete }) => {
           <div className={styles.summaryRow}>
             <span className={styles.summaryLabel}>Schedule</span>
             <span className={styles.summaryValue}>
-              {draft.date ? formatDate(draft.date) : ''} - {draft.time ? formatTime(draft.time) : ''}
+              {draft.date ? formatDate(draft.date) : ''} · {draft.time ? formatTime(draft.time) : ''} – {draft.endTime ? formatTime(draft.endTime) : ''}
             </span>
           </div>
 
-          <div className={styles.summaryRow}>
-            <span className={styles.summaryLabel}>Subtotal</span>
-            <span className={styles.summaryValue}>{priceService.formatPrice(basePrice)}</span>
-          </div>
-
-          <div style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid #e2e8f0' }}>
-            <h4 style={{ fontSize: 13, fontWeight: 700, color: '#334155', marginBottom: 12 }}>Apply Reward Voucher</h4>
-            <select
-              value={draft.appliedVoucherId || ''}
-              onChange={(e) => updateDraft({ appliedVoucherId: e.target.value || undefined })}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                borderRadius: 8,
-                border: '1px solid #cbd5e1',
-                fontSize: 13,
-                marginBottom: 16,
-              }}
-            >
-              <option value="">-- No voucher applied --</option>
-              {myVouchers.map(v => (
-                <option key={v.id} value={v.id}>{v.title} ({v.code})</option>
-              ))}
-            </select>
-          </div>
-
           <div className={styles.totalRow}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <span className={styles.totalLabel}>Total Amount</span>
-              {discountAmount > 0 && <span style={{ fontSize: 12, color: '#16a34a', fontWeight: 600 }}>Discount: -{priceService.formatPrice(discountAmount)}</span>}
-            </div>
+            <span className={styles.totalLabel}>Total Amount</span>
             <span className={styles.totalValue}>{priceService.formatPrice(totalPrice)}</span>
           </div>
         </div>

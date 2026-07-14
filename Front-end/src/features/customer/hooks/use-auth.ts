@@ -17,17 +17,8 @@ export function useCustomerRegister() {
         phoneNormalized = '+84' + phoneNormalized.substring(1);
       }
       
-      // Trigger Firebase Phone Auth (Mocking to bypass billing-not-enabled error)
-      console.warn('Bypassing Firebase Phone Auth due to missing billing config');
-      const confirmationResult = {
-        verificationId: 'mock-id',
-        confirm: async (otp: string) => {
-          if (otp === '123456') {
-             return { user: { getIdToken: async () => 'mock-token' } };
-          }
-          throw new Error('Mã OTP không hợp lệ. Vui lòng nhập 123456');
-        }
-      };
+      // Trigger Firebase Phone Auth
+      const confirmationResult = await signInWithPhoneNumber(auth, phoneNormalized, data.recaptchaVerifier);
 
       // Store temp registration data in session storage for verification step
       sessionStorage.setItem('temp_reg_data', JSON.stringify({
@@ -61,17 +52,7 @@ export function useSendCustomerOtp() {
       if (phoneNormalized.startsWith('0')) {
         phoneNormalized = '+84' + phoneNormalized.substring(1);
       }
-      // Mocking Firebase Phone Auth for resend
-      console.warn('Bypassing Firebase Phone Auth due to missing billing config');
-      const confirmationResult = {
-        verificationId: 'mock-id',
-        confirm: async (otp: string) => {
-          if (otp === '123456') {
-             return { user: { getIdToken: async () => 'mock-token' } };
-          }
-          throw new Error('Mã OTP không hợp lệ. Vui lòng nhập 123456');
-        }
-      };
+      const confirmationResult = await signInWithPhoneNumber(auth, phoneNormalized, data.recaptchaVerifier);
       return { confirmationResult, otpExpiresIn: 60 };
     } catch (err: any) {
       setError({ message: err.message || 'Failed to resend OTP' });

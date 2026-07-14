@@ -305,3 +305,4 @@
   border-radius: 0.25rem;
   font-family: monospace;
 }
+.loadError { color:#dc2626; font-weight:600; }

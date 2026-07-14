@@ -1,52 +1,8 @@
 import type { Customer, CustomerTier, Vehicle } from '../../types';
 
-export type CustomerTierFilter = CustomerTier | 'ALL';
-export type CustomerSortKey = 'createdAt' | 'totalSpend' | 'points';
-
-interface FilterCustomersInput {
-  customers: Customer[];
-  vehicles: Vehicle[];
-  search: string;
-  tier: CustomerTierFilter;
-  sortBy: CustomerSortKey;
+interface FilterInput { customers:Customer[]; vehicles:Vehicle[]; search:string; tier:'ALL'|CustomerTier; sortBy:'createdAt'|'totalSpend'|'points'; }
+export function getFilteredCustomers({customers,vehicles,search,tier,sortBy}:FilterInput):Customer[]{
+  const term=search.trim().toLowerCase();
+  return customers.filter(c=>tier==='ALL'||c.tier===tier).filter(c=>!term||c.name.toLowerCase().includes(term)||c.phone.includes(term)||vehicles.some(v=>v.customerId===c.id&&v.licensePlate.toLowerCase().includes(term))).sort((a,b)=>sortBy==='totalSpend'?b.totalSpend-a.totalSpend:sortBy==='points'?b.accumulatedPoints-a.accumulatedPoints:new Date(b.createdAt).getTime()-new Date(a.createdAt).getTime());
 }
-
-const normalize = (value: string) => value.trim().toLowerCase();
-
-export function getFilteredCustomers({
-  customers,
-  vehicles,
-  search,
-  tier,
-  sortBy,
-}: FilterCustomersInput): Customer[] {
-  const query = normalize(search);
-
-  return customers
-    .filter(customer => {
-      const matchesTier = tier === 'ALL' || customer.tier === tier;
-      if (!matchesTier) return false;
-      if (!query) return true;
-
-      const customerVehicles = vehicles.filter(vehicle => vehicle.customerId === customer.id);
-      const matchesCustomer =
-        normalize(customer.name).includes(query) ||
-        normalize(customer.phone).includes(query) ||
-        normalize(customer.email ?? '').includes(query);
-      const matchesVehicle = customerVehicles.some(vehicle =>
-        normalize(vehicle.licensePlate).includes(query),
-      );
-
-      return matchesCustomer || matchesVehicle;
-    })
-    .sort((left, right) => {
-      if (sortBy === 'totalSpend') return right.totalSpend - left.totalSpend;
-      if (sortBy === 'points') return right.accumulatedPoints - left.accumulatedPoints;
-      return new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime();
-    });
-}
-
-export function isValidOptionalEmail(email: string): boolean {
-  if (!email.trim()) return true;
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-}
+export const isValidOptionalEmail=(email:string):boolean=>!email||/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);

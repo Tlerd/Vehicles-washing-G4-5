@@ -91,10 +91,10 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public VehicleResponse updateVehicle(
             Long vehicleId,
+            Long customerId,
             VehicleRequest request
     ) {
-        Vehicle vehicle = vehicleRepository.findById(vehicleId)
-                .orElseThrow(() -> new RuntimeException("Vehicle not found."));
+        Vehicle vehicle = findOwnedVehicle(vehicleId, customerId);
 
         if (request == null) {
             throw new RuntimeException("Vehicle request is required.");
@@ -113,8 +113,7 @@ public class VehicleServiceImpl implements VehicleService {
                             .equalsIgnoreCase(normalizedPlate);
 
             if (plateChanged) {
-                Long customerId =
-                        vehicle.getCustomer().getCustomerId();
+               
 
                 boolean plateExists =
                         vehicleRepository
@@ -163,8 +162,7 @@ public class VehicleServiceImpl implements VehicleService {
         }
 
         if (Boolean.TRUE.equals(request.getIsDefault())) {
-            Long customerId =
-                    vehicle.getCustomer().getCustomerId();
+           
 
             clearCurrentDefault(customerId);
             vehicle.setIsDefault(true);
@@ -176,12 +174,9 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
-public void deleteVehicle(Long vehicleId) {
+public void deleteVehicle(Long vehicleId, Long customerId) {
 
-    Vehicle vehicle = vehicleRepository.findById(vehicleId)
-            .orElseThrow(() -> new RuntimeException("Vehicle not found."));
-
-    Long customerId = vehicle.getCustomer().getCustomerId();
+    Vehicle vehicle = findOwnedVehicle(vehicleId, customerId);
 
     long totalVehicles =
             vehicleRepository.countByCustomerCustomerId(customerId);

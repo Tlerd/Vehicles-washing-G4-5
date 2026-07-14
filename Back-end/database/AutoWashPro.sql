@@ -28,6 +28,8 @@ CREATE TABLE [dbo].[bookings](
 	[branch_id] [bigint] NOT NULL,
 	[booking_date] [date] NOT NULL,
 	[booking_time] [time](7) NOT NULL,
+	[end_time] [time](7) NULL,
+	[duration_minutes] [int] NULL,
 	[total_price] [decimal](12, 2) NULL,
 	[status] [varchar](30) NULL,
 	[applied_voucher_id] [bigint] NULL,
@@ -71,6 +73,7 @@ CREATE TABLE [dbo].[customers](
 	[email] [varchar](100) NULL,
 	[password_hash] [varchar](255) NOT NULL,
 	[tier] [varchar](20) NOT NULL,
+	[role] [varchar](20) NOT NULL DEFAULT 'CUSTOMER',
 	[accumulated_points] [int] NOT NULL,
 	[total_spent] [decimal](12, 2) NOT NULL,
 	[total_washes] [int] NOT NULL,
@@ -292,4 +295,34 @@ REFERENCES [dbo].[customers] ([customer_id])
 GO
 ALTER TABLE [dbo].[vouchers]  WITH CHECK ADD FOREIGN KEY([customer_id])
 REFERENCES [dbo].[customers] ([customer_id])
+GO
+
+-- FR-005..FR-009 demo catalog. Safe to run repeatedly on a new or existing database.
+IF NOT EXISTS (SELECT 1 FROM branches WHERE branch_id = 1)
+BEGIN
+    SET IDENTITY_INSERT branches ON;
+    INSERT INTO branches (branch_id, branch_name, address, phone, open_time, close_time, status)
+    VALUES (1, N'AutoWash Pro - District 1', N'123 Lê Lợi, Quận 1, TP.HCM', '02812345678', '07:00', '20:00', 'ACTIVE');
+    SET IDENTITY_INSERT branches OFF;
+END
+IF NOT EXISTS (SELECT 1 FROM branches WHERE branch_id = 2)
+BEGIN
+    SET IDENTITY_INSERT branches ON;
+    INSERT INTO branches (branch_id, branch_name, address, phone, open_time, close_time, status)
+    VALUES (2, N'AutoWash Pro - District 7', N'456 Nguyễn Hữu Thọ, Quận 7, TP.HCM', '02887654321', '07:00', '20:00', 'COMING_SOON');
+    SET IDENTITY_INSERT branches OFF;
+END
+UPDATE branches SET status='COMING_SOON' WHERE branch_id=2;
+GO
+
+IF NOT EXISTS (SELECT 1 FROM services WHERE service_code = 'wc1') INSERT INTO services(service_code,service_name,description,base_price,duration_minutes,status) VALUES('wc1',N'VW Basic Wash',N'Basic exterior and interior cleaning',170000,20,'ACTIVE');
+IF NOT EXISTS (SELECT 1 FROM services WHERE service_code = 'wc2') INSERT INTO services(service_code,service_name,description,base_price,duration_minutes,status) VALUES('wc2',N'VW Detail Wash',N'Detailed wash package',270000,20,'ACTIVE');
+IF NOT EXISTS (SELECT 1 FROM services WHERE service_code = 'wc3') INSERT INTO services(service_code,service_name,description,base_price,duration_minutes,status) VALUES('wc3',N'VW Ultimate Wash',N'Ultimate wash and care package',590000,40,'ACTIVE');
+IF NOT EXISTS (SELECT 1 FROM services WHERE service_code = 'wc4') INSERT INTO services(service_code,service_name,description,base_price,duration_minutes,status) VALUES('wc4',N'Exterior Wash',N'Basic exterior wash',80000,20,'ACTIVE');
+IF NOT EXISTS (SELECT 1 FROM services WHERE service_code = 'wc5') INSERT INTO services(service_code,service_name,description,base_price,duration_minutes,status) VALUES('wc5',N'Undercarriage Wash',N'Basic undercarriage wash',40000,20,'ACTIVE');
+IF NOT EXISTS (SELECT 1 FROM services WHERE service_code = 'ic1') INSERT INTO services(service_code,service_name,description,base_price,duration_minutes,status) VALUES('ic1',N'Super Clean Interior Detailing',N'Deep interior cleaning',1200000,120,'ACTIVE');
+IF NOT EXISTS (SELECT 1 FROM services WHERE service_code = 'ic2') INSERT INTO services(service_code,service_name,description,base_price,duration_minutes,status) VALUES('ic2',N'Ultimate Clean Interior Detailing',N'Premium interior cleaning',1700000,180,'ACTIVE');
+IF NOT EXISTS (SELECT 1 FROM services WHERE service_code = 'ic3') INSERT INTO services(service_code,service_name,description,base_price,duration_minutes,status) VALUES('ic3',N'Ultimate Clean Plus',N'Most intensive interior cleaning',2100000,240,'ACTIVE');
+IF NOT EXISTS (SELECT 1 FROM services WHERE service_code = 'ic4') INSERT INTO services(service_code,service_name,description,base_price,duration_minutes,status) VALUES('ic4',N'Interior Seat Spot Cleaning',N'Cleaning for one seat',350000,30,'ACTIVE');
+IF NOT EXISTS (SELECT 1 FROM services WHERE service_code = 'ic5') INSERT INTO services(service_code,service_name,description,base_price,duration_minutes,status) VALUES('ic5',N'Endoscopic AC Cleaning',N'Deep AC cleaning',1200000,60,'ACTIVE');
 GO

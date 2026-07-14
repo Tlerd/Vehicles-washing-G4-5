@@ -23,7 +23,9 @@ export const VehicleList: React.FC = () => {
   const [formBrand, setFormBrand] = useState('');
   const [formSize, setFormSize] = useState<CarSize>('sedan');
   const [formNotes, setFormNotes] = useState('');
+  const [formIsDefault, setFormIsDefault] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [settingDefaultId, setSettingDefaultId] = useState<string | null>(null);
 
   // Delete confirmation states
   const [vehicleToDelete, setVehicleToDelete] = useState<Vehicle | null>(null);
@@ -60,6 +62,7 @@ export const VehicleList: React.FC = () => {
     setFormBrand('');
     setFormSize('sedan');
     setFormNotes('');
+    setFormIsDefault(false);
     setEditingVehicle(null);
   };
 
@@ -73,6 +76,7 @@ export const VehicleList: React.FC = () => {
     setFormBrand(v.brand);
     setFormSize(v.size);
     setFormNotes(v.notes || '');
+    setFormIsDefault(v.isDefault);
     setEditingVehicle(v);
     setShowForm(true);
   };
@@ -89,12 +93,13 @@ export const VehicleList: React.FC = () => {
         if (editingVehicle.brand !== formBrand) updates.brand = formBrand;
         if (editingVehicle.size !== formSize) updates.size = formSize;
         if (editingVehicle.notes !== formNotes) updates.notes = formNotes;
+        if (!editingVehicle.isDefault && formIsDefault) updates.isDefault = true;
         
         if (Object.keys(updates).length > 0) {
           await vehicleService.updateVehicle(editingVehicle.id, updates);
         }
       } else {
-        await vehicleService.addVehicle(currentUser.id, formPlate, formBrand, formSize, formNotes);
+        await vehicleService.addVehicle(currentUser.id, formPlate, formBrand, formSize, formNotes, formIsDefault);
       }
       await fetchVehicles();
       setShowForm(false);
@@ -109,6 +114,20 @@ export const VehicleList: React.FC = () => {
 
   const confirmDelete = (v: Vehicle) => {
     setVehicleToDelete(v);
+  };
+
+  const handleSetDefault = async (vehicle: Vehicle) => {
+    if (!currentUser || vehicle.isDefault) return;
+    setSettingDefaultId(vehicle.id);
+    try {
+      await vehicleService.setDefaultVehicle(vehicle.id, currentUser.id);
+      await fetchVehicles();
+    } catch (error) {
+      console.error('Failed to set default vehicle', error);
+      alert('Could not set this vehicle as default.');
+    } finally {
+      setSettingDefaultId(null);
+    }
   };
 
   const handleDelete = async () => {
@@ -160,9 +179,19 @@ export const VehicleList: React.FC = () => {
               <div className={styles.vehicleInfo}>
                 <div className={styles.vehicleName}>{v.brand}</div>
                 <div className={styles.vehiclePlate}>{v.licensePlate}</div>
+                {v.isDefault && <span className={styles.defaultBadge}>✓ Default vehicle</span>}
               </div>
               <span className={styles.vehicleSize}>{v.size.toUpperCase()}</span>
               <div className={styles.vehicleActions}>
+                {!v.isDefault && (
+                  <button
+                    className={styles.defaultBtn}
+                    onClick={() => handleSetDefault(v)}
+                    disabled={settingDefaultId === v.id}
+                  >
+                    {settingDefaultId === v.id ? 'Setting...' : 'Set default'}
+                  </button>
+                )}
                 <button className={styles.actionBtn} onClick={() => openEditForm(v)}>✏️</button>
                 <button className={`${styles.actionBtn} ${styles.deleteBtn}`} onClick={() => confirmDelete(v)}>🗑️</button>
               </div>
@@ -214,6 +243,15 @@ export const VehicleList: React.FC = () => {
             value={formNotes}
             onChange={e => setFormNotes(e.target.value)}
           />
+          <label className={styles.defaultCheckbox}>
+            <input
+              type="checkbox"
+              checked={formIsDefault}
+              disabled={editingVehicle?.isDefault}
+              onChange={e => setFormIsDefault(e.target.checked)}
+            />
+            Set as default vehicle
+          </label>
           <div className={styles.formActions}>
             <Button variant="secondary" size="sm" onClick={() => { setShowForm(false); resetForm(); }}>
               Cancel

@@ -9,13 +9,14 @@ export const vehicleService = {
     return response.data;
   },
 
-  async addVehicle(customerId: string, licensePlate: string, brand: string, size: CarSize, notes?: string): Promise<Vehicle> {
+  async addVehicle(customerId: string, licensePlate: string, brand: string, size: CarSize, notes?: string, isDefault = false): Promise<Vehicle> {
     const response = await apiClient.post('/vehicles', {
       customerId,
       licensePlate,
       brand,
       size,
       notes,
+      isDefault,
     });
     return response.data;
   },
@@ -27,5 +28,12 @@ export const vehicleService = {
 
   async deleteVehicle(id: string): Promise<void> {
     await apiClient.delete(`/vehicles/${id}`);
+  },
+
+  async setDefaultVehicle(id: string, customerId: string): Promise<Vehicle> {
+    const response = await apiClient.patch(`/vehicles/${id}/default`, null, {
+      params: { customerId },
+    });
+    return response.data;
   }
 };
