@@ -13,6 +13,7 @@ import { CustomerLayout } from '../layouts/CustomerLayout';
 import { bookingService } from '../services/customer/booking.service';
 import { mockStore } from '../services/mockStore';
 import { useAuth } from '../context/AuthContext';
+import { CustomerBookingProvider } from '../context/CustomerBookingContext';
 
 type PageId = 'dashboard' | 'booking' | 'vehicles' | 'history' | 'promotions' | 'points';
 
@@ -89,10 +90,12 @@ export const AppRouter: React.FC = () => {
   };
 
   return (
-    <CustomerLayout activeNav={activePage} onNavChange={handleNavigate}>
-       <Routes>
-          <Route path="/*" element={renderPage()} />
-       </Routes>
-    </CustomerLayout>
+    <CustomerBookingProvider>
+      <CustomerLayout activeNav={activePage} onNavChange={handleNavigate}>
+         <Routes>
+            <Route path="/*" element={renderPage()} />
+         </Routes>
+      </CustomerLayout>
+    </CustomerBookingProvider>
   );
 };

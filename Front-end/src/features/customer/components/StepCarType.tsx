@@ -10,7 +10,7 @@ export const StepCarType: React.FC = () => {
   const { draft, updateDraft } = useCustomerBooking();
   const { currentUser } = useAuth();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (currentUser && currentUser.id !== 'guest') {

@@ -20,11 +20,11 @@ This document contains a structured list of development tasks for implementing t
 
 ---
 
-## Task 3: Twilio OTP Service Scaffolding
-*   **[ ] Task 3.1: OTP Proxy Server**  
-    Build a local Node.js Express server in `Back-end/otp-service/` with endpoints `/api/otp/send` and `/api/otp/verify`. Use Twilio Verify API client.
-*   **[ ] Task 3.2: OTP Front-end Client**  
-    Create API service methods in `src/services/otpService.ts` to call send and verify endpoints. Add helper function `formatToE164` to normalize Vietnamese phone number entries.
+## Task 3: Firebase OTP Service Integration
+*   **[ ] Task 3.1: Firebase Admin SDK Setup**  
+    Initialize Firebase Admin SDK on the Spring Boot Back-end. Map the properties and configure a decoder to verify Firebase ID tokens.
+*   **[ ] Task 3.2: OTP Front-end Firebase Integration**  
+    Configure Firebase Client SDK on the Front-end. Set up RecaptchaVerifier and call `signInWithPhoneNumber` to send and verify OTP codes, passing the ID token to the backend during registration.
 
 ---
 
@@ -49,15 +49,15 @@ This document contains a structured list of development tasks for implementing t
 
 ## Task 5: 6-Step Booking Wizard Implementation
 *   **[ ] Task 5.1: Booking Header and Navigation**  
-    Implement `BookingHeader.tsx` displaying the stepper indicator (`Size Xe` ➔ `Branch` ➔ `Date & Time` ➔ `Services` ➔ `Information` ➔ `Confirmation`). Make headers clickable to support back navigation. Add car size dropdown selector.
+    Implement `BookingHeader.tsx` displaying the stepper indicator (`Size Xe` ➔ `Branch` ➔ `Services` ➔ `Date & Time` ➔ `Information` ➔ `Confirmation`). Make headers clickable to support back navigation. Add car size dropdown selector.
 *   **[ ] Task 5.2: Step 1 (StepCarSize)**  
     Create size selection step with cards for Hatchback, Sedan, SUV, and Pickup. Set selection to state and auto-advance.
 *   **[ ] Task 5.3: Step 2 (StepBranch)**  
     Create branch card selector (District 1 / District 7).
-*   **[ ] Task 5.4: Step 3 (StepSchedule)**  
-    Build date calendar slider (showing 7-14 slots depending on user tier) and 30-minute interval grid. Incorporate "Receive SMS reminder 1 day before" checkbox.
-*   **[ ] Task 5.5: Step 4 (StepServices)**  
-    Build services catalog with collapsable accordions. Add detailed description modal overlays for each service and a sticky checkout cart summary. Apply car size multipliers to prices.
+*   **[ ] Task 5.4: Step 3 (StepServices)**  
+    Build services catalog visually divided into two tabs: Express Wash & Add-ons vs Detailing & Premium Combos. Add detailed description modal overlays for each service and a sticky checkout cart summary. Apply car size multipliers to prices.
+*   **[ ] Task 5.5: Step 4 (StepSchedule)**  
+    Build date calendar slider (showing 7-14 slots depending on user tier) and 30-minute interval grid. Check and dynamically disable slots that do not have enough contiguous slots to fit the total duration of selected services. Incorporate "Receive SMS reminder 1 day before" checkbox.
 *   **[ ] Task 5.6: Step 5 (StepContact)**  
     Implement contact form validating Name, SĐT, Biển số xe, and password fields (visible if "Create Account" checkbox is checked).
 *   **[ ] Task 5.7: Step 6 (StepPayment)**  

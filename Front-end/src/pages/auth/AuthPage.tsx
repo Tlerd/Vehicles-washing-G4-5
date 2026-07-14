@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTheme } from '../../context/ThemeContext';
 import { useBooking } from '../../context/BookingContext';
-import { Sun, Moon, Car, ShieldAlert, Sparkles, Trophy, ShieldCheck } from 'lucide-react';
+import { Sun, Moon, Car, ShieldAlert, ShieldCheck } from 'lucide-react';
 
 interface AuthPageProps {
   onStartBooking: (isGuest: boolean, customerData?: any) => void;

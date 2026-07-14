@@ -1,6 +1,6 @@
-# Technical Specification: [FR-001] Customer Registration & Twilio OTP Verification
+# Technical Specification: [FR-001] Customer Registration & Firebase OTP Verification
 
-This document specifies the technical design, requirements, and BDD verification scenarios for implementing customer registration secured with Twilio SMS OTP verification.
+This document specifies the technical design, requirements, and BDD verification scenarios for implementing customer registration secured with Firebase Phone Authentication OTP verification.
 
 * **Parent Epic**: `EPIC: FR-001..FR-013 Delivery`
 * **Milestone**: Release 1.0
@@ -14,7 +14,7 @@ This document specifies the technical design, requirements, and BDD verification
 
 ### 1.1. Granular Operations (CRUD Matrix)
 
-* **Create**: Register a new Customer profile in the database upon successful OTP verification and password check.
+* **Create**: Register a new Customer profile in the database upon successful Firebase ID Token verification and password check.
 * **Read**: Check if a phone number already exists in the database before sending OTP to prevent duplicate registrations.
 * **Update / Delete**: None (handled under user profile edit workflows).
 
@@ -26,18 +26,18 @@ This document specifies the technical design, requirements, and BDD verification
 | `phone` | String | Yes | Phone number in normalized E.164 format. Unique. |
 | `password` | String | Yes | Password. Minimum 6 characters. Stored as BCrypt hash. |
 | `email` | String | No | Optional email address. Must pass standard email format. |
-| `isOtpVerified` | Boolean | Yes | Flag indicating whether the customer's phone was OTP-verified. |
+| `firebaseToken` | String | Yes | Firebase ID Token verified on the backend. |
 
 ### 1.3. Business Rules & Constraints
 
-* **Phone Normalization (BR-015)**: The client must strip all non-digit characters and transform local Vietnamese prefixes (e.g. `0901234567`) to E.164 format (e.g., `+84901234567`) before dispatching requests.
-* **OTP Validity**: Twilio verification codes are valid for exactly 5 minutes.
-* **SMS Rate-Limiting**: A phone number is restricted to requesting a maximum of 3 OTP dispatches within a 1-hour window.
+* **Phone Normalization (BR-015)**: The client must strip all non-digit characters and transform local Vietnamese prefixes (e.g. `0901234567`) to E.164 format (e.g., `+84901234567`) before dispatching to Firebase.
+* **Firebase Token Verification**: The backend must decode and verify the Firebase ID Token using the Firebase Admin SDK. The phone number verified in the token must match the registration phone number.
+* **SMS Rate-Limiting**: Managed natively by Firebase Phone Authentication policies.
 
 ### 1.4. Role-Based Access Control (RBAC)
 
 * **Authorized Roles**: Anonymous Guest Users can access all endpoints under this specification.
-* **Security Restrictions**: Register endpoints must require a valid, backend-verified Twilio session signature or confirmation key to prevent registration via API spoofing without OTP verification.
+* **Security Restrictions**: Register endpoints must require a valid, backend-verified Firebase ID Token (`firebaseToken`) to prevent registration via API spoofing.
 
 ---
 
@@ -65,9 +65,10 @@ This document specifies the technical design, requirements, and BDD verification
 
 ### 2.2. Components & Interactive Controls
 
+* **Invisible Recaptcha**: Render `recaptcha-container` invisibly to protect against SMS spam.
 * **Countdown Timer**: A 60-second reactive countdown timer displayed next to the "Send OTP" button. The button must show "Resend OTP in XXs" and remain disabled until the timer expires.
 * **OTP Verification Input**: A 6-character text input field that remains disabled until the OTP is successfully sent.
-* **Submit Button**: The main "Sign Up & Start" button remains disabled until `isOtpVerified === true` and the password matches its confirmation.
+* **Submit Button**: The main "Sign Up & Start" button remains disabled until the OTP is successfully confirmed via Firebase and the password matches its confirmation.
 
 ### 2.3. Client-Side Validation
 
@@ -102,58 +103,18 @@ CREATE TABLE customers (
 
 ### 3.2. RESTful API Contract
 
-#### Dispatch Verification SMS
-
-* **Method & Path**: `POST /api/otp/send`
-* **Auth**: None (Permit All)
-* **Request Payload**:
-
-    ```json
-    {
-      "phoneNumber": "+84901234567"
-    }
-    ```
-
-* **Response Payload (200 OK)**:
-
-    ```json
-    {
-      "success": true,
-      "sid": "VAd172b8344e6fae8bb0db5e11f1837b2d"
-    }
-    ```
-
-#### Verify OTP Code
-
-* **Method & Path**: `POST /api/otp/verify`
-* **Request Payload**:
-
-    ```json
-    {
-      "phoneNumber": "+84901234567",
-      "code": "123456"
-    }
-    ```
-
-* **Response Payload (200 OK)**:
-
-    ```json
-    {
-      "success": true
-    }
-    ```
-
 #### Submit Registration
 
-* **Method & Path**: `POST /api/auth/register`
+* **Method & Path**: `POST /api/v1/auth/register`
 * **Request Payload**:
 
     ```json
     {
       "name": "John Doe",
       "phone": "+84901234567",
-      "password": "hashed_password_val",
-      "email": "john@example.com"
+      "password": "password_val",
+      "email": "john@example.com",
+      "firebaseToken": "eyJhbGciOiJSUzI1NiIs..."
     }
     ```
 
@@ -168,12 +129,12 @@ CREATE TABLE customers (
 
 ### 3.3. Exception Handling & HTTP Status Codes
 
-* `400 Bad Request` (Validation Failures / Invalid OTP):
+* `400 Bad Request` (Validation Failures / Invalid Firebase ID Token):
 
     ```json
     {
       "success": false,
-      "error": "Incorrect OTP code. Please try again."
+      "error": "Mã xác thực Firebase đã hết hạn hoặc không hợp lệ."
     }
     ```
 
@@ -194,22 +155,21 @@ CREATE TABLE customers (
 
 * **Given** the user enters a valid Vietnamese phone number `0901234567` in the signup form.
 * **When** the user clicks "Send OTP".
-* **Then** the client must convert the number to `+84901234567` and make a POST request to `/api/otp/send`.
+* **Then** the client must convert the number to `+84901234567` and invoke the Firebase Client SDK to send the SMS OTP.
 * **And** the "Send OTP" button must disable, displaying a 60s countdown timer.
 
 ### AC-2: Successful Registration Submission (Happy Path)
 
-* **Given** the phone number `+84901234567` is verified by the backend.
-* **And** the passwords in both password fields match and are $\ge 6$ characters.
-* **When** the user clicks "Sign Up & Start".
-* **Then** the client submits the payload to `/api/auth/register`.
-* **And** the server creates a new customer entity in `customers` table with tier set to `Member`.
+* **Given** the user inputs the correct OTP code and clicks "Verify".
+* **When** the Firebase Client SDK confirms the code and returns a valid Firebase ID Token.
+* **Then** the client submits the registration payload along with the `firebaseToken` to `POST /api/v1/auth/register`.
+* **And** the backend verifies the token, matches the phone number, and creates the customer profile in the database.
 
 ### AC-3: Failed OTP Code Verification (Edge Case)
 
 * **Given** the user enters a wrong 6-digit code.
 * **When** they click "Verify".
-* **Then** the API returns `400 Bad Request` and the frontend renders an error tag: "Incorrect OTP code. Please try again."
+* **Then** the Firebase SDK returns verification failure, and the frontend renders an error tag: "Incorrect OTP code. Please try again."
 * **And** the "Sign Up & Start" button remains disabled.
 
 ### AC-4: Duplicate Phone Number Registration (Edge Case)
@@ -231,8 +191,8 @@ CREATE TABLE customers (
 
 * **Front-end Development (Nguyen & Phong)**:
   * `[ ]` Design signup form (name, phone, email) and OTP input UI: **Nguyen** (Lead) & **Phong** (Support/Review)
-  * `[ ]` Validate phone input, password constraints, and integrate OTP send/verify APIs: **Phong** (Lead) & **Nguyen** (Support/Review)
+  * `[ ]` Integrate Firebase Client SDK and RecaptchaVerifier for OTP send/verify: **Phong** (Lead) & **Nguyen** (Support/Review)
 * **Back-end Development (Phat & Binh & Anh)**:
-  * `[ ]` Database Schema & Entity mapping (tables `customers` and `otp_tokens`): **Phat** (Lead), **Binh** (Review) & **Anh** (Support)
-  * `[ ]` Write Twilio integration service for SMS OTP and code verification logic: **Phat** (Lead), **Binh** (Review) & **Anh** (Support)
-  * `[ ]` Setup REST Controllers `/api/v1/auth/register` and `/api/v1/auth/send-otp`: **Binh** (Lead), **Phat** (Review) & **Anh** (Support)
+  * `[ ]` Database Schema & Entity mapping (table `customers`): **Phat** (Lead), **Binh** (Review) & **Anh** (Support)
+  * `[ ]` Integrate Firebase Admin SDK and write token verification logic in `AuthServiceImpl.java`: **Phat** (Lead), **Binh** (Review) & **Anh** (Support)
+  * `[ ]` Setup REST Controller `/api/v1/auth/register` with `firebaseToken` check: **Binh** (Lead), **Phat** (Review) & **Anh** (Support)

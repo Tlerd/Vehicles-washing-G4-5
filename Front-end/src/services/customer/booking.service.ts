@@ -89,12 +89,17 @@ export const bookingService = {
     return { valid: errors.length === 0, errors };
   },
 
-  getNextSevenDays(): { date: string; dayName: string; dayNum: number; monthName: string; isToday: boolean }[] {
+  getBookingWindowDays(tier: string = 'Member'): { date: string; dayName: string; dayNum: number; monthName: string; isToday: boolean }[] {
+    let numDays = 7;
+    if (tier === 'Silver') numDays = 10;
+    else if (tier === 'Gold') numDays = 12;
+    else if (tier === 'Platinum') numDays = 14;
+
     const days = [];
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < numDays; i++) {
       const d = new Date();
       d.setDate(d.getDate() + i);
       days.push({

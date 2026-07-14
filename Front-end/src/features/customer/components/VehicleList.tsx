@@ -134,11 +134,11 @@ export const VehicleList: React.FC = () => {
   return (
     <div>
       <div className={styles.header}>
-        <h3 className={styles.title}>🚗 My Vehicles</h3>
+        <h3 className={styles.title}>My vehicles</h3>
         <button className={styles.addBtn} onClick={openAddForm}>+ Add new vehicle</button>
       </div>
 
-      <div style={{ marginBottom: '1rem' }}>
+      <div className={styles.searchWrap}>
         <Input 
           placeholder="Search by plate or brand..." 
           value={searchTerm}
@@ -147,7 +147,7 @@ export const VehicleList: React.FC = () => {
       </div>
 
       {isLoading ? (
-        <div style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>Loading vehicles...</div>
+        <div className={styles.loading}>Loading vehicles...</div>
       ) : filteredVehicles.length === 0 ? (
         <div className={styles.empty}>
           {searchTerm ? 'No vehicles match your search.' : 'No vehicles yet. Add your first vehicle!'}
@@ -192,7 +192,7 @@ export const VehicleList: React.FC = () => {
             onChange={e => setFormBrand(e.target.value)}
           />
           <div>
-            <label style={{ fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px', display: 'block' }}>
+            <label className={styles.fieldLabel}>
               Vehicle size
             </label>
             <div className={styles.sizeSelect}>
@@ -232,8 +232,8 @@ export const VehicleList: React.FC = () => {
         title="Confirm Deletion"
         size="sm"
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <p style={{ margin: 0, fontSize: '0.875rem', color: '#334155', lineHeight: '1.5' }}>
+        <div className={styles.confirmContent}>
+          <p className={styles.confirmText}>
             Are you sure you want to delete the vehicle <strong>{vehicleToDelete?.licensePlate} ({vehicleToDelete?.brand})</strong>? 
             This action cannot be undone.
           </p>

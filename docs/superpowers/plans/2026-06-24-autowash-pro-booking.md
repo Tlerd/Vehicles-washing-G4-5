@@ -550,8 +550,8 @@
 
   const steps = [
     { number: 1, name: 'Branch' },
-    { number: 2, name: 'Date & Time' },
-    { number: 3, name: 'Services' },
+    { number: 2, name: 'Services' },
+    { number: 3, name: 'Date & Time' },
     { number: 4, name: 'Information' },
     { number: 5, name: 'Confirmation' }
   ];
@@ -793,13 +793,13 @@
         </div>
 
         <div className="flex justify-between mt-8 border-t border-slate-200/50 dark:border-slate-800/50 pt-6">
-          <button onClick={() => updateState({ currentStep: 1 })} className="btn-secondary">Back</button>
+          <button onClick={() => updateState({ currentStep: 2 })} className="btn-secondary">Back</button>
           <button 
             disabled={!state.selectedDate || !state.selectedTime}
-            onClick={() => updateState({ currentStep: 3 })}
+            onClick={() => updateState({ currentStep: 4 })}
             className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Continue to Services
+            Continue to Information
           </button>
         </div>
       </div>
@@ -830,49 +830,50 @@
     rua_xe_and_combo: {
       title: "Rửa xe & combo",
       items: [
-        { id: "vw_basic", name: "VW Basic Wash", price: 180000, duration: "20 phút", detail: "Bao gồm rửa xe ngoài, rửa gầm, hút bụi và lau nội thất." },
-        { id: "vw_detail", name: "VW Detail Wash", price: 280000, duration: "20 phút", detail: "Detail Wash là gói rửa xe kỹ hơn Basic Wash, phù hợp cho xe cần làm sạch sâu hơn ở cả ngoại thất, gầm xe và khu vực nội thất cơ bản. Bao gồm: Rửa xe ngoài, Rửa gầm, Hút bụi nội thất, Lau nội thất cơ bản, Vệ sinh mặt sau lazang, Vệ sinh khe kẽ nội thất, Dưỡng nhựa nhám/đen ngoại thất và dưỡng ron cửa nội thất bằng dung dịch Boronax VRP cao cấp." },
-        { id: "vw_ultimate", name: "VW Ultimate Wash", price: 640000, duration: "40 phút", detail: "Ultimate Wash là gói rửa và chăm sóc xe toàn diện hơn, kết hợp làm sạch ngoại thất, gầm, nội thất cơ bản, khử mùi và tăng độ bóng bề mặt sơn. Bao gồm toàn bộ quy trình Detail Wash kết hợp khử mùi bằng công nghệ C-AirFog và Wax sáp bóng Carnauba cao cấp." },
-        { id: "rua_ngoai", name: "Rửa xe ngoài", price: 90000, duration: "20 phút", detail: "Làm sạch ngoại thất cơ bản." },
-        { id: "rua_gam", name: "Rửa gầm", price: 50000, duration: "20 phút", detail: "Xịt áp lực cao vệ sinh bùn đất khung gầm." }
+        { id: "vw_basic", name: "VW Basic Wash", price: 180000, duration: 20, categoryType: 'EXPRESS', group: 'rua_xe', detail: "Bao gồm rửa xe ngoài, rửa gầm, hút bụi và lau nội thất." },
+        { id: "vw_detail", name: "VW Detail Wash", price: 280000, duration: 20, categoryType: 'EXPRESS', group: 'rua_xe', detail: "Detail Wash là gói rửa xe kỹ hơn Basic Wash, phù hợp cho xe cần làm sạch sâu hơn ở cả ngoại thất, gầm xe và khu vực nội thất cơ bản. Bao gồm: Rửa xe ngoài, Rửa gầm, Hút bụi nội thất, Lau nội thất cơ bản, Vệ sinh mặt sau lazang, Vệ sinh khe kẽ nội thất, Dưỡng nhựa nhám/đen ngoại thất và dưỡng ron cửa nội thất bằng dung dịch Boronax VRP cao cấp." },
+        { id: "vw_ultimate", name: "VW Ultimate Wash", price: 640000, duration: 40, categoryType: 'DETAILING', group: 'rua_xe', detail: "Ultimate Wash là gói rửa và chăm sóc xe toàn diện hơn, kết hợp làm sạch ngoại thất, gầm, nội thất cơ bản, khử mùi và tăng độ bóng bề mặt sơn. Bao gồm toàn bộ quy trình Detail Wash kết hợp khử mùi bằng công nghệ C-AirFog và Wax sáp bóng Carnauba cao cấp." },
+        { id: "rua_ngoai", name: "Rửa xe ngoài", price: 90000, duration: 20, categoryType: 'EXPRESS', group: 'rua_xe', detail: "Làm sạch ngoại thất cơ bản." },
+        { id: "rua_gam", name: "Rửa gầm", price: 50000, duration: 20, categoryType: 'EXPRESS', group: 'rua_xe', detail: "Xịt áp lực cao vệ sinh bùn đất khung gầm." }
       ]
     },
     ve_sinh_trong: {
       title: "Vệ sinh trong",
       items: [
-        { id: "interior_super", name: "Vệ sinh nội thất Super Clean", price: 1400000, duration: "Linh hoạt", detail: "Gói dọn nội thất chuyên sâu cơ bản. Bao gồm: Giặt ghế da/nỉ, vệ sinh trần, vệ sinh mặt taplo, vệ sinh tapi cửa, vệ sinh khe kẽ nội thất/cửa, vệ sinh cửa gió máy lạnh, khử mùi bằng máy ozone, dưỡng ghế da và chi tiết nhựa." },
-        { id: "interior_ultimate", name: "Vệ sinh nội thất Ultimate Clean", price: 1900000, duration: "Linh hoạt", detail: "Gói dọn nội thất cao cấp. Thực hiện tháo toàn bộ ghế xe để làm sạch sâu, giặt trần sàn, vệ sinh taplo, khe kẽ, khe điều hòa, khử mùi máy ozone và dưỡng chi tiết nhựa/da." },
-        { id: "interior_plus", name: "Vệ sinh nội thất Ultimate Clean Plus", price: 2300000, duration: "Linh hoạt", detail: "Phiên bản nâng cấp tối đa. Tháo rời toàn bộ ghế và tháo toàn bộ thảm sàn xe để giặt sàn và khử mùi sàn chuyên biệt, xử lý triệt để xe bị ngập nước, ẩm mốc hoặc đổ thức ăn nước uống." },
-        { id: "ghe_le", name: "Xử lý vị trí ngồi trên nội thất (1 vị trí)", price: 350000, duration: "Linh hoạt", detail: "Xử lý vết bẩn cục bộ trên từng vị trí ghế." },
-        { id: "noi_soi_1", name: "Vệ sinh nội soi / dàn lạnh", price: 1200000, duration: "Linh hoạt", detail: "Làm sạch dàn lạnh bằng công nghệ nội soi camera." }
+        { id: "interior_super", name: "Vệ sinh nội thất Super Clean", price: 1400000, duration: 120, categoryType: 'DETAILING', group: 've_sinh_trong', detail: "Gói dọn nội thất chuyên sâu cơ bản. Bao gồm: Giặt ghế da/nỉ, vệ sinh trần, vệ sinh mặt taplo, vệ sinh tapi cửa, vệ sinh khe kẽ nội thất/cửa, vệ sinh cửa gió máy lạnh, khử mùi bằng máy ozone, dưỡng ghế da và chi tiết nhựa." },
+        { id: "interior_ultimate", name: "Vệ sinh nội thất Ultimate Clean", price: 1900000, duration: 180, categoryType: 'DETAILING', group: 've_sinh_trong', detail: "Gói dọn nội thất cao cấp. Thực hiện tháo toàn bộ ghế xe để làm sạch sâu, giặt trần sàn, vệ sinh taplo, khe kẽ, khe điều hòa, khử mùi máy ozone và dưỡng chi tiết nhựa/da." },
+        { id: "interior_plus", name: "Vệ sinh nội thất Ultimate Clean Plus", price: 2300000, duration: 240, categoryType: 'DETAILING', group: 've_sinh_trong', detail: "Phiên bản nâng cấp tối đa. Tháo rời toàn bộ ghế và tháo toàn bộ thảm sàn xe để giặt sàn và khử mùi sàn chuyên biệt, xử lý triệt để xe bị ngập nước, ẩm mốc hoặc đổ thức ăn nước uống." },
+        { id: "ghe_le", name: "Xử lý vị trí ngồi trên nội thất (1 vị trí)", price: 350000, duration: 30, categoryType: 'EXPRESS', group: 've_sinh_trong', detail: "Xử lý vết bẩn cục bộ trên từng vị trí ghế." },
+        { id: "noi_soi_1", name: "Vệ sinh nội soi / dàn lạnh", price: 1200000, duration: 60, categoryType: 'DETAILING', group: 've_sinh_trong', detail: "Làm sạch dàn lạnh bằng công nghệ nội soi camera." }
       ]
     },
     ve_sinh_ngoai: {
       title: "Vệ sinh ngoài",
       items: [
-        { id: "khoang_may", name: "Vệ sinh khoang máy", price: 800000, duration: "Linh hoạt", detail: "Dọn dẹp bụi bẩn, dầu mỡ khoang động cơ bằng hơi nước nóng." },
-        { id: "tay_nhua_duong", name: "Tẩy nhựa đường", price: 400000, duration: "Linh hoạt", detail: "Tẩy sạch các vết nhựa đường bám quanh sườn xe." }
+        { id: "khoang_may", name: "Vệ sinh khoang máy", price: 800000, duration: 120, categoryType: 'DETAILING', group: 've_sinh_ngoai', detail: "Dọn dẹp bụi bẩn, dầu mỡ khoang động cơ bằng hơi nước nóng." },
+        { id: "tay_nhua_duong", name: "Tẩy nhựa đường", price: 400000, duration: 60, categoryType: 'EXPRESS', group: 've_sinh_ngoai', detail: "Tẩy sạch các vết nhựa đường bám quanh sườn xe." }
       ]
     },
     xu_ly_be_mat: {
       title: "Xử lý bề mặt",
       items: [
-        { id: "polish_basic", name: "Đánh bóng sơn xe Basic", price: 1500000, duration: "Linh hoạt", detail: "Đánh bóng hiệu năng 1 bước, clay bề mặt và tẩy keo nhựa đường. Xóa xước quầng xoáy nhẹ 60-70%." },
-        { id: "polish_hieu_chinh", name: "Đánh bóng sơn xe hiệu chỉnh", price: 2200000, duration: "Linh hoạt", detail: "Hiệu chỉnh khuyết tật sơn chuyên sâu 3 bước tiêu chuẩn 3M. Xóa xước dăm và quầng xoáy nặng từ 90-98%." }
+        { id: "polish_basic", name: "Đánh bóng sơn xe Basic", price: 1500000, duration: 120, categoryType: 'DETAILING', group: 'xu_ly_be_mat', detail: "Đánh bóng hiệu năng 1 bước, clay bề mặt và tẩy keo nhựa đường. Xóa xước quầng xoáy nhẹ 60-70%." },
+        { id: "polish_hieu_chinh", name: "Đánh bóng sơn xe hiệu chỉnh", price: 2200000, duration: 240, categoryType: 'DETAILING', group: 'xu_ly_be_mat', detail: "Hiệu chỉnh khuyết tật sơn chuyên sâu 3 bước tiêu chuẩn 3M. Xóa xước dăm và quầng xoáy nặng từ 90-98%." }
       ]
     },
     bao_ve: {
       title: "Bảo vệ",
       items: [
-        { id: "ceramic_2", name: "Pro Coating (Ceramic 2 lớp)", price: 8500000, duration: "Linh hoạt", detail: "Phủ ceramic bảo vệ sơn độ bền cao." },
-        { id: "ppf_dopon", "name": "PPF Dopon Save Protection 7.5 mil", price: 21000000, duration: "7.5 mil", detail: "Dán phim bảo vệ chống trầy xước đá văng." },
-        { id: "film_3m", "name": "Phim cách nhiệt 3M Crystalline", price: 15600000, duration: "Linh hoạt", detail: "Dán phim cách nhiệt quang học cao cấp nhất của 3M." }
+        { id: "ceramic_2", name: "Pro Coating (Ceramic 2 lớp)", price: 8500000, duration: 360, categoryType: 'DETAILING', group: 'bao_ve', detail: "Phủ ceramic bảo vệ sơn độ bền cao." },
+        { id: "ppf_dopon", name: "PPF Dopon Save Protection 7.5 mil", price: 21000000, duration: 720, categoryType: 'DETAILING', group: 'bao_ve', detail: "Dán phim bảo vệ chống trầy xước đá văng." },
+        { id: "film_3m", name: "Phim cách nhiệt 3M Crystalline", price: 15600000, duration: 240, categoryType: 'DETAILING', group: 'bao_ve', detail: "Dán phim cách nhiệt quang học cao cấp nhất của 3M." }
       ]
     }
   };
 
   export const StepServices: React.FC = () => {
     const { state, updateState, multiplier } = useBooking();
+    const [activeTab, setActiveTab] = useState<'EXPRESS' | 'DETAILING'>('EXPRESS');
     const [openedCategories, setOpenedCategories] = useState<Record<string, boolean>>({ rua_xe_and_combo: true });
     const [openedDetails, setOpenedDetails] = useState<Record<string, boolean>>({});
 
@@ -898,11 +899,25 @@
     // Calculate details for Cart
     const allItems = Object.values(vinawashMenu).flatMap(cat => cat.items);
     const selectedItemsDetails = allItems.filter(item => state.selectedServices.includes(item.id));
-    const totalTime = selectedItemsDetails.reduce((sum, item) => {
-      const minutes = parseInt(item.duration) || 0;
-      return sum + minutes;
-    }, 0);
+    const totalTime = selectedItemsDetails.reduce((sum, item) => sum + item.duration, 0);
     const totalPrice = selectedItemsDetails.reduce((sum, item) => sum + (item.price * multiplier), 0);
+
+    // Filter items based on active tab
+    const getFilteredMenu = () => {
+      const filtered: Record<string, { title: string; items: typeof allItems }> = {};
+      Object.entries(vinawashMenu).forEach(([catKey, cat]) => {
+        const tabItems = cat.items.filter(item => item.categoryType === activeTab);
+        if (tabItems.length > 0) {
+          filtered[catKey] = {
+            title: cat.title,
+            items: tabItems
+          };
+        }
+      });
+      return filtered;
+    };
+
+    const filteredMenu = getFilteredMenu();
 
     return (
       <div className="flex flex-col md:flex-row gap-8 py-4">
@@ -911,7 +926,31 @@
           <h2 className="text-2xl font-bold mb-2">Select Care Services</h2>
           <p className="text-slate-500 dark:text-slate-400 mb-6">Service prices are automatically multiplier-adjusted based on selected Car Size.</p>
 
-          {Object.entries(vinawashMenu).map(([catKey, cat]) => {
+          {/* Tab Switcher */}
+          <div className="flex gap-2 p-1 bg-slate-100 dark:bg-slate-900 rounded-xl max-w-md mb-6">
+            <button
+              onClick={() => setActiveTab('EXPRESS')}
+              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-colors ${
+                activeTab === 'EXPRESS'
+                  ? 'bg-brand-orange text-white'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
+              }`}
+            >
+              Express Wash & Add-ons
+            </button>
+            <button
+              onClick={() => setActiveTab('DETAILING')}
+              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-colors ${
+                activeTab === 'DETAILING'
+                  ? 'bg-brand-orange text-white'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
+              }`}
+            >
+              Detailing & Premium Combos
+            </button>
+          </div>
+
+          {Object.entries(filteredMenu).map(([catKey, cat]) => {
             const isCatOpen = !!openedCategories[catKey];
             return (
               <div key={catKey} className="glass-card overflow-hidden">
@@ -951,7 +990,7 @@
                               <div>
                                 <span className={`font-semibold text-base ${isSelected ? 'text-brand-orange' : ''}`}>{item.name}</span>
                                 <div className="text-xs text-slate-400 dark:text-slate-500 flex gap-2 items-center mt-1">
-                                  <span>{item.duration}</span>
+                                  <span>{item.duration} mins</span>
                                   <span>•</span>
                                   <span>{cat.title}</span>
                                 </div>
@@ -1372,8 +1411,8 @@
         
         <main className="flex-1 max-w-6xl mx-auto w-full px-6 mt-6">
           {state.currentStep === 1 && <StepBranch />}
-          {state.currentStep === 2 && <StepSchedule />}
-          {state.currentStep === 3 && <StepServices />}
+          {state.currentStep === 2 && <StepServices />}
+          {state.currentStep === 3 && <StepSchedule />}
           {state.currentStep === 4 && <StepContact />}
           {state.currentStep === 5 && <StepPayment onCompleteBooking={onComplete} />}
         </main>

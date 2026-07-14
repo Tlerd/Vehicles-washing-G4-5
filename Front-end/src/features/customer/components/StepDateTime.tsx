@@ -1,12 +1,17 @@
 import React, { useMemo } from 'react';
 import { useCustomerBooking } from '../../../context/CustomerBookingContext';
+import { useAuth } from '../../../context/AuthContext';
 import { bookingService } from '../../../services/customer/booking.service';
 import styles from '../styles/StepDateTime.module.css';
 
 export const StepDateTime: React.FC = () => {
   const { draft, updateDraft } = useCustomerBooking();
+  const { currentUser } = useAuth();
 
-  const days = useMemo(() => bookingService.getNextSevenDays(), []);
+  const days = useMemo(() => {
+    const tier = currentUser && currentUser.id !== 'guest' ? (currentUser as any).tier : 'Member';
+    return bookingService.getBookingWindowDays(tier);
+  }, [currentUser]);
 
   const timeSlots = useMemo(() => {
     if (!draft.branchId || !draft.date) return [];

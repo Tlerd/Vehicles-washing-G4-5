@@ -41,14 +41,14 @@ AutoWash Pro ra đời nhằm cung cấp một giải pháp quản lý rửa xe 
 ### 1.7. Giả định và Phụ thuộc (Business Assumptions and Dependencies)
 *   **AS-1**: Trạm rửa xe được trang bị đầy đủ hạ tầng phần cứng cần thiết gồm camera IP ghi nhận biển số và máy tính kết nối internet ổn định cho nhân viên vận hành.
 *   **AS-2**: Khách hàng sử dụng điện thoại thông minh có kết nối internet để đặt lịch và quản lý tài khoản.
-*   **DE-1**: Hệ thống phụ thuộc vào tính ổn định của các dịch vụ bên thứ ba như Twilio Verify API để gửi mã OTP xác thực đăng ký tài khoản.
+*   **DE-1**: Hệ thống phụ thuộc vào tính ổn định của các dịch vụ bên thứ ba như Firebase Authentication để gửi mã OTP xác thực đăng ký tài khoản.
 
 ---
 
 ## 2. Phạm vi và Giới hạn (Scope and Limitations)
 
 ### 2.1. Các Tính năng Chính (Major Features)
-*   **FE-1: Đăng ký & Xác thực Tài khoản**: Đăng ký bằng số điện thoại, xác thực OTP qua Twilio, hỗ trợ cập nhật thông tin cá nhân và phương tiện (CRUD).
+*   **FE-1: Đăng ký & Xác thực Tài khoản**: Đăng ký bằng số điện thoại, xác thực OTP qua Firebase, hỗ trợ cập nhật thông tin cá nhân và phương tiện (CRUD).
 *   **FE-2: Đặt lịch Hẹn thông minh (Booking Wizard)**: Giao diện đặt lịch 6 bước trực quan (chọn kích thước xe, chi nhánh, thời gian, dịch vụ, thông tin liên hệ và xác nhận thanh toán).
 *   **FE-3: Động cơ Khách hàng Thân thiết (Loyalty Engine)**: Tích lũy điểm thưởng thời gian thực dựa trên chi tiêu thực tế, phân cấp thành viên (Member, Silver, Gold, Platinum) và tự động xét nâng/hạ hạng theo chu kỳ rolling 12 tháng.
 *   **FE-4: Quản lý Voucher & Quà tặng**: Đổi điểm thưởng tích lũy lấy các mã giảm giá hoặc dịch vụ miễn phí. Áp dụng chính sách chào mừng người dùng mới (tặng voucher cho hóa đơn đầu tiên trên 300k/500k).
