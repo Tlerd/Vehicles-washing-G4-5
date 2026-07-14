@@ -1,7 +1,7 @@
 export type CarSize = 'hatchback' | 'sedan' | 'suv' | 'pickup';
 export type BookingStatus = 'PENDING' | 'CONFIRMED' | 'CHECKED_IN' | 'COMPLETED' | 'CANCELLED';
 export type CustomerTier = 'Member' | 'Silver' | 'Gold' | 'Platinum';
-export type UserRole = 'CUSTOMER' | 'STAFF' | 'ADMIN';
+export type UserRole = 'ADMIN' | 'COUNTER' | 'CUSTOMER';
 
 export interface Customer {
   id: string;
@@ -12,7 +12,6 @@ export interface Customer {
   accumulatedPoints: number;
   totalSpend: number;
   createdAt: string;
-  role: UserRole;
 }
 
 export interface Vehicle {
@@ -54,13 +53,11 @@ export interface Branch {
   phone: string;
   openTime: string;
   closeTime: string;
-  status?: 'ACTIVE' | 'COMING_SOON';
+  isAvailable?: boolean;
 }
 
 export interface TimeSlot {
   time: string;
-  endTime: string;
-  durationMinutes: number;
   available: boolean;
 }
 
@@ -68,18 +65,12 @@ export interface Booking {
   id: string;
   bookingRef?: string;
   customerId: string;
-  customerName?: string;
-  customerPhone?: string;
   vehicleId: string;
-  licensePlate?: string;
-  vehicleBrand?: string;
   services: string[];
   carSize: CarSize;
   branchId: string;
   date: string;
   time: string;
-  endTime?: string;
-  durationMinutes?: number;
   totalPrice: number;
   status: BookingStatus;
   pointsEarned: number;
@@ -94,15 +85,8 @@ export interface BookingDraft {
   date: string | null;
   time: string | null;
   vehicleId: string | null;
-  vehiclePlate: string;
-  vehicleBrand: string;
-  endTime?: string;
-  durationMinutes?: number;
   bookingId?: string;
-  bookingRef?: string;
-  vietQrUrl?: string;
-  confirmedTotalPrice?: number;
-  voucherId?: string | null;
+  appliedVoucherId?: string;
 }
 
 export interface Promotion {
@@ -113,6 +97,9 @@ export interface Promotion {
   validUntil: string;
   bgGradient: string;
   icon: string;
+  isActive?: boolean;
+  targetTier?: CustomerTier | 'ALL';
+  createdAt?: string;
 }
 
 export interface PointsTransaction {
@@ -122,4 +109,23 @@ export interface PointsTransaction {
   points: number;
   description: string;
   createdAt: string;
+}
+
+export interface RedeemedVoucher {
+  id: string;
+  customerId: string;
+  type: 'discount_50k' | 'free_basic' | 'free_detail';
+  title: string;
+  pointsCost: number;
+  code: string;
+  isUsed: boolean;
+  createdAt: string;
+}
+
+export interface VoucherCatalogItem {
+  id: string;
+  type: 'discount_50k' | 'free_basic' | 'free_detail';
+  title: string;
+  pointsCost: number;
+  description: string;
 }

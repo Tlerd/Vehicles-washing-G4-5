@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useBooking, Vehicle } from '../../../context/BookingContext';
+import { useBooking } from '../../../context/BookingContext';
 import { User, Phone, Mail, Car, ChevronDown, Lock, Pencil, Info } from 'lucide-react';
 
 export const StepContact: React.FC = () => {
