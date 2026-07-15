@@ -8,15 +8,15 @@ import { LandingPage } from '../features/customer/pages/LandingPage';
 import { LoginPage } from '../features/customer/pages/LoginPage';
 import { useAuth } from '../context/AuthContext';
 import { WashingCounterPage } from '../pages/washing-counter/WashingCounterPage';
+import { BookingProvider } from '../context/BookingContext';
+import { getDestinationForRole } from '../features/auth/roleAccess';
 
 const RootRedirect = () => {
   const { isAuthenticated, role } = useAuth();
   
   if (!isAuthenticated) return <Navigate to="/landing" replace />;
-  
-  if (role === 'ADMIN') return <Navigate to="/admin" replace />;
-  if (role === 'COUNTER') return <Navigate to="/counter" replace />;
-  return <Navigate to="/app" replace />;
+
+  return <Navigate to={getDestinationForRole(role)} replace />;
 };
 
 export const RootRouter: React.FC = () => {
@@ -56,7 +56,9 @@ export const RootRouter: React.FC = () => {
            path="/counter/*"
            element={
              <ProtectedRoute allowedRoles={['COUNTER']}>
-                <WashingCounterPage />
+                <BookingProvider>
+                  <WashingCounterPage />
+                </BookingProvider>
              </ProtectedRoute>
            }
         />

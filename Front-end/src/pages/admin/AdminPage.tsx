@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useBooking, Customer, Booking, RedeemedVoucher, TransactionLog, Promotion } from '../../context/BookingContext';
+import { useBooking, Customer } from '../../context/BookingContext';
 import { 
   Users, Calendar, BarChart3, Search, Filter, ArrowUpDown, Eye, X, Edit, Plus, BrainCircuit, CreditCard, Check, Gift, Trash2
 } from 'lucide-react';
@@ -8,7 +8,7 @@ import { VoucherCatalogItem } from '../../types';
 
 export const AdminPage: React.FC = () => {
   const { 
-    customers, bookings, vehicles, transactionLogs, promotions,
+    customers, bookings, vehicles, transactionLogs,
     updateBookingStatus, addPromotion 
   } = useBooking();
 
@@ -81,9 +81,7 @@ export const AdminPage: React.FC = () => {
   });
 
   // --- Filtering Bookings (with infinite scroll mock) ---
-  const todayStr = new Date().toISOString().split('T')[0];
   const filteredBookings = bookings.filter(b => {
-    const isToday = b.bookingDate === todayStr;
     const matchStatus = bkStatusFilter === 'ALL' || b.status === bkStatusFilter;
     return matchStatus; // You can toggle to default to today or let them filter
   }).sort((a, b) => {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useBooking, Customer, Vehicle, RedeemedVoucher } from '../../context/BookingContext';
+import { useBooking, Vehicle, RedeemedVoucher } from '../../context/BookingContext';
 import {
-  Car, Calendar, CreditCard, Gift, Award, Plus, Trash2, Edit, Check, ShieldAlert, Sparkles, AlertCircle, Upload
+  Car, Calendar, Gift, Award, Plus, Trash2, Edit, ShieldAlert, Sparkles, AlertCircle, Upload
 } from 'lucide-react';
 
 interface CustomerDashboardProps {
@@ -10,7 +10,7 @@ interface CustomerDashboardProps {
 
 export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({ onStartBooking }) => {
   const {
-    currentUser, customers, vehicles, bookings, vouchers, transactionLogs, promotions,
+    currentUser, vehicles, bookings, vouchers, transactionLogs, promotions,
     addVehicle, updateVehicle, deleteVehicle, redeemVoucher
   } = useBooking();
 

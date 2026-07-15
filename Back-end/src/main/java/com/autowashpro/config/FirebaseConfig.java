@@ -24,10 +24,6 @@ public class FirebaseConfig {
     @PostConstruct
     public void initFirebase() {
         try {
-            if (!firebaseResource.exists()) {
-                log.warn("WARNING: Firebase service account file was not found at {}. Firebase features will not be available, but application startup continues.", firebaseResource.getDescription());
-                return;
-            }
             InputStream serviceAccount = firebaseResource.getInputStream();
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
@@ -39,7 +35,7 @@ public class FirebaseConfig {
             }
         } catch (IOException e) {
             log.error("Failed to initialize Firebase Admin SDK", e);
-            log.warn("WARNING: Firebase Admin SDK initialization skipped due to IOException: {}", e.getMessage());
+            throw new RuntimeException("Lỗi cấu hình Firebase Admin SDK: " + e.getMessage(), e);
         }
     }
 }

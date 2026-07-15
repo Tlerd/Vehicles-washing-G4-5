@@ -16,11 +16,10 @@ public interface VehicleService {
 
     VehicleResponse updateVehicle(
             Long vehicleId,
-            Long customerId,
             VehicleRequest request
     );
 
-void deleteVehicle(Long vehicleId, Long customerId);
+void deleteVehicle(Long vehicleId);
 
     VehicleResponse setDefaultVehicle(
             Long vehicleId,

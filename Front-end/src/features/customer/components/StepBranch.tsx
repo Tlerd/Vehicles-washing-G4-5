@@ -15,12 +15,18 @@ export const StepBranch: React.FC = () => {
         {BRANCHES.map(branch => (
           <div
             key={branch.id}
-            className={`${styles.card} ${draft.branchId === branch.id ? styles.cardSelected : ''} ${branch.status==='COMING_SOON'?styles.cardDisabled:''}`}
-            onClick={() => branch.status==='ACTIVE' && updateDraft({ branchId: branch.id })}
+            className={`${styles.card} ${draft.branchId === branch.id ? styles.cardSelected : ''}`}
+            onClick={() => updateDraft({ branchId: branch.id })}
           >
-            <span className={styles.cardIcon}>📍</span>
-            <div className={styles.cardName}>{branch.name}</div>
-            {branch.status==='COMING_SOON' && <strong className={styles.comingSoon}>Sắp mở cửa</strong>}
+            <div className={styles.cardHeader}>
+              <div className={styles.cardTitle}>
+                <span className={styles.cardIcon}>📍</span>
+                <div className={styles.cardName}>{branch.name}</div>
+              </div>
+              <div className={`${styles.badge} ${branch.isAvailable ? styles.badgeAvailable : styles.badgeBusy}`}>
+                {branch.isAvailable ? '🟢 Available' : '🔴 Busy'}
+              </div>
+            </div>
             <div className={styles.cardAddress}>{branch.address}</div>
             <div className={styles.cardMeta}>
               <span className={styles.cardMetaItem}>

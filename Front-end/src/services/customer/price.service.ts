@@ -1,5 +1,6 @@
 import { CAR_MULTIPLIERS, SERVICES } from '../../config/constants';
 import { CarSize } from '../../types';
+import { formatPrice as formatCurrency } from '../../utils/formatters';
 
 export const priceService = {
   calculateBasePrice(serviceIds: string[]): number {
@@ -20,11 +21,7 @@ export const priceService = {
   },
 
   formatPrice(amount: number): string {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND',
-      minimumFractionDigits: 0,
-    }).format(amount);
+    return formatCurrency(amount);
   },
 
   getServiceDetails(serviceIds: string[]) {

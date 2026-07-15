@@ -3,7 +3,6 @@ package com.autowashpro.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Getter
 @Setter
@@ -19,12 +18,10 @@ public class PointHistory {
     private Long pointHistoryId;
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "booking_id")
     private Booking booking;
 

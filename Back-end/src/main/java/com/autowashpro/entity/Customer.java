@@ -34,9 +34,6 @@ public class Customer {
     @Column(name = "tier", nullable = false, length = 20)
     private String tier;
 
-    @Column(name = "role", nullable = false, length = 20)
-    private String role = "CUSTOMER";
-
     @Column(name = "accumulated_points", nullable = false)
     private Integer accumulatedPoints;
 

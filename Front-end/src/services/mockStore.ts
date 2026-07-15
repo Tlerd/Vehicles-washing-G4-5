@@ -142,7 +142,7 @@ class MockStore {
     return []; // Empty for now, we can add mock data later if needed
   }
 
-  addPromotion(promotion: Promotion): void {
+  addPromotion(_promotion: Promotion): void {
     // In a real app this would add to the store
   }
 
