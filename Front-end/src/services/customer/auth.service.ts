@@ -1,5 +1,5 @@
 import { Customer } from '../../types';
-import { mockStore } from '../mockStore';
+
 import apiClient from '../../config/axios';
 
 export const authService = {
@@ -19,36 +19,7 @@ export const authService = {
       };
       return { success: true, token: data.token, customer };
     } catch (err: any) {
-      let customer = mockStore.getCustomerByPhone(phone);
-      if (!customer) {
-        if (phone === '0999999999') {
-          customer = {
-            id: 'admin',
-            name: 'Admin',
-            phone: phone,
-            email: '',
-            tier: 'Platinum',
-            accumulatedPoints: 0,
-            totalSpend: 0,
-            createdAt: new Date().toISOString()
-          };
-        } else if (phone === '0987654321') {
-          customer = {
-            id: 'counter',
-            name: 'Counter Staff',
-            phone: phone,
-            email: '',
-            tier: 'Member',
-            accumulatedPoints: 0,
-            totalSpend: 0,
-            createdAt: new Date().toISOString()
-          };
-        } else {
-          return { success: false, customer: null, error: 'This phone number is not registered in the system.' };
-        }
-      }
-      console.warn('Bypassing error and logging in with Mock Data.');
-      return { success: true, token: 'mock-jwt-token', customer };
+      return { success: false, customer: null, error: err.response?.data?.message || 'Login failed.' };
     }
   },
 
@@ -85,22 +56,7 @@ export const authService = {
       }
       return { success: false, customer: null, error: 'Registration failed.' };
     } catch (err: any) {
-      console.warn('Bypassing error and registering using Mock Data.');
-      let customer = mockStore.getCustomerByPhone(phone);
-      if (!customer) {
-        customer = {
-          id: `c_${Date.now()}`,
-          name,
-          phone,
-          email,
-          tier: 'Member',
-          accumulatedPoints: 0,
-          totalSpend: 0,
-          createdAt: new Date().toISOString()
-        };
-        mockStore.addCustomer(customer);
-      }
-      return { success: true, customer };
+      return { success: false, customer: null, error: err.response?.data?.message || 'Registration failed.' };
     }
   },
 

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { BookingDraft } from '../types';
 
 interface CustomerBookingContextType {
@@ -18,12 +18,29 @@ const initialDraft: BookingDraft = {
   date: null,
   time: null,
   vehicleId: null,
+  vehiclePlate: '',
+  vehicleBrand: '',
+  voucherId: null,
 };
 
 const CustomerBookingContext = createContext<CustomerBookingContextType | undefined>(undefined);
 
 export const CustomerBookingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [draft, setDraft] = useState<BookingDraft>(initialDraft);
+  const [draft, setDraft] = useState<BookingDraft>(() => {
+    const saved = localStorage.getItem('booking_draft');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed to parse booking_draft', e);
+      }
+    }
+    return initialDraft;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('booking_draft', JSON.stringify(draft));
+  }, [draft]);
 
   const updateDraft = useCallback((updates: Partial<BookingDraft>) => {
     setDraft(prev => ({ ...prev, ...updates }));
@@ -31,6 +48,7 @@ export const CustomerBookingProvider: React.FC<{ children: React.ReactNode }> = 
 
   const resetDraft = useCallback(() => {
     setDraft(initialDraft);
+    localStorage.removeItem('booking_draft');
   }, []);
 
   const goToStep = useCallback((step: number) => {

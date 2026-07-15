@@ -59,6 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loginAsGuest = useCallback(() => {
     const guest = authService.loginAsGuest();
     setCurrentUser(guest);
+    localStorage.setItem('user', JSON.stringify(guest));
   }, []);
 
   const logout = useCallback(() => {
@@ -66,6 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user');
     localStorage.removeItem('session');
+    localStorage.removeItem('booking_draft');
   }, []);
 
   const role = React.useMemo(() => {

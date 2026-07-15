@@ -77,7 +77,7 @@ class MockStore {
 
   // Bookings
   getBookingsByCustomer(customerId: string): Booking[] {
-    return this.bookings.filter(b => b.customerId === customerId).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return this.bookings.filter(b => b.customerId === customerId).sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
   }
 
   addBooking(booking: Booking): void {
@@ -107,6 +107,13 @@ class MockStore {
     this.customers = this.customers.map(c => 
       c.id === customerId ? { ...c, accumulatedPoints: c.accumulatedPoints + points } : c
     );
+  }
+
+  getExpiringPointsNextMonth(_customerId: string): number {
+    // In our mock, points expire exactly after 12 months.
+    // So points expiring NEXT month were earned exactly 11 months ago (i.e. between 12 and 11 months ago).
+    // For simplicity of the mock, we can just return a fixed number or a simple calculation.
+    return 0; // Currently returning 0 for mock purposes unless we want to seed old data
   }
 
   // --- Admin Methods ---

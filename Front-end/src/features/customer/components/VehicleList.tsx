@@ -23,7 +23,10 @@ export const VehicleList: React.FC = () => {
   const [formBrand, setFormBrand] = useState('');
   const [formSize, setFormSize] = useState<CarSize>('sedan');
   const [formNotes, setFormNotes] = useState('');
+  const [formIsDefault, setFormIsDefault] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [formError, setFormError] = useState('');
+  const [settingDefaultId, setSettingDefaultId] = useState<string | null>(null);
 
   // Delete confirmation states
   const [vehicleToDelete, setVehicleToDelete] = useState<Vehicle | null>(null);
@@ -60,6 +63,8 @@ export const VehicleList: React.FC = () => {
     setFormBrand('');
     setFormSize('sedan');
     setFormNotes('');
+    setFormIsDefault(false);
+    setFormError('');
     setEditingVehicle(null);
   };
 
@@ -73,35 +78,46 @@ export const VehicleList: React.FC = () => {
     setFormBrand(v.brand);
     setFormSize(v.size);
     setFormNotes(v.notes || '');
+    setFormIsDefault(v.isDefault);
     setEditingVehicle(v);
     setShowForm(true);
   };
 
   const handleSave = async () => {
     if (!formPlate || !formBrand || !currentUser) return;
+
+    const normalizedPlate = formPlate.trim().toUpperCase().replace(/\s+/g, '');
+    if (!/^[0-9]{2}[A-Z]-[0-9]{3}\.?[0-9]{2}$/.test(normalizedPlate)) {
+      setFormError('Invalid license plate format. Example: 51A-123.45');
+      return;
+    }
+
+    setFormError('');
     setIsSaving(true);
     
     try {
       if (editingVehicle) {
         // Submit only changed fields
         const updates: Partial<Vehicle> = {};
-        if (editingVehicle.licensePlate !== formPlate) updates.licensePlate = formPlate;
+        if (editingVehicle.licensePlate !== normalizedPlate) updates.licensePlate = normalizedPlate;
         if (editingVehicle.brand !== formBrand) updates.brand = formBrand;
         if (editingVehicle.size !== formSize) updates.size = formSize;
         if (editingVehicle.notes !== formNotes) updates.notes = formNotes;
+        if (!editingVehicle.isDefault && formIsDefault) updates.isDefault = true;
         
         if (Object.keys(updates).length > 0) {
           await vehicleService.updateVehicle(editingVehicle.id, updates);
         }
       } else {
-        await vehicleService.addVehicle(currentUser.id, formPlate, formBrand, formSize, formNotes);
+        await vehicleService.addVehicle(currentUser.id, normalizedPlate, formBrand, formSize, formNotes, formIsDefault);
       }
       await fetchVehicles();
       setShowForm(false);
       resetForm();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save vehicle', error);
-      alert('Could not save vehicle. Please try again.');
+      const message = error?.response?.data?.message || error?.message || 'Could not save vehicle. Please try again.';
+      setFormError(message);
     } finally {
       setIsSaving(false);
     }
@@ -109,6 +125,20 @@ export const VehicleList: React.FC = () => {
 
   const confirmDelete = (v: Vehicle) => {
     setVehicleToDelete(v);
+  };
+
+  const handleSetDefault = async (vehicle: Vehicle) => {
+    if (!currentUser || vehicle.isDefault) return;
+    setSettingDefaultId(vehicle.id);
+    try {
+      await vehicleService.setDefaultVehicle(vehicle.id, currentUser.id);
+      await fetchVehicles();
+    } catch (error) {
+      console.error('Failed to set default vehicle', error);
+      alert('Could not set this vehicle as default.');
+    } finally {
+      setSettingDefaultId(null);
+    }
   };
 
   const handleDelete = async () => {
@@ -160,9 +190,19 @@ export const VehicleList: React.FC = () => {
               <div className={styles.vehicleInfo}>
                 <div className={styles.vehicleName}>{v.brand}</div>
                 <div className={styles.vehiclePlate}>{v.licensePlate}</div>
+                {v.isDefault && <span className={styles.defaultBadge}>✓ Default vehicle</span>}
               </div>
               <span className={styles.vehicleSize}>{v.size.toUpperCase()}</span>
               <div className={styles.vehicleActions}>
+                {!v.isDefault && (
+                  <button
+                    className={styles.defaultBtn}
+                    onClick={() => handleSetDefault(v)}
+                    disabled={settingDefaultId === v.id}
+                  >
+                    {settingDefaultId === v.id ? 'Setting...' : 'Set default'}
+                  </button>
+                )}
                 <button className={styles.actionBtn} onClick={() => openEditForm(v)}>✏️</button>
                 <button className={`${styles.actionBtn} ${styles.deleteBtn}`} onClick={() => confirmDelete(v)}>🗑️</button>
               </div>
@@ -214,6 +254,16 @@ export const VehicleList: React.FC = () => {
             value={formNotes}
             onChange={e => setFormNotes(e.target.value)}
           />
+          <label className={styles.defaultCheckbox}>
+            <input
+              type="checkbox"
+              checked={formIsDefault}
+              disabled={editingVehicle?.isDefault}
+              onChange={e => setFormIsDefault(e.target.checked)}
+            />
+            Set as default vehicle
+          </label>
+          {formError && <p style={{ color: '#ef4444', fontSize: '13px', margin: 0 }}>{formError}</p>}
           <div className={styles.formActions}>
             <Button variant="secondary" size="sm" onClick={() => { setShowForm(false); resetForm(); }}>
               Cancel

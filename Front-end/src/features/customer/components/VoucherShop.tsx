@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { mockStore } from '../../../services/mockStore';
+import { loyaltyService } from '../../../services/customer/loyalty.service';
+import { RedeemedVoucher } from '../../../types';
 import styles from '../styles/VoucherShop.module.css';
 
 interface VoucherShopProps {
@@ -10,16 +12,24 @@ interface VoucherShopProps {
 
 export const VoucherShop: React.FC<VoucherShopProps> = ({ customerId, points, onChanged }) => {
   const [message, setMessage] = useState('');
-  const vouchers = mockStore.getVouchersByCustomer(customerId);
-  const voucherCatalog = mockStore.getVoucherCatalog();
+  const [vouchers, setVouchers] = useState<RedeemedVoucher[]>([]);
+  const voucherCatalog = mockStore.getVoucherCatalog(); // Still using mock for catalog, as there's no backend catalog API yet
 
-  const handleRedeem = (item: (typeof voucherCatalog)[number]) => {
-    const voucher = mockStore.redeemVoucher(customerId, item.type, item.pointsCost, item.title);
-    if (!voucher) {
-      setMessage('Not enough points for this voucher.');
+  useEffect(() => {
+    if (customerId && customerId !== 'guest') {
+      loyaltyService.getVouchers(customerId).then(setVouchers).catch(console.error);
+    }
+  }, [customerId]);
+
+  const handleRedeem = async (item: (typeof voucherCatalog)[number]) => {
+    setMessage('Processing...');
+    const result = await loyaltyService.redeemVoucher(customerId, item.type, item.pointsCost);
+    if (!result.success) {
+      setMessage(result.error || 'Not enough points for this voucher.');
       return;
     }
-    setMessage(`Redeemed ${voucher.title}. Code: ${voucher.code}`);
+    setMessage(`Redeemed ${item.title}. Code: ${result.data?.voucherCode || 'SUCCESS'}`);
+    loyaltyService.getVouchers(customerId).then(setVouchers).catch(console.error);
     onChanged();
   };
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from './context/AuthContext';
 import { LoginPage } from './features/customer/pages/LoginPage';
 import { LandingPage } from './features/customer/pages/LandingPage';
@@ -14,7 +14,9 @@ import { VoucherShop } from './features/customer/components/VoucherShop';
 import { CustomerPageSection, CustomerPageShell } from './features/customer/components/CustomerPageShell';
 import { CustomerLayout } from './layouts/CustomerLayout';
 import { bookingService } from './services/customer/booking.service';
+import { vehicleService } from './services/customer/vehicle.service';
 import { mockStore } from './services/mockStore';
+import { Booking, Vehicle } from './types';
 import { MOCK_PROMOTIONS } from './config/constants';
 import { AdminRouter } from './routes/AdminRouter';
 import { WashingCounterPage } from './pages/washing-counter/WashingCounterPage';
@@ -30,8 +32,25 @@ function CustomerPortal() {
   const { currentUser, refreshUser } = useAuth();
   const [activePage, setActivePage] = useState<PageId>('dashboard');
   const customerId = currentUser?.id || '';
-  const customerBookings = bookingService.getBookings(customerId);
-  const customerVehicles = mockStore.getVehiclesByCustomer(customerId);
+  
+  const [customerBookings, setCustomerBookings] = useState<Booking[]>([]);
+  const [customerVehicles, setCustomerVehicles] = useState<Vehicle[]>([]);
+  
+  useEffect(() => {
+    if (!customerId) return;
+    let mounted = true;
+    Promise.all([
+      bookingService.getBookings(customerId),
+      vehicleService.getVehicles(customerId)
+    ]).then(([bookings, vehicles]) => {
+      if (mounted) {
+        setCustomerBookings(bookings);
+        setCustomerVehicles(vehicles);
+      }
+    }).catch(console.error);
+    return () => { mounted = false; };
+  }, [customerId]);
+
   const customerTransactions = mockStore.getTransactionsByCustomer(customerId);
   const completedBookings = customerBookings.filter((booking) => booking.status === 'COMPLETED').length;
   const pendingBookings = customerBookings.filter((booking) =>

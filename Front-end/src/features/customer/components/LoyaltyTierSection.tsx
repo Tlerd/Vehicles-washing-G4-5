@@ -9,13 +9,15 @@ interface LoyaltyTierSectionProps {
   currentPoints?: number;
   completedWashes?: number;
   totalSpend?: number;
+  expiringPoints?: number;
 }
 
 export const LoyaltyTierSection: React.FC<LoyaltyTierSectionProps> = ({ 
   currentTier = 'Member', 
   currentPoints = 0,
   completedWashes = 2,
-  totalSpend = 1280000 
+  totalSpend = 1280000,
+  expiringPoints = 0,
 }) => {
   let nextTierName = '';
   let washesNeeded = 0;
@@ -98,7 +100,7 @@ export const LoyaltyTierSection: React.FC<LoyaltyTierSectionProps> = ({
 
         <div className={styles.expiringNote}>
           <AlertCircle size={15} />
-          <span>Ưu tiên sử dụng điểm thưởng trước khi thực hiện các giao dịch đổi voucher lớn.</span>
+          <span>Lưu ý: Bạn có <strong>{expiringPoints.toLocaleString('vi-VN')} điểm sẽ hết hạn vào tháng tới</strong>. Điểm thưởng có giá trị 12 tháng kể từ ngày tích lũy.</span>
         </div>
       </section>
 

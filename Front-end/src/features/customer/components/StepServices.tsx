@@ -1,25 +1,76 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useCustomerBooking } from '../../../context/CustomerBookingContext';
 import { useAuth } from '../../../context/AuthContext';
-import { SERVICES, LOYALTY_TIERS } from '../../../config/constants';
+import { CAR_TYPES } from '../../../config/constants';
 import { priceService } from '../../../services/customer/price.service';
 import { ServiceItem } from '../../../types';
+import { catalogService } from '../../../services/customer/catalog.service';
 import { ChevronDown, ShoppingCart, X } from 'lucide-react';
 import styles from '../styles/StepServices.module.css';
 
 export const StepServices: React.FC = () => {
   const { draft, updateDraft } = useCustomerBooking();
   const { currentUser } = useAuth();
-
+  const [services,setServices]=useState<ServiceItem[]>(catalogService.getCachedServices());
+  const [loadError,setLoadError]=useState('');
+  useEffect(()=>{catalogService.getServices().then(setServices).catch(()=>setLoadError('Unable to load services from SQL Server.'));},[]);
+  
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
     'Wash & Combo': true, // Open by default
   });
   const [expandedDetails, setExpandedDetails] = useState<Record<string, boolean>>({});
   const [isCartOpen, setIsCartOpen] = useState(false);
-  
-  // FR-006: Promotion and Tier Multipliers for points calculation
-  const Kh = LOYALTY_TIERS.find(t => t.name === currentUser?.tier)?.multiplier || 1.0;
-  const Kkm = 1.0; // Default active promotional multiplier
+
+  // Dragging states
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const isDraggingRef = useRef(false);
+  const dragStartRef = useRef({ x: 0, y: 0, offsetX: 0, offsetY: 0 });
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    isDraggingRef.current = false;
+    dragStartRef.current = {
+      x: e.clientX,
+      y: e.clientY,
+      offsetX: dragOffset.x,
+      offsetY: dragOffset.y,
+    };
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      const dx = e.clientX - dragStartRef.current.x;
+      const dy = e.clientY - dragStartRef.current.y;
+      
+      if (!isDraggingRef.current && (Math.abs(dx) > 3 || Math.abs(dy) > 3)) {
+        isDraggingRef.current = true;
+      }
+      
+      if (isDraggingRef.current) {
+        setDragOffset({
+          x: dragStartRef.current.offsetX + dx,
+          y: dragStartRef.current.offsetY + dy,
+        });
+      }
+    }
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    e.currentTarget.releasePointerCapture(e.pointerId);
+  };
+
+  const handleCartClick = () => {
+    if (isDraggingRef.current) {
+      isDraggingRef.current = false;
+      return;
+    }
+    setIsCartOpen(true);
+  };
+
+  const carTypeObj = CAR_TYPES.find(c => c.id === draft.carSize);
+  const kh = carTypeObj?.multiplier || 1.0;
+  const kkm = 1.0; // Promotion multiplier default to 1.0
 
   const toggleGroup = (groupName: string) => {
     setExpandedGroups(prev => ({ ...prev, [groupName]: !prev[groupName] }));
@@ -41,7 +92,7 @@ export const StepServices: React.FC = () => {
   const groupedServices = () => {
     const groups: Record<string, ServiceItem[]> = {};
 
-    SERVICES.forEach(s => {
+    services.forEach(s => {
       const groupName = s.group || 'Other';
       if (!groups[groupName]) {
         groups[groupName] = [];
@@ -61,7 +112,7 @@ export const StepServices: React.FC = () => {
   const renderServiceCard = (service: ServiceItem) => {
     const isSelected = draft.selectedServices.includes(service.id);
     const isExpanded = expandedDetails[service.id];
-    const servicePrice = priceService.calculateFinalPrice([service.id], draft.carSize);
+    const servicePrice = service.basePrice * kh;
 
     return (
       <div
@@ -80,15 +131,15 @@ export const StepServices: React.FC = () => {
               <div className={styles.cardMeta}>
                 {service.duration} min &middot; {service.category === 'combo' ? 'Wash & Combo' : 'Single Service'}
               </div>
-              <button
-                className={styles.toggleDetailsBtn}
+              <button 
+                className={styles.toggleDetailsBtn} 
                 onClick={(e) => toggleDetails(service.id, e)}
               >
                 {isExpanded ? 'Hide details' : 'View details'}
               </button>
             </div>
           </div>
-          <div className="flex flex-col items-end gap-2">
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
             <span className={styles.cardPrice}>{priceService.formatPrice(servicePrice)}</span>
             <div className={`${styles.cardCheck} ${isSelected ? (service.isPremium ? styles.cardCheckPremium : styles.cardCheckSelected) : ''}`}>
               {isSelected ? '✓' : ''}
@@ -99,7 +150,7 @@ export const StepServices: React.FC = () => {
         {isExpanded && (
           <div className={styles.cardExpanded} onClick={(e) => e.stopPropagation()}>
             <p style={{ margin: 0 }}>{service.description}</p>
-
+            
             {service.includes && service.includes.length > 0 && (
               <div className={styles.detailSection}>
                 <div className={styles.detailSectionTitle}>Includes:</div>
@@ -108,11 +159,11 @@ export const StepServices: React.FC = () => {
                 </ul>
               </div>
             )}
-
+            
             {service.suitableFor && (
               <div className={styles.detailSection}>
                 <div className={styles.detailSectionTitle}>Best for:</div>
-                <p className="m-0 pl-5">{service.suitableFor}</p>
+                <p style={{ margin: 0, paddingLeft: '1.25rem' }}>{service.suitableFor}</p>
               </div>
             )}
           </div>
@@ -122,51 +173,55 @@ export const StepServices: React.FC = () => {
   };
 
   // Calculate panel values
-  const V = priceService.calculateFinalPrice(draft.selectedServices, draft.carSize);
-  const estimatedPoints = Math.floor((V / 1000) * Kh * Kkm);
+  const selected=services.filter(s=>draft.selectedServices.includes(s.id));
+  const totalBasePrice=selected.reduce((sum,s)=>sum+s.basePrice,0);
+  const totalSelectedPrice=totalBasePrice*kh;
+  const estimatedPoints = Math.floor((totalBasePrice / 1000) * kh * kkm);
 
   return (
-    <div className="relative w-full max-w-4xl mx-auto pb-24">
-      {/* Services List */}
-      <div className="w-full">
-        <header className="mb-6">
-          <h3 className={styles.title}>Service Selection</h3>
-          <p className={styles.subtitle}>Choose one or multiple services for your vehicle</p>
-        </header>
-
-        <div>
-          {groupedServices().map(([groupName, items]) => {
-            const isOpen = expandedGroups[groupName];
-            return (
-              <div key={groupName} className={styles.group}>
-                <div className={styles.groupHeader} onClick={() => toggleGroup(groupName)}>
-                  <div className={styles.groupTitle}>
-                    {groupName}
-                    <span className={styles.groupCount}>{items.length} services</span>
-                  </div>
-                  <ChevronDown
-                    className={`${styles.groupIcon} ${isOpen ? styles.groupIconOpen : ''}`}
-                    size={20}
-                  />
-                </div>
-
-                {isOpen && (
-                  <div className={styles.groupContent}>
-                    {items.map(renderServiceCard)}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+    <div className={styles.container}>
+      <div>
+        {loadError && <p className={styles.loadError}>{loadError}</p>}
+        <h3 className={styles.title}>Service Selection</h3>
+        <p className={styles.subtitle}>Choose one or multiple services for your vehicle</p>
       </div>
 
+      <div>
+        {groupedServices().map(([groupName, items]) => {
+          const isOpen = expandedGroups[groupName];
+          return (
+            <div key={groupName} className={styles.group}>
+              <div className={styles.groupHeader} onClick={() => toggleGroup(groupName)}>
+                <div className={styles.groupTitle}>
+                  {groupName}
+                  <span className={styles.groupCount}>{items.length} services</span>
+                </div>
+                <ChevronDown 
+                  className={`${styles.groupIcon} ${isOpen ? styles.groupIconOpen : ''}`} 
+                  size={20} 
+                />
+              </div>
+              
+              {isOpen && (
+                <div className={styles.groupContent}>
+                  {items.map(renderServiceCard)}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
 
       {/* Floating Cart Button */}
       {!isCartOpen && (
         <button
-          onClick={() => setIsCartOpen(true)}
-          className="fixed bottom-6 right-6 lg:bottom-10 lg:right-10 bg-blue-600 text-white p-4 rounded-full shadow-2xl flex items-center gap-3 hover:bg-blue-500 transition-all z-50 group border border-blue-400"
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          onClick={handleCartClick}
+          style={{ transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)`, touchAction: 'none' }}
+          className="fixed bottom-6 right-6 lg:bottom-10 lg:right-10 bg-blue-600 text-white p-4 rounded-full shadow-2xl flex items-center gap-3 hover:bg-blue-500 transition-all z-50 group border border-blue-400 select-none cursor-pointer"
         >
           <div className="relative">
             <ShoppingCart size={24} />
@@ -177,7 +232,7 @@ export const StepServices: React.FC = () => {
             )}
           </div>
           <span className="font-bold pr-2 hidden sm:inline">
-            {priceService.formatPrice(V)}
+            {priceService.formatPrice(totalSelectedPrice)}
           </span>
         </button>
       )}
@@ -210,7 +265,7 @@ export const StepServices: React.FC = () => {
                 </span>
                 <ul className="space-y-3">
                   {draft.selectedServices.map(id => {
-                    const s = SERVICES.find(srv => srv.id === id);
+                    const s = services.find(srv => srv.id === id);
                     if (!s) return null;
                     const sp = priceService.calculateFinalPrice([id], draft.carSize);
                     return (
@@ -226,7 +281,7 @@ export const StepServices: React.FC = () => {
               <div className="flex justify-between items-end py-4 border-y border-slate-100 mb-6">
                 <span className="text-sm font-bold text-slate-500 mb-0.5 uppercase tracking-wider">Total Amount:</span>
                 <span className="text-2xl font-black text-blue-600">
-                  {priceService.formatPrice(V)}
+                  {priceService.formatPrice(totalSelectedPrice)}
                 </span>
               </div>
 
@@ -235,9 +290,9 @@ export const StepServices: React.FC = () => {
                   <div className="text-sm font-bold text-emerald-800">Expected Points (FR-006)</div>
                   
                   <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700 bg-emerald-100/50 px-2.5 py-1.5 rounded-md border border-emerald-200 w-fit">
-                    <span>Loyalty (K_h): {Kh}x</span>
+                    <span>Loyalty (K_h): {kh}x</span>
                     <span>&bull;</span>
-                    <span>Promo (K_km): {Kkm}x</span>
+                    <span>Promo (K_km): {kkm}x</span>
                   </div>
                   
                   <div className="text-lg font-black text-amber-500 flex items-center gap-1.5 mt-1">
@@ -245,7 +300,7 @@ export const StepServices: React.FC = () => {
                   </div>
                   
                   <div className="text-[10px] text-emerald-600/70 font-mono mt-1">
-                    Formula: ⌊Total / 1,000⌋ × {Kh} × {Kkm}
+                    Formula: ⌊Total / 1,000⌋ × {kh} × {kkm}
                   </div>
                 </div>
               )}

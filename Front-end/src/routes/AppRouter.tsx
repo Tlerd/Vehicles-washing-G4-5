@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { DashboardPage } from '../features/customer/pages/DashboardPage';
 import { BookingWizardPage } from '../features/customer/pages/BookingWizardPage';
@@ -14,14 +14,49 @@ import { bookingService } from '../services/customer/booking.service';
 import { mockStore } from '../services/mockStore';
 import { useAuth } from '../context/AuthContext';
 import { CustomerBookingProvider } from '../context/CustomerBookingContext';
+import { loyaltyService } from '../services/customer/loyalty.service';
+import { PointsTransaction } from '../types';
 
 type PageId = 'dashboard' | 'booking' | 'vehicles' | 'history' | 'promotions' | 'points';
 
 export const AppRouter: React.FC = () => {
   const { currentUser } = useAuth();
   const [activePage, setActivePage] = useState<PageId>('dashboard');
-  const [, setRefreshKey] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
   const liveCustomer = currentUser ? mockStore.getCustomerById(currentUser.id) || currentUser : null;
+
+  const [historyBookings, setHistoryBookings] = useState<any[]>([]);
+  const [pointHistory, setPointHistory] = useState<PointsTransaction[]>([]);
+  const [expiringPoints, setExpiringPoints] = useState(0);
+
+  useEffect(() => {
+    if (activePage === 'history' && currentUser) {
+      bookingService.getBookings(currentUser.id).then(setHistoryBookings).catch(console.error);
+    }
+  }, [activePage, currentUser]);
+
+  useEffect(() => {
+    if (currentUser && currentUser.id !== 'guest') {
+      loyaltyService.getPointsHistory(currentUser.id).then((history) => {
+        setPointHistory(history);
+        
+        // Calculate expiring points (earned exactly 11 months ago, mock logic for next month expiry)
+        const now = new Date();
+        const elevenMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1);
+        const tenMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 10, 1);
+        
+        const expiring = history
+          .filter(t => t.type === 'earn')
+          .filter(t => {
+            const date = new Date(t.createdAt);
+            return date >= elevenMonthsAgo && date < tenMonthsAgo;
+          })
+          .reduce((sum, t) => sum + t.points, 0);
+        
+        setExpiringPoints(expiring);
+      }).catch(console.error);
+    }
+  }, [currentUser, activePage, refreshKey]);
 
   const handleNavigate = (page: string) => {
     setActivePage(page as PageId);
@@ -44,7 +79,7 @@ export const AppRouter: React.FC = () => {
         return (
           <div>
             <BookingHistory
-              bookings={bookingService.getBookings(currentUser?.id || '')}
+              bookings={historyBookings}
             />
           </div>
         );
@@ -57,7 +92,13 @@ export const AppRouter: React.FC = () => {
       case 'points':
         return (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <LoyaltyTierSection currentTier={liveCustomer?.tier} currentPoints={liveCustomer?.accumulatedPoints} />
+            <LoyaltyTierSection 
+              currentTier={liveCustomer?.tier} 
+              currentPoints={liveCustomer?.accumulatedPoints} 
+              completedWashes={0} // totalWashes not present on Customer yet
+              totalSpend={liveCustomer?.totalSpend}
+              expiringPoints={expiringPoints}
+            />
             {liveCustomer && (
               <VoucherShop
                 customerId={liveCustomer.id}
@@ -78,7 +119,7 @@ export const AppRouter: React.FC = () => {
                 ⭐ Points History
               </h3>
               <PointsHistory
-                transactions={mockStore.getTransactionsByCustomer(liveCustomer?.id || '')}
+                transactions={pointHistory}
               />
             </div>
             </div>

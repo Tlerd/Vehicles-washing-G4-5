@@ -87,7 +87,7 @@ export function AdminCustomerRegistryPage({ onBackToCustomerPortal }: AdminCusto
   const selectedBookings = selectedCustomer
     ? bookings
         .filter(booking => booking.customerId === selectedCustomer.id)
-        .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime())
+        .sort((left, right) => new Date(right.createdAt || 0).getTime() - new Date(left.createdAt || 0).getTime())
     : [];
   const selectedTransactions = selectedCustomer
     ? transactions

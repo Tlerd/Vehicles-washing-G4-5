@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ArrowRight,
   CalendarClock,
@@ -12,7 +12,9 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { bookingService } from '../../../services/customer/booking.service';
-import { mockStore } from '../../../services/mockStore';
+import { vehicleService } from '../../../services/customer/vehicle.service';
+import { loyaltyService } from '../../../services/customer/loyalty.service';
+import { Booking, Vehicle, PointsTransaction } from '../../../types';
 import { BookingHistory } from '../components/BookingHistory';
 import { PromotionDisplay } from '../components/PromotionDisplay';
 import { PointsHistory } from '../components/PointsHistory';
@@ -28,9 +30,32 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
   const { currentUser } = useAuth();
   const customerId = currentUser?.id || '';
 
-  const bookings = bookingService.getBookings(customerId);
-  const vehicles = mockStore.getVehiclesByCustomer(customerId);
-  const transactions = mockStore.getTransactionsByCustomer(customerId);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [transactions, setTransactions] = useState<PointsTransaction[]>([]);
+
+  useEffect(() => {
+    if (!customerId) return;
+    let isMounted = true;
+    const fetchData = async () => {
+      try {
+        const [fetchedBookings, fetchedVehicles, fetchedTransactions] = await Promise.all([
+          bookingService.getBookings(customerId),
+          vehicleService.getVehicles(customerId),
+          loyaltyService.getPointsHistory(customerId)
+        ]);
+        if (isMounted) {
+          setBookings(fetchedBookings);
+          setVehicles(fetchedVehicles);
+          setTransactions(fetchedTransactions);
+        }
+      } catch (err) {
+        console.error('Error fetching dashboard data:', err);
+      }
+    };
+    fetchData();
+    return () => { isMounted = false; };
+  }, [customerId]);
 
   const totalBookings = bookings.length;
   const completedBookings = bookings.filter((booking) => booking.status === 'COMPLETED').length;

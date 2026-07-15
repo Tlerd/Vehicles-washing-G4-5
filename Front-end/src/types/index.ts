@@ -11,6 +11,7 @@ export interface Customer {
   tier: CustomerTier;
   accumulatedPoints: number;
   totalSpend: number;
+  role?: UserRole;
   createdAt: string;
 }
 
@@ -53,25 +54,35 @@ export interface Branch {
   phone: string;
   openTime: string;
   closeTime: string;
+  status?: string;
   isAvailable?: boolean;
 }
 
 export interface TimeSlot {
   time: string;
   available: boolean;
+  endTime?: string;
+  durationMinutes?: number;
 }
 
 export interface Booking {
   id: string;
   bookingRef?: string;
   customerId: string;
+  customerName?: string;
+  customerPhone?: string;
   vehicleId: string;
+  vehicleBrand?: string;
+  licensePlate?: string;
   services: string[];
   carSize: CarSize;
   branchId: string;
   date: string;
   time: string;
+  endTime?: string;
+  durationMinutes?: number;
   totalPrice: number;
+  vietQrUrl?: string;
   status: BookingStatus;
   pointsEarned: number;
   createdAt: string;
@@ -85,7 +96,15 @@ export interface BookingDraft {
   date: string | null;
   time: string | null;
   vehicleId: string | null;
+  vehiclePlate?: string;
+  vehicleBrand?: string;
   bookingId?: string;
+  bookingRef?: string;
+  vietQrUrl?: string;
+  confirmedTotalPrice?: number;
+  endTime?: string;
+  durationMinutes?: number;
+  voucherId?: string | null;
   appliedVoucherId?: string;
 }
 
