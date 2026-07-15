@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { mockStore } from '../../../services/mockStore';
 import { loyaltyService } from '../../../services/customer/loyalty.service';
 import { RedeemedVoucher } from '../../../types';
 import styles from '../styles/VoucherShop.module.css';
@@ -10,10 +9,35 @@ interface VoucherShopProps {
   onChanged: () => void;
 }
 
+const voucherCatalog: Array<{
+  type: 'DISCOUNT_50K'|'FREE_BASIC'|'FREE_DETAIL';
+  title: string;
+  pointsCost: number;
+  description: string;
+}> = [
+  {
+    type: 'DISCOUNT_50K',
+    title: '50k Discount Voucher',
+    pointsCost: 500,
+    description: 'Use on any wash bill from 200k.',
+  },
+  {
+    type: 'FREE_BASIC',
+    title: 'Free Basic Wash',
+    pointsCost: 1200,
+    description: 'Redeem one standard exterior and interior basic wash.',
+  },
+  {
+    type: 'FREE_DETAIL',
+    title: 'Free Detail Upgrade',
+    pointsCost: 2400,
+    description: 'Upgrade a basic wash to detail wash at checkout.',
+  },
+];
+
 export const VoucherShop: React.FC<VoucherShopProps> = ({ customerId, points, onChanged }) => {
   const [message, setMessage] = useState('');
   const [vouchers, setVouchers] = useState<RedeemedVoucher[]>([]);
-  const voucherCatalog = mockStore.getVoucherCatalog(); // Still using mock for catalog, as there's no backend catalog API yet
 
   useEffect(() => {
     if (customerId && customerId !== 'guest') {

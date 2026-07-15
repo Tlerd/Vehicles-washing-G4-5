@@ -13,7 +13,7 @@ export const StepCarType: React.FC = () => {
   const { draft, updateDraft } = useCustomerBooking();
   const { currentUser } = useAuth();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [_isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [showAddVehicle, setShowAddVehicle] = useState(false);
   const [newPlate, setNewPlate] = useState('');
   const [newBrand, setNewBrand] = useState('');
@@ -73,8 +73,8 @@ export const StepCarType: React.FC = () => {
       setVehicles(refreshed);
       handleSelectVehicle(created);
       setShowAddVehicle(false);
-    } catch (error: any) {
-      const message = error?.response?.data?.message || error?.message || 'Could not add vehicle.';
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Could not add vehicle.';
       setSaveError(message);
     } finally { setIsSaving(false); }
   };

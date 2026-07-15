@@ -1,41 +1,20 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import type { UIEvent } from 'react';
-import {
-  ArrowDownUp,
-  BarChart3,
-  BrainCircuit,
-  CalendarClock,
-  Car,
-  ClipboardList,
-  Mail,
-  Phone,
-  Search,
-  ShieldCheck,
-  Sparkles,
-  UserRoundSearch,
-  WalletCards,
-  X,
-} from 'lucide-react';
-import { mockStore } from '../../../services/mockStore';
-import type { Booking, Customer, CustomerTier, PointsTransaction, Vehicle } from '../../../types';
-import { formatDate, formatPrice, formatTime } from '../../../utils/formatters';
-import {
-  CustomerSortKey,
-  CustomerTierFilter,
-  getFilteredCustomers,
-  isValidOptionalEmail,
-} from '../customerRegistry';
-import {
-  BookingSortKey,
-  BookingStatusFilter,
-  getBookingPage,
-  shouldLoadNextPage,
-} from '../bookingLog';
-import { CampaignBuilderPanel } from './CampaignBuilderPanel';
+import { useEffect, useState, useMemo, useRef, UIEvent } from 'react';
+import { platformService } from '../../../services/platform.service';
 import { RevenueAuditPanel } from './RevenueAuditPanel';
+import { CampaignBuilderPanel } from './CampaignBuilderPanel';
+import { Customer, Vehicle, Booking, PointsTransaction } from '../../../types';
+import { mockStore } from '../../../services/mockStore';
+import { getFilteredCustomers, getBookingPage, shouldLoadNextPage } from '../../../utils/adminFilters';
+import { isValidOptionalEmail } from '../../../utils/validation';
+import { formatPrice, formatDate, formatTime } from '../../../utils/formatters';
+import { UserRoundSearch, ClipboardList, BarChart3, BrainCircuit, Car, CalendarClock, WalletCards, Search, ShieldCheck, ArrowDownUp, Sparkles, X, Phone, Mail } from 'lucide-react';
 import styles from './AdminCustomerRegistryPage.module.css';
 
-const tiers: CustomerTierFilter[] = ['ALL', 'Member', 'Silver', 'Gold', 'Platinum'];
+type CustomerTier = 'Member' | 'Silver' | 'Gold' | 'Platinum';
+type CustomerTierFilter = 'ALL' | CustomerTier;
+type CustomerSortKey = 'createdAt' | 'totalSpend' | 'points';
+type BookingStatusFilter = 'ALL' | Booking['status'];
+type BookingSortKey = 'time' | 'price';
 const bookingStatuses: BookingStatusFilter[] = ['ALL', 'PENDING', 'CONFIRMED', 'CHECKED_IN', 'COMPLETED', 'CANCELLED'];
 const bookingPageSize = 10;
 
@@ -603,6 +582,8 @@ export function AdminCustomerRegistryPage({ onBackToCustomerPortal }: AdminCusto
           </section>
         </div>
       )}
+    </main>
+  );
     </main>
   );
 }

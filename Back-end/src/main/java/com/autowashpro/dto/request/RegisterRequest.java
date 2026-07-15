@@ -29,4 +29,8 @@ public class RegisterRequest {
     @Size(max = 100)
     @Schema(description = "Optional email address", example = "john@example.com")
     private String email;
+
+    @NotBlank
+    @Schema(description = "Firebase ID Token verified on the client", example = "eyJhbGciOiJSUzI1NiIs...")
+    private String firebaseToken;
 }

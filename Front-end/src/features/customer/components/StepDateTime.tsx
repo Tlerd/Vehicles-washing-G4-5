@@ -15,7 +15,6 @@ export const StepDateTime: React.FC = () => {
 
   const [timeSlots,setTimeSlots]=useState<TimeSlot[]>([]);
   useEffect(()=>{if(draft.branchId&&draft.date&&draft.selectedServices.length)bookingService.getAvailableSlots(draft.branchId,draft.date,draft.selectedServices).then(setTimeSlots);else setTimeSlots([])},[draft.branchId,draft.date,draft.selectedServices]);
-
   const filteredSlots = useMemo(() => {
     if (!draft.date || !timeSlots.length) return timeSlots;
     

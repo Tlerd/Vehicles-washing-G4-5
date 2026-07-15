@@ -1,7 +1,7 @@
 export type CarSize = 'hatchback' | 'sedan' | 'suv' | 'pickup';
 export type BookingStatus = 'PENDING' | 'CONFIRMED' | 'CHECKED_IN' | 'COMPLETED' | 'CANCELLED';
 export type CustomerTier = 'Member' | 'Silver' | 'Gold' | 'Platinum';
-export type UserRole = 'ADMIN' | 'COUNTER' | 'CUSTOMER';
+export type UserRole = 'ADMIN' | 'COUNTER' | 'CUSTOMER' | 'STAFF';
 
 export interface Customer {
   id: string;
@@ -13,6 +13,7 @@ export interface Customer {
   totalSpend: number;
   role?: UserRole;
   createdAt: string;
+  role: UserRole;
 }
 
 export interface Vehicle {
@@ -54,7 +55,7 @@ export interface Branch {
   phone: string;
   openTime: string;
   closeTime: string;
-  status?: string;
+  status?: 'ACTIVE' | 'COMING_SOON' | string;
   isAvailable?: boolean;
 }
 
@@ -98,6 +99,8 @@ export interface BookingDraft {
   vehicleId: string | null;
   vehiclePlate?: string;
   vehicleBrand?: string;
+  endTime?: string;
+  durationMinutes?: number;
   bookingId?: string;
   bookingRef?: string;
   vietQrUrl?: string;

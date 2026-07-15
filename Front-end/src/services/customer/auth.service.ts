@@ -15,7 +15,8 @@ export const authService = {
         tier: data.customer.tier,
         accumulatedPoints: data.customer.accumulatedPoints,
         totalSpend: data.customer.totalSpend,
-        createdAt: data.customer.createdAt || new Date().toISOString()
+        createdAt: data.customer.createdAt || new Date().toISOString(),
+        role: data.customer.role || 'CUSTOMER'
       };
       return { success: true, token: data.token, customer };
     } catch (err: any) {
@@ -23,19 +24,6 @@ export const authService = {
     }
   },
 
-  sendOtp(email: string): { success: boolean; otpExpiresIn: number } {
-    // Mock sending OTP (Deprecated for Client SDK Phone Auth but kept for potential fallbacks)
-    console.log(`Mock OTP sent to ${email}: 123456`);
-    return { success: true, otpExpiresIn: 60 };
-  },
-
-  verifyOtp(_email: string, otp: string): { success: boolean; error?: string } {
-    // Mock verifying OTP (Deprecated for Client SDK Phone Auth but kept for potential fallbacks)
-    if (otp === '123456') {
-      return { success: true };
-    }
-    return { success: false, error: 'Invalid OTP code. Use 123456.' };
-  },
 
   async register(name: string, phone: string, email: string, password: string, firebaseToken?: string): Promise<{ success: boolean; customer: Customer | null; error?: string }> {
     try {
@@ -50,7 +38,7 @@ export const authService = {
           tier: 'Member',
           accumulatedPoints: 0,
           totalSpend: 0,
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(), role: 'CUSTOMER'
         };
         return { success: true, customer };
       }
@@ -69,6 +57,7 @@ export const authService = {
       accumulatedPoints: 0,
       totalSpend: 0,
       createdAt: new Date().toISOString(),
+      role: 'CUSTOMER',
     };
   }
 };

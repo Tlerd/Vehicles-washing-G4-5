@@ -41,6 +41,12 @@ public class Booking {
     @Column(name = "booking_time", nullable = false)
     private LocalTime bookingTime;
 
+    @Column(name = "end_time")
+    private LocalTime endTime;
+
+    @Column(name = "duration_minutes")
+    private Integer durationMinutes;
+
     @Column(name = "total_price")
     private BigDecimal totalPrice;
 

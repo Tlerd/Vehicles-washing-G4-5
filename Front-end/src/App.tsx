@@ -15,11 +15,15 @@ import { CustomerPageSection, CustomerPageShell } from './features/customer/comp
 import { CustomerLayout } from './layouts/CustomerLayout';
 import { bookingService } from './services/customer/booking.service';
 import { vehicleService } from './services/customer/vehicle.service';
+import { platformService } from './services/platform.service';
 import { mockStore } from './services/mockStore';
-import { Booking, Vehicle } from './types';
+import { Booking, Vehicle, PointsTransaction } from './types';
 import { MOCK_PROMOTIONS } from './config/constants';
 import { AdminRouter } from './routes/AdminRouter';
 import { WashingCounterPage } from './pages/washing-counter/WashingCounterPage';
+import { WashingPortal } from './features/operations/OperationsPortal';
+import { getPortalForUser } from './features/auth/roleAccess';
+import { AdminCustomerRegistryPage } from './features/admin/pages/AdminCustomerRegistryPage';
 import { BrowserRouter } from 'react-router-dom';
 import { BookingProvider } from './context/BookingContext';
 import { CustomerBookingProvider } from './context/CustomerBookingContext';
@@ -35,7 +39,21 @@ function CustomerPortal() {
   
   const [customerBookings, setCustomerBookings] = useState<Booking[]>([]);
   const [customerVehicles, setCustomerVehicles] = useState<Vehicle[]>([]);
+  const [points, setPoints] = useState<PointsTransaction[]>([]);
+  const [pointBalance, setPointBalance] = useState(currentUser?.accumulatedPoints || 0);
   
+  const refreshPoints = async () => {
+    if (!currentUser) return;
+    try {
+      const rows = await platformService.points(currentUser.id);
+      setPoints(rows);
+      setPointBalance(rows.reduce((total, row) => total + row.points, 0));
+    } catch (e) {
+      console.error(e);
+      setPoints(mockStore.getTransactionsByCustomer(currentUser.id));
+    }
+  };
+
   useEffect(() => {
     if (!customerId) return;
     let mounted = true;
@@ -48,18 +66,22 @@ function CustomerPortal() {
         setCustomerVehicles(vehicles);
       }
     }).catch(console.error);
+    
+    refreshPoints();
+    
     return () => { mounted = false; };
   }, [customerId]);
 
-  const customerTransactions = mockStore.getTransactionsByCustomer(customerId);
   const completedBookings = customerBookings.filter((booking) => booking.status === 'COMPLETED').length;
   const pendingBookings = customerBookings.filter((booking) =>
     ['PENDING', 'CONFIRMED', 'CHECKED_IN'].includes(booking.status)
   ).length;
-  const currentPoints = currentUser?.accumulatedPoints || 0;
+  const currentPoints = pointBalance;
 
   const handleNavigate = (page: string) => {
     setActivePage(page as PageId);
+    if (page === 'history' && currentUser) bookingService.getBookings(currentUser.id).then(setHistory);
+    if (page === 'points' && currentUser) void refreshPoints();
   };
 
   const sharedAside = (
@@ -210,7 +232,7 @@ function CustomerPortal() {
               { label: 'Current points', value: currentPoints.toLocaleString('vi-VN'), helper: 'Sẵn sàng để redeem' },
               { label: 'Tier hiện tại', value: currentUser?.tier || 'Member', helper: 'Dựa trên loyalty hiện tại' },
               { label: 'Tổng chi tiêu', value: formatPrice(currentUser?.totalSpend || 0), helper: 'Hỗ trợ xét nâng hạng' },
-              { label: 'Giao dịch điểm', value: customerTransactions.length.toString(), helper: 'Bao gồm earn và redeem' },
+              { label: 'Giao dịch điểm', value: points.length.toString(), helper: 'Bao gồm earn và redeem' },
             ]}
             actions={[
               { label: 'Đặt lịch để tích điểm', onClick: () => handleNavigate('booking') },
@@ -248,7 +270,7 @@ function CustomerPortal() {
                 >
                   <LoyaltyTierSection
                     currentTier={currentUser?.tier}
-                    currentPoints={currentUser?.accumulatedPoints}
+                    currentPoints={currentPoints}
                     totalSpend={currentUser?.totalSpend}
                     completedWashes={completedBookings}
                   />
@@ -258,7 +280,7 @@ function CustomerPortal() {
                   title="Points history"
                   description="Lịch sử cộng, trừ và thay đổi điểm thưởng gần đây của tài khoản."
                 >
-                  <PointsHistory transactions={customerTransactions} />
+                  <PointsHistory transactions={points} />
                 </CustomerPageSection>
               </div>
 
@@ -267,7 +289,7 @@ function CustomerPortal() {
                   title="Customer profile"
                   description="Thông tin thành viên được đặt cạnh khu vực rewards để tra cứu nhanh."
                 >
-                  {currentUser && <ProfileCard customer={currentUser} />}
+                  {currentUser && <ProfileCard customer={{...currentUser, accumulatedPoints: currentPoints}} />}
                 </CustomerPageSection>
 
                 <CustomerPageSection
@@ -277,8 +299,9 @@ function CustomerPortal() {
                   {currentUser && (
                     <VoucherShop
                       customerId={currentUser.id}
-                      points={currentUser.accumulatedPoints}
+                      points={currentPoints}
                       onChanged={() => {
+                        refreshPoints();
                         refreshUser();
                       }}
                     />
@@ -304,7 +327,7 @@ function CustomerPortal() {
 }
 
 function App() {
-  const { isAuthenticated, role } = useAuth();
+  const { isAuthenticated, currentUser, logout, role } = useAuth();
   const [showLanding, setShowLanding] = useState(true);
 
   if (showLanding && !isAuthenticated) {
@@ -315,7 +338,9 @@ function App() {
     return <LoginPage onLoginSuccess={() => {}} />;
   }
 
-  if (role === 'ADMIN') {
+  const portal = getPortalForUser(currentUser);
+  
+  if (portal === 'admin') {
     return (
       <BrowserRouter>
         <AdminRouter />
@@ -323,7 +348,7 @@ function App() {
     );
   }
 
-  if (role === 'COUNTER') {
+  if (portal === 'washing') {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col">
         <BookingProvider>
@@ -332,7 +357,6 @@ function App() {
       </div>
     );
   }
-
   return <CustomerPortal />;
 }
 

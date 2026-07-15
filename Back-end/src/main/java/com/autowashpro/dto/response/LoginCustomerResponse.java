@@ -19,6 +19,7 @@ public class LoginCustomerResponse {
 
     @Schema(example = "Member")
     private String tier;
+    private String role;
 
     @Schema(example = "150")
     private Integer accumulatedPoints;

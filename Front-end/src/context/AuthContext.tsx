@@ -19,8 +19,18 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<Customer | null>(() => {
-    const savedUser = localStorage.getItem('user');
-    return savedUser ? JSON.parse(savedUser) : null;
+    const token = localStorage.getItem('auth_token');
+    const saved = localStorage.getItem('user');
+    if (!saved) return null;
+    try {
+      const user = JSON.parse(saved) as Customer;
+      if (user.id !== 'guest' && !token) return null;
+      return user;
+    } catch {
+      localStorage.removeItem('user');
+      localStorage.removeItem('auth_token');
+      return null;
+    }
   });
 
   const login = useCallback(async (phone: string, password: string) => {

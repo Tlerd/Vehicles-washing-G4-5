@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class SendOtpRequest {
 
-    @NotBlank
+    @NotBlank(message = "Số điện thoại không được để trống")
     @Schema(description = "Phone number in E.164 format", example = "+84901234567")
     private String phoneNumber;
 }

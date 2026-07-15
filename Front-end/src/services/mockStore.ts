@@ -110,12 +110,8 @@ class MockStore {
   }
 
   getExpiringPointsNextMonth(_customerId: string): number {
-    // In our mock, points expire exactly after 12 months.
-    // So points expiring NEXT month were earned exactly 11 months ago (i.e. between 12 and 11 months ago).
-    // For simplicity of the mock, we can just return a fixed number or a simple calculation.
-    return 0; // Currently returning 0 for mock purposes unless we want to seed old data
+    return 0; 
   }
-
   // --- Admin Methods ---
   getCustomers(): Customer[] {
     return [...this.customers];

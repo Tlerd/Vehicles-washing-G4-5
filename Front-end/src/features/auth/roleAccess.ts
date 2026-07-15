@@ -1,7 +1,7 @@
 import type { Customer, UserRole } from '../../types';
 
-export type PortalTarget = 'auth' | 'customer' | 'counter' | 'admin';
-export type LoginRole = 'CUSTOMER' | 'COUNTER' | 'ADMIN';
+export type PortalTarget = 'auth' | 'customer' | 'washing' | 'admin';
+export type LoginRole = 'CUSTOMER' | 'STAFF' | 'ADMIN';
 
 interface RoleBearingUser {
   role?: UserRole;
@@ -32,11 +32,11 @@ export const LOGIN_ROLE_OPTIONS: LoginRoleOption[] = [
     supportText: 'Use your member account to continue booking faster and keep loyalty benefits in sync.',
   },
   {
-    id: 'COUNTER',
+    id: 'STAFF',
     label: 'Staff',
     heading: 'Staff counter access',
     description: 'Approve arrivals, check vehicles in, and keep daily operations moving without friction.',
-    destination: '/counter',
+    destination: '/washing-counter',
     demoPhone: '0987654321',
     demoPassword: 'password123',
     supportText: 'Use the counter workspace for branch-level check-in, queue handling, and handoff updates.',
@@ -66,8 +66,8 @@ export function getUserRole(user: RoleBearingUser | Customer | null): UserRole |
     return 'ADMIN';
   }
 
-  if (user.id === 'counter' || user.phone === '0987654321') {
-    return 'COUNTER';
+  if (user.id === 'staff' || user.id === 'counter' || user.phone === '0987654321') {
+    return 'STAFF';
   }
 
   return 'CUSTOMER';
@@ -88,8 +88,8 @@ export function getPortalForUser(user: RoleBearingUser | Customer | null): Porta
     return 'admin';
   }
 
-  if (role === 'COUNTER') {
-    return 'counter';
+  if (role === 'STAFF' || role === 'COUNTER') {
+    return 'washing';
   }
 
   return 'customer';
@@ -99,8 +99,9 @@ export function getDestinationForRole(role: UserRole | null): string {
   switch (role) {
     case 'ADMIN':
       return '/admin';
+    case 'STAFF':
     case 'COUNTER':
-      return '/counter';
+      return '/washing-counter';
     case 'CUSTOMER':
       return '/app';
     default:

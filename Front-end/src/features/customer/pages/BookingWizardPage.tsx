@@ -32,7 +32,7 @@ export const BookingWizardPage: React.FC<BookingWizardPageProps> = ({ onComplete
 
   const canProceed = (): boolean => {
     switch (draft.currentStep) {
-      case 1: return !!draft.carSize || !!draft.vehicleId;
+      case 1: return !!draft.vehicleId || (!!draft.carSize && !!draft.vehiclePlate.trim() && !!draft.vehicleBrand.trim());
       case 2: return draft.selectedServices.length > 0;
       case 3: return !!draft.branchId;
       case 4: return !!draft.date && !!draft.time;

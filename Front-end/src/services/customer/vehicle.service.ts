@@ -14,21 +14,16 @@ export const vehicleService = {
     }
   },
 
-  async addVehicle(customerId: string, licensePlate: string, brand: string, size: CarSize, notes?: string, isDefault: boolean = false): Promise<Vehicle> {
-    try {
-      const response = await apiClient.post('/vehicles', {
-        customerId,
-        licensePlate,
-        brand,
-        size,
-        notes,
-        isDefault
-      });
-      return response.data;
-    } catch (error) {
-      console.error('Error adding vehicle:', error);
-      throw error;
-    }
+  async addVehicle(customerId: string, licensePlate: string, brand: string, size: CarSize, notes?: string, isDefault = false): Promise<Vehicle> {
+    const response = await apiClient.post('/vehicles', {
+      customerId,
+      licensePlate,
+      brand,
+      size,
+      notes,
+      isDefault,
+    });
+    return response.data;
   },
 
   async updateVehicle(id: string, updates: Partial<Vehicle>): Promise<Vehicle> {
@@ -51,11 +46,13 @@ export const vehicleService = {
   },
 
   async deleteVehicle(id: string): Promise<void> {
-    try {
-      await apiClient.delete(`/vehicles/${id}`);
-    } catch (error) {
-      console.error('Error deleting vehicle:', error);
-      throw error;
-    }
+    await apiClient.delete(`/vehicles/${id}`);
+  },
+
+  async setDefaultVehicle(id: string, customerId: string): Promise<Vehicle> {
+    const response = await apiClient.patch(`/vehicles/${id}/default`, null, {
+      params: { customerId },
+    });
+    return response.data;
   }
 };

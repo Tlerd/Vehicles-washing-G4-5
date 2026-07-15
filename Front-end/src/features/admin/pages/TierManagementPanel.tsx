@@ -1,5 +1,7 @@
 import { Check, Sparkles } from 'lucide-react';
 import styles from './TierManagementPanel.module.css';
+import { Check, Sparkles } from 'lucide-react';
+import styles from './TierManagementPanel.module.css';
 
 type TierTone = 'Member' | 'Silver' | 'Gold' | 'Platinum';
 
@@ -138,6 +140,7 @@ export function TierManagementPanel() {
           );
         })}
       </div>
+    </section>
     </section>
   );
 }

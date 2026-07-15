@@ -7,37 +7,43 @@ import com.autowashpro.dto.response.LoginCustomerResponse;
 import com.autowashpro.dto.response.LoginResponse;
 import com.autowashpro.dto.response.RegisterResponse;
 import com.autowashpro.entity.Customer;
+import com.autowashpro.entity.Voucher;
 import com.autowashpro.exception.custom.BadRequestException;
 import com.autowashpro.exception.custom.ConflictException;
 import com.autowashpro.exception.custom.UnauthorizedException;
 import com.autowashpro.repository.CustomerRepository;
+import com.autowashpro.repository.VoucherRepository;
 import com.autowashpro.service.AuthService;
-import com.autowashpro.service.OtpService;
 import com.autowashpro.utils.PhoneNormalizer;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.UUID;
 
 @Service
 public class AuthServiceImpl implements AuthService {
 
     private final CustomerRepository customerRepository;
-    private final OtpService otpService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final VoucherRepository voucherRepository;
 
     public AuthServiceImpl(
             CustomerRepository customerRepository,
-            OtpService otpService,
             PasswordEncoder passwordEncoder,
-            JwtTokenProvider jwtTokenProvider) {
+            JwtTokenProvider jwtTokenProvider,
+            VoucherRepository voucherRepository) {
         this.customerRepository = customerRepository;
-        this.otpService = otpService;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.voucherRepository = voucherRepository;
     }
 
     @Override
@@ -49,8 +55,22 @@ public class AuthServiceImpl implements AuthService {
             throw new ConflictException("Phone number already registered.");
         }
 
-        if (!otpService.isPhoneVerifiedForRegistration(phone)) {
-            throw new BadRequestException("Phone number must be OTP-verified before registration.");
+        try {
+            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(request.getFirebaseToken());
+            String verifiedPhone = (String) decodedToken.getClaims().get("phone_number");
+
+            if (verifiedPhone == null) {
+                throw new BadRequestException("Mã xác minh của Firebase không chứa số điện thoại.");
+            }
+
+            String requestPhone = PhoneNormalizer.toE164(phone);
+            String firebaseVerifiedPhone = PhoneNormalizer.toE164(verifiedPhone);
+
+            if (!requestPhone.equals(firebaseVerifiedPhone)) {
+                throw new BadRequestException("Số điện thoại đăng ký không trùng khớp với số điện thoại xác minh trên Firebase.");
+            }
+        } catch (FirebaseAuthException e) {
+            throw new BadRequestException("Mã xác thực Firebase đã hết hạn hoặc không hợp lệ: " + e.getMessage());
         }
 
         Customer customer = new Customer();
@@ -59,6 +79,7 @@ public class AuthServiceImpl implements AuthService {
         customer.setEmail(request.getEmail());
         customer.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         customer.setTier("Member");
+        customer.setRole("CUSTOMER");
         customer.setAccumulatedPoints(0);
         customer.setTotalSpent(BigDecimal.ZERO);
         customer.setTotalWashes(0);
@@ -66,6 +87,8 @@ public class AuthServiceImpl implements AuthService {
         customer.setUpdatedAt(LocalDateTime.now());
 
         Customer savedCustomer = customerRepository.save(customer);
+
+        Voucher welcome=new Voucher(); welcome.setCustomer(savedCustomer); welcome.setVoucherCode("WELCOME-"+UUID.randomUUID().toString().substring(0,8).toUpperCase()); welcome.setVoucherType("DISCOUNT_50K"); welcome.setDiscountAmount(new BigDecimal("50000")); welcome.setStatus("ACTIVE"); welcome.setExpiredAt(LocalDate.now().plusMonths(1)); voucherRepository.save(welcome);
 
         return new RegisterResponse(true, String.valueOf(savedCustomer.getCustomerId()));
     }
@@ -81,13 +104,14 @@ public class AuthServiceImpl implements AuthService {
             throw new UnauthorizedException("Incorrect phone number or password.");
         }
 
-        String token = jwtTokenProvider.generateToken(customer.getCustomerId(), customer.getPhone());
+        String token = jwtTokenProvider.generateToken(customer.getCustomerId(), customer.getPhone(), customer.getRole());
 
         LoginCustomerResponse customerResponse = new LoginCustomerResponse();
         customerResponse.setId(String.valueOf(customer.getCustomerId()));
         customerResponse.setName(customer.getFullName());
         customerResponse.setPhone(customer.getPhone());
         customerResponse.setTier(customer.getTier());
+        customerResponse.setRole(customer.getRole());
         customerResponse.setAccumulatedPoints(customer.getAccumulatedPoints());
         customerResponse.setTotalSpend(customer.getTotalSpent().longValue());
 

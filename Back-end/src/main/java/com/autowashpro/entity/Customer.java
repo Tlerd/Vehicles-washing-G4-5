@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -33,6 +34,9 @@ public class Customer {
     @Column(name = "tier", nullable = false, length = 20)
     private String tier;
 
+    @Column(name = "role", nullable = false, length = 20)
+    private String role = "CUSTOMER";
+
     @Column(name = "accumulated_points", nullable = false)
     private Integer accumulatedPoints;
 
@@ -47,4 +51,6 @@ public class Customer {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+      @OneToMany(mappedBy = "customer")
+    private List<Vehicle> vehicles;
 }
