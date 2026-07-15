@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { Customer } from '../types';
+import { Customer, UserRole } from '../types';
 import { authService } from '../services/customer/auth.service';
 import { getUserRole } from '../features/auth/roleAccess';
 
 interface AuthContextType {
   currentUser: Customer | null;
-  role: 'ADMIN' | 'COUNTER' | 'CUSTOMER' | null;
+  role: UserRole | null;
   isAuthenticated: boolean;
   isGuest: boolean;
   login: (phone: string, password: string) => Promise<{ success: boolean; error?: string }>;

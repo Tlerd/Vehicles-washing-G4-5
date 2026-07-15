@@ -13,7 +13,6 @@ export interface Customer {
   totalSpend: number;
   role?: UserRole;
   createdAt: string;
-  role: UserRole;
 }
 
 export interface Vehicle {
@@ -105,8 +104,6 @@ export interface BookingDraft {
   bookingRef?: string;
   vietQrUrl?: string;
   confirmedTotalPrice?: number;
-  endTime?: string;
-  durationMinutes?: number;
   voucherId?: string | null;
   appliedVoucherId?: string;
 }

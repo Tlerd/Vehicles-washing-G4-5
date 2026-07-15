@@ -4,7 +4,7 @@ import { RevenueAuditPanel } from './RevenueAuditPanel';
 import { CampaignBuilderPanel } from './CampaignBuilderPanel';
 import { Customer, Vehicle, Booking, PointsTransaction } from '../../../types';
 import { mockStore } from '../../../services/mockStore';
-import { getFilteredCustomers, getBookingPage, shouldLoadNextPage } from '../../../utils/adminFilters';
+import { getFilteredCustomers, getBookingPage, shouldLoadNextPage, tiers } from '../../../utils/adminFilters';
 import { isValidOptionalEmail } from '../../../utils/validation';
 import { formatPrice, formatDate, formatTime } from '../../../utils/formatters';
 import { UserRoundSearch, ClipboardList, BarChart3, BrainCircuit, Car, CalendarClock, WalletCards, Search, ShieldCheck, ArrowDownUp, Sparkles, X, Phone, Mail } from 'lucide-react';
@@ -292,7 +292,7 @@ export function AdminCustomerRegistryPage({ onBackToCustomerPortal }: AdminCusto
           <label className={styles.selectControl}>
             <ShieldCheck size={16} aria-hidden="true" />
             <select value={tier} onChange={event => setTier(event.target.value as CustomerTierFilter)}>
-              {tiers.map(tierOption => (
+              {tiers.map((tierOption: string) => (
                 <option key={tierOption} value={tierOption}>
                   {tierOption === 'ALL' ? 'All tiers' : tierOption}
                 </option>
@@ -324,7 +324,7 @@ export function AdminCustomerRegistryPage({ onBackToCustomerPortal }: AdminCusto
               </tr>
             </thead>
             <tbody>
-              {filteredCustomers.map(customer => {
+              {filteredCustomers.map((customer: Customer) => {
                 const customerVehicles = vehicles.filter(vehicle => vehicle.customerId === customer.id);
                 return (
                   <tr key={customer.id}>
@@ -452,11 +452,7 @@ export function AdminCustomerRegistryPage({ onBackToCustomerPortal }: AdminCusto
       )}
 
       {activeAdminTab === 'revenue' && (
-        <RevenueAuditPanel
-          bookings={bookings}
-          transactions={transactions}
-          getCustomerName={getCustomerName}
-        />
+        <RevenueAuditPanel />
       )}
 
       {activeAdminTab === 'campaigns' && (
@@ -582,8 +578,6 @@ export function AdminCustomerRegistryPage({ onBackToCustomerPortal }: AdminCusto
           </section>
         </div>
       )}
-    </main>
-  );
     </main>
   );
 }

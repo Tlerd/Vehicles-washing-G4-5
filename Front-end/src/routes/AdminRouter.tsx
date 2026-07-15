@@ -63,13 +63,7 @@ export const AdminRouter: React.FC = () => {
       sectionDescription:
         'Track bookings, transactions, and customer-linked spend through premium summary surfaces that reduce scanning friction.',
       icon: BarChart3,
-      render: () => (
-        <RevenueAuditPanel
-          bookings={mockStore.getBookings()}
-          transactions={mockStore.getTransactions()}
-          getCustomerName={(id) => mockStore.getCustomerById(id)?.name || 'Unknown'}
-        />
-      ),
+      render: () => <RevenueAuditPanel />,
     },
     {
       id: 'tiers',

@@ -48,11 +48,4 @@ export const vehicleService = {
   async deleteVehicle(id: string): Promise<void> {
     await apiClient.delete(`/vehicles/${id}`);
   },
-
-  async setDefaultVehicle(id: string, customerId: string): Promise<Vehicle> {
-    const response = await apiClient.patch(`/vehicles/${id}/default`, null, {
-      params: { customerId },
-    });
-    return response.data;
-  }
 };

@@ -64,7 +64,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
       };
     }
 
-    if (selectedRole === 'COUNTER') {
+    if (selectedRole === 'STAFF') {
       return {
         eyebrow: 'Branch execution',
         promise: 'Faster approvals, cleaner queue handling, and less friction at the washing counter.',
@@ -226,7 +226,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                   aria-pressed={selectedRole === option.id}
                 >
                   <strong>{option.label}</strong>
-                  <span>{option.id === 'COUNTER' ? 'Counter operations' : option.id === 'ADMIN' ? 'Operations control' : 'Booking and rewards'}</span>
+                  <span>{option.id === 'STAFF' ? 'Counter operations' : option.id === 'ADMIN' ? 'Operations control' : 'Booking and rewards'}</span>
                 </button>
               ))}
             </nav>
