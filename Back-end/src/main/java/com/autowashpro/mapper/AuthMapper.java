@@ -18,7 +18,6 @@ public interface AuthMapper {
     @Mapping(target = "passwordHash", ignore = true)
     @Mapping(target = "fullName", source = "name")
     @Mapping(target = "tier", constant = "Member")
-    @Mapping(target = "role", constant = "CUSTOMER")
     @Mapping(target = "accumulatedPoints", constant = "0")
     @Mapping(target = "totalSpent", expression = "java(BigDecimal.ZERO)")
     @Mapping(target = "totalWashes", constant = "0")

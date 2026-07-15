@@ -25,14 +25,14 @@ public class JwtTokenProvider {
         this.expirationHours = expirationHours;
     }
 
-    public String generateToken(Long customerId, String phone, String role) {
+    public String generateToken(Long customerId, String phone) {
         Instant now = Instant.now();
         Instant expiry = now.plus(expirationHours, ChronoUnit.HOURS);
 
         return Jwts.builder()
                 .subject(String.valueOf(customerId))
                 .claim("phone", phone)
-                .claim("role", role)
+                .claim("role", "CUSTOMER")
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiry))
                 .signWith(secretKey)

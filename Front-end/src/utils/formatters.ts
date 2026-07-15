@@ -1,7 +1,8 @@
 export const formatPrice = (amount: number): string => {
-  return new Intl.NumberFormat('vi-VN', {
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'VND',
+    currencyDisplay: 'code',
     minimumFractionDigits: 0,
   }).format(amount);
 };

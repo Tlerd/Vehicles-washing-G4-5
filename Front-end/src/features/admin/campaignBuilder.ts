@@ -1,5 +1,64 @@
-import type { CustomerTier } from '../../types';
-export interface Campaign {id?:string;title:string;description:string;discount:string;validUntil:string;bgGradient:string;icon:string;targetTier:CustomerTier|'ALL';kmMultiplier:number;isActive:boolean;createdAt?:string;}
-export function generateCampaignDraft({goal,targetTier,discountPercent,validUntil}:{goal:string;targetTier:CustomerTier|'ALL';discountPercent:number;validUntil:string}):Campaign{return {title:`${targetTier} AutoWash Boost`,description:`${discountPercent}% reward campaign to ${goal.charAt(0).toLowerCase()+goal.slice(1)}`,discount:`${discountPercent}% BONUS`,validUntil,bgGradient:'linear-gradient(135deg, #0b7f86, #18344f)',icon:'sparkles',targetTier,kmMultiplier:1+discountPercent/100,isActive:false};}
-export const publishCampaign=<T extends Campaign>(campaign:T):T=>({...campaign,isActive:true});
-export function getActivePromotionsForTier(items:Campaign[],tier:CustomerTier,date:string){return items.filter(p=>p.isActive&&p.validUntil>=date&&(p.targetTier==='ALL'||p.targetTier===tier));}
+import type { CustomerTier, Promotion } from '../../types';
+
+export type PromotionTargetTier = CustomerTier | 'ALL';
+
+export interface CampaignDraftInput {
+  goal: string;
+  targetTier: PromotionTargetTier;
+  discountPercent: number;
+  validUntil: string;
+}
+
+export interface CampaignDraft extends Promotion {
+  targetTier: PromotionTargetTier;
+  kmMultiplier: number;
+  isActive: boolean;
+  createdAt: string;
+}
+
+const normalizeDiscount = (discountPercent: number) => Math.max(0, Math.min(100, discountPercent));
+
+export function generateCampaignDraft({
+  goal,
+  targetTier,
+  discountPercent,
+  validUntil,
+}: CampaignDraftInput): CampaignDraft {
+  const cleanGoal = goal.trim();
+  const discount = normalizeDiscount(discountPercent);
+  const tierLabel = targetTier === 'ALL' ? 'All Tiers' : targetTier;
+  const kmMultiplier = Number((1 + discount / 100).toFixed(2));
+
+  return {
+    id: `draft-${Date.now()}`,
+    title: `${tierLabel} Care Sprint`,
+    description: `Mock-AI proposal to ${cleanGoal.toLowerCase()} with a ${discount}% wash incentive.`,
+    discount: `${discount}% OFF`,
+    validUntil,
+    bgGradient: 'linear-gradient(135deg, #0b7f86, #18344f)',
+    icon: 'Sparkles',
+    targetTier,
+    kmMultiplier,
+    isActive: false,
+    createdAt: new Date().toISOString(),
+  };
+}
+
+export function publishCampaign(campaign: CampaignDraft): CampaignDraft {
+  return {
+    ...campaign,
+    isActive: true,
+  };
+}
+
+export function getActivePromotionsForTier(
+  promotions: Promotion[],
+  tier: CustomerTier,
+  today: string,
+): Promotion[] {
+  return promotions
+    .filter(promotion => promotion.isActive !== false)
+    .filter(promotion => promotion.validUntil >= today)
+    .filter(promotion => !promotion.targetTier || promotion.targetTier === 'ALL' || promotion.targetTier === tier)
+    .sort((left, right) => new Date(right.createdAt ?? '').getTime() - new Date(left.createdAt ?? '').getTime());
+}

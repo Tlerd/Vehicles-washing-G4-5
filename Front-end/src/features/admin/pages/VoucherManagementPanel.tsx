@@ -1,7 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Coins, Edit, Gift, Plus, Sparkles, TicketPercent, Trash2, X } from 'lucide-react';
 import { mockStore } from '../../../services/mockStore';
 import { VoucherCatalogItem } from '../../../types';
+import styles from './VoucherManagementPanel.module.css';
+
+type VoucherType = VoucherCatalogItem['type'];
+
+const voucherTypeLabel: Record<VoucherType, string> = {
+  discount_50k: '50k Discount',
+  free_basic: 'Free Basic Wash',
+  free_detail: 'Detail Upgrade',
+};
+
+const voucherTypeDetail: Record<VoucherType, string> = {
+  discount_50k: 'Direct bill discount for high-conversion redemptions.',
+  free_basic: 'Entry reward to keep basic wash visits repeating.',
+  free_detail: 'Premium upsell reward for higher-tier customers.',
+};
+
+const voucherTypeClassName: Record<VoucherType, string> = {
+  discount_50k: styles.typeDiscount,
+  free_basic: styles.typeBasic,
+  free_detail: styles.typeDetail,
+};
 
 export const VoucherManagementPanel: React.FC = () => {
   const [voucherCatalog, setVoucherCatalog] = useState<VoucherCatalogItem[]>([]);
@@ -14,11 +35,24 @@ export const VoucherManagementPanel: React.FC = () => {
   }, []);
 
   const handleSaveVoucher = () => {
-    if (!vcForm.type || !vcForm.title || !vcForm.pointsCost || !vcForm.description) return;
+    const type = vcForm.type;
+    const title = vcForm.title?.trim() ?? '';
+    const pointsCost = typeof vcForm.pointsCost === 'number' ? vcForm.pointsCost : Number(vcForm.pointsCost ?? 0);
+    const description = vcForm.description?.trim() ?? '';
+
+    if (!type || !title || !pointsCost || !description) return;
+
+    const voucherPayload: Omit<VoucherCatalogItem, 'id'> = {
+      type,
+      title,
+      pointsCost,
+      description,
+    };
+
     if (editingVoucherId) {
-      mockStore.updateVoucherCatalogItem(editingVoucherId, vcForm);
+      mockStore.updateVoucherCatalogItem(editingVoucherId, voucherPayload);
     } else {
-      mockStore.addVoucherCatalogItem(vcForm as any);
+      mockStore.addVoucherCatalogItem(voucherPayload);
     }
     setVoucherCatalog(mockStore.getVoucherCatalog());
     setIsModalOpen(false);
@@ -51,117 +85,170 @@ export const VoucherManagementPanel: React.FC = () => {
     setVcForm({});
   };
 
+  const modalTitle = editingVoucherId ? 'Edit voucher' : 'Add new voucher';
+  const selectedType = (vcForm.type ?? 'discount_50k') as VoucherType;
+
   return (
-    <div style={{ padding: '24px', maxWidth: '1000px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-        <div>
-          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#0f172a', marginBottom: '8px' }}>Voucher Management</h1>
-          <p style={{ color: '#64748b' }}>Manage the rewards catalog where customers can exchange points for vouchers.</p>
+    <section className={styles.panel}>
+      <div className={styles.toolbar}>
+        <div className={styles.headerBlock}>
+          <span className={styles.kicker}>Rewards catalog</span>
+          <div className={styles.titleRow}>
+            <h1>Voucher Management</h1>
+            <p>Manage the points redemption catalog with the same polished card system, toolbar rhythm, and modal language used in the rest of Admin.</p>
+          </div>
+          <div className={styles.metaRow}>
+            <span className={styles.metaPill}>
+              <Gift size={14} aria-hidden="true" />
+              {voucherCatalog.length} reward items
+            </span>
+            <span className={styles.metaPill}>
+              <Sparkles size={14} aria-hidden="true" />
+              Premium bright surface
+            </span>
+          </div>
         </div>
-        <button 
-          onClick={openAddModal}
-          style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#0ea5e9', color: 'white', border: 'none', padding: '10px 16px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', boxShadow: '0 2px 4px rgba(14, 165, 233, 0.2)' }}
-        >
-          <Plus size={18} /> Add Voucher
+
+        <button className={styles.primaryButton} type="button" onClick={openAddModal}>
+          <Plus size={18} aria-hidden="true" />
+          Add voucher
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
-        {voucherCatalog.map(vc => (
-          <div key={vc.id} style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-              <span style={{ background: '#f0f9ff', color: '#0284c7', padding: '4px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase' }}>
-                {vc.type}
-              </span>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button onClick={() => openEditModal(vc)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#64748b', padding: '4px' }}>
-                  <Edit size={16} />
-                </button>
-                <button onClick={() => handleDeleteVoucher(vc.id)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#ef4444', padding: '4px' }}>
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            </div>
-            
-            <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>{vc.title}</h3>
-            <p style={{ fontSize: '13px', color: '#64748b', lineHeight: 1.5, flex: 1, marginBottom: '16px' }}>{vc.description}</p>
-            
-            <div style={{ display: 'flex', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
-              <span style={{ fontSize: '18px', fontWeight: 800, color: '#f59e0b' }}>{vc.pointsCost} <span style={{ fontSize: '13px', fontWeight: 600, color: '#94a3b8' }}>pts</span></span>
-            </div>
+      <div className={styles.content}>
+        {voucherCatalog.length > 0 ? (
+          <div className={styles.cardGrid}>
+            {voucherCatalog.map(vc => (
+              <article key={vc.id} className={styles.voucherCard}>
+                <div className={styles.cardHeader}>
+                  <div className={styles.cardHeaderMain}>
+                    <span className={`${styles.typeBadge} ${voucherTypeClassName[vc.type]}`}>
+                      {voucherTypeLabel[vc.type]}
+                    </span>
+                    <div className={styles.cardMeta}>{voucherTypeDetail[vc.type]}</div>
+                  </div>
+
+                  <div className={styles.actionRow}>
+                    <button
+                      className={styles.iconButton}
+                      type="button"
+                      onClick={() => openEditModal(vc)}
+                      aria-label={`Edit ${vc.title}`}
+                    >
+                      <Edit size={16} aria-hidden="true" />
+                    </button>
+                    <button
+                      className={`${styles.iconButton} ${styles.dangerButton}`}
+                      type="button"
+                      onClick={() => handleDeleteVoucher(vc.id)}
+                      aria-label={`Delete ${vc.title}`}
+                    >
+                      <Trash2 size={16} aria-hidden="true" />
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className={styles.cardTitle}>{vc.title}</h3>
+                  <p className={styles.cardDescription}>{vc.description}</p>
+                </div>
+
+                <div className={styles.cardFooter}>
+                  <span className={styles.pointsValue}>
+                    <strong>{vc.pointsCost}</strong>
+                    <span>points required</span>
+                  </span>
+                  <span className={styles.cardHint}>Visible in customer rewards exchange.</span>
+                </div>
+              </article>
+            ))}
           </div>
-        ))}
+        ) : (
+          <div className={styles.emptyState}>
+            <TicketPercent size={28} aria-hidden="true" />
+            <strong>No vouchers yet</strong>
+            <span>Add the first catalog item to start point redemptions.</span>
+          </div>
+        )}
       </div>
 
       {isModalOpen && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-          <div style={{ background: '#ffffff', width: '100%', maxWidth: '500px', borderRadius: '16px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)', padding: '24px' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#0f172a', marginBottom: '24px' }}>
-              {editingVoucherId ? 'Edit Voucher' : 'Add New Voucher'}
-            </h2>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>Type</label>
-                <select 
-                  value={vcForm.type} 
-                  onChange={e => setVcForm({...vcForm, type: e.target.value as any})}
-                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }}
+        <div className={styles.modalBackdrop} role="presentation" onMouseDown={closeModal}>
+          <section
+            className={styles.modal}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="voucher-management-title"
+            onMouseDown={event => event.stopPropagation()}
+          >
+            <div className={styles.modalHeader}>
+              <div>
+                <span className={`${styles.typeBadge} ${voucherTypeClassName[selectedType]}`}>
+                  {voucherTypeLabel[selectedType]}
+                </span>
+                <h2 id="voucher-management-title">{modalTitle}</h2>
+                <p>Use the standard Admin form styling so voucher rules remain easy to scan and quick to maintain.</p>
+              </div>
+
+              <button className={styles.closeButton} type="button" onClick={closeModal} aria-label="Close voucher modal">
+                <X size={18} aria-hidden="true" />
+              </button>
+            </div>
+
+            <div className={styles.formGrid}>
+              <label className={styles.field}>
+                Type
+                <select
+                  value={selectedType}
+                  onChange={event => setVcForm({ ...vcForm, type: event.target.value as VoucherType })}
                 >
                   <option value="discount_50k">50k Discount</option>
                   <option value="free_basic">Free Basic Wash</option>
                   <option value="free_detail">Free Detail Upgrade</option>
                 </select>
-              </div>
+              </label>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>Title</label>
-                <input 
-                  type="text" 
-                  value={vcForm.title || ''} 
-                  onChange={e => setVcForm({...vcForm, title: e.target.value})}
-                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }}
+              <label className={styles.field}>
+                Title
+                <input
+                  type="text"
+                  value={vcForm.title || ''}
+                  onChange={event => setVcForm({ ...vcForm, title: event.target.value })}
                 />
-              </div>
+              </label>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>Cost (Points)</label>
-                <input 
-                  type="number" 
-                  value={vcForm.pointsCost || 0} 
-                  onChange={e => setVcForm({...vcForm, pointsCost: parseInt(e.target.value) || 0})}
-                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none' }}
+              <label className={styles.field}>
+                Cost (Points)
+                <input
+                  type="number"
+                  min={0}
+                  value={vcForm.pointsCost || 0}
+                  onChange={event => setVcForm({ ...vcForm, pointsCost: parseInt(event.target.value, 10) || 0 })}
                 />
-              </div>
+              </label>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>Description</label>
-                <textarea 
+              <label className={styles.field}>
+                Description
+                <textarea
                   rows={3}
-                  value={vcForm.description || ''} 
-                  onChange={e => setVcForm({...vcForm, description: e.target.value})}
-                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none', resize: 'vertical' }}
+                  value={vcForm.description || ''}
+                  onChange={event => setVcForm({ ...vcForm, description: event.target.value })}
                 />
-              </div>
+              </label>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' }}>
-              <button 
-                onClick={closeModal}
-                style={{ padding: '10px 16px', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
-              >
+            <div className={styles.modalActions}>
+              <button className={styles.secondaryButton} type="button" onClick={closeModal}>
                 Cancel
               </button>
-              <button 
-                onClick={handleSaveVoucher}
-                style={{ padding: '10px 16px', background: '#0ea5e9', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
-              >
-                Save Voucher
+              <button className={styles.primaryButton} type="button" onClick={handleSaveVoucher}>
+                <Coins size={16} aria-hidden="true" />
+                Save voucher
               </button>
             </div>
-          </div>
+          </section>
         </div>
       )}
-    </div>
+    </section>
   );
 };

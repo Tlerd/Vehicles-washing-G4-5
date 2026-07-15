@@ -1,10 +1,10 @@
-# AutoWash Pro Development Plan & Task Assignments
+# AutoWash Pro Development Plan \& Task Assignments
 
 Tài liệu này ghi nhận cơ cấu nhóm phát triển, bảng phân công tổng quát và phân chia chi tiết nhiệm vụ cho từng Yêu cầu Chức năng (Functional Requirements - FR) từ FR-001 đến FR-013 của dự án **AutoWash Pro**.
 
----
+\---
 
-## 1. Cơ cấu Nhóm & Phân chia Vai trò (Team Structure & Roles)
+## 1\. Cơ cấu Nhóm \& Phân chia Vai trò (Team Structure \& Roles)
 
 Nhóm phát triển gồm 7 thành viên được tổ chức làm việc theo cặp (Pair Programming) để tăng hiệu quả và chất lượng mã nguồn:
 
@@ -18,9 +18,9 @@ Nhóm phát triển gồm 7 thành viên được tổ chức làm việc theo c
     *   **Phong** (Phong) (tài khoản GitHub: `phong` / `typhoon517`)
     *   **An** (An) (tài khoản GitHub: `Dang Minh Binh An` / `vmbazoe`)
 
----
+\---
 
-## 2. Bảng phân công tổng quát (FR Assignment Overview)
+## 2\. Bảng phân công tổng quát (FR Assignment Overview)
 
 Bảng tổng hợp phân bổ thành viên cho từng FR (Đảm bảo các task phân chia rõ ràng theo 3 nhóm cốt lõi và có reviewer hỗ trợ):
 
@@ -40,9 +40,9 @@ Bảng tổng hợp phân bổ thành viên cho từng FR (Đảm bảo các tas
 | **FR-012** | CRUD User (Manager/Staff) & Thống kê doanh thu / Audit logs | **Nguyen** | **DAnh** | Chưa bắt đầu |
 | **FR-013** | AI Campaign Promotion Builder (Admin) | **DAnh & An** | **DAnh & Phat** | Chưa bắt đầu |
 
----
+\---
 
-## 3. Phân rã chi tiết đầu việc (Detailed Sub-task Breakdowns)
+## 3\. Phân rã chi tiết đầu việc (Detailed Sub-task Breakdowns)
 
 ### FR-001: Đăng ký & Xác thực OTP qua Twilio
 *   **Phát triển Front-end (Nguyen & Phong)**:
@@ -158,9 +158,9 @@ Bảng tổng hợp phân bổ thành viên cho từng FR (Đảm bảo các tas
     *   `[ ]` Tích hợp mock-AI phân tích sinh nội dung ưu đãi và tự động lưu vào bảng `promotions` với hệ số $K_{km}$: **DAnh** (Code chính) & **Phat** (Review/Hỗ trợ)
     *   `[ ]` API Controllers kích hoạt / công bố chiến dịch khuyến mãi mới: **DAnh** (Code chính) & **Phat** (Review/Hỗ trợ)
 
----
+\---
 
-## 4. Quy trình phát triển & Kiểm thử của Nhóm (Team Workflow)
+## 4\. Quy trình phát triển \& Kiểm thử của Nhóm (Team Workflow)
 
 1.  **Phát triển Front-end**:
     - Sử dụng React Functional Components + Hooks + Tailwind CSS.
