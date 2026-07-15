@@ -1,6 +1,5 @@
-import { Customer, Vehicle, Booking, BookingStatus } from '../types';
+import { Customer, Vehicle, Booking, BookingStatus, CustomerTier } from '../types';
 
-type CustomerTier = 'Member' | 'Silver' | 'Gold' | 'Platinum';
 type CustomerTierFilter = 'ALL' | CustomerTier;
 type CustomerSortKey = 'createdAt' | 'totalSpend' | 'points';
 type BookingStatusFilter = 'ALL' | BookingStatus;
@@ -87,4 +86,4 @@ export function shouldLoadNextPage({ scrollHeight, scrollTop, clientHeight, thre
   return scrollTop + clientHeight >= scrollHeight - threshold;
 }
 
-export const tiers: Array<'ALL' | CustomerTier> = ['ALL', 'Member', 'Silver', 'Gold', 'Platinum'];
+export const tiers: Array<CustomerTierFilter> = ['ALL', 'Member', 'Silver', 'Gold', 'Platinum'];

@@ -80,7 +80,7 @@ function CustomerPortal() {
 
   const handleNavigate = (page: string) => {
     setActivePage(page as PageId);
-    if (page === 'history' && currentUser) bookingService.getBookings(currentUser.id).then(setHistory);
+    if (page === 'history' && currentUser) bookingService.getBookings(currentUser.id).then(setCustomerBookings);
     if (page === 'points' && currentUser) void refreshPoints();
   };
 
