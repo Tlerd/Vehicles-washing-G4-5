@@ -32,14 +32,17 @@ export const VehicleList: React.FC = () => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchVehicles = async () => {
-    if (!currentUser) return;
+    if (!currentUser || currentUser.id === 'guest') {
+      setVehicles([]);
+      setIsLoading(false);
+      return;
+    }
     setIsLoading(true);
     try {
       const data = await vehicleService.getVehicles(currentUser.id);
       setVehicles(data);
     } catch (error) {
       console.error('Failed to fetch vehicles', error);
-      // Fallback for demo purposes if backend is down
       setVehicles([]);
     } finally {
       setIsLoading(false);
@@ -82,15 +85,17 @@ export const VehicleList: React.FC = () => {
   };
 
   const handleSave = async () => {
-    if (!formPlate || !formBrand || !currentUser) return;
+    if (!formPlate.trim() || !formBrand.trim() || !currentUser || currentUser.id === 'guest') return;
     setIsSaving(true);
     
     try {
       if (editingVehicle) {
         // Submit only changed fields
         const updates: Partial<Vehicle> = {};
-        if (editingVehicle.licensePlate !== formPlate) updates.licensePlate = formPlate;
-        if (editingVehicle.brand !== formBrand) updates.brand = formBrand;
+        const normalizedPlate = formPlate.trim().toUpperCase();
+        const normalizedBrand = formBrand.trim();
+        if (editingVehicle.licensePlate !== normalizedPlate) updates.licensePlate = normalizedPlate;
+        if (editingVehicle.brand !== normalizedBrand) updates.brand = normalizedBrand;
         if (editingVehicle.size !== formSize) updates.size = formSize;
         if (editingVehicle.notes !== formNotes) updates.notes = formNotes;
         if (!editingVehicle.isDefault && formIsDefault) updates.isDefault = true;
@@ -99,7 +104,7 @@ export const VehicleList: React.FC = () => {
           await vehicleService.updateVehicle(editingVehicle.id, updates);
         }
       } else {
-        await vehicleService.addVehicle(currentUser.id, formPlate, formBrand, formSize, formNotes, formIsDefault);
+        await vehicleService.addVehicle(currentUser.id, formPlate.trim().toUpperCase(), formBrand.trim(), formSize, formNotes.trim(), formIsDefault);
       }
       await fetchVehicles();
       setShowForm(false);
@@ -153,11 +158,11 @@ export const VehicleList: React.FC = () => {
   return (
     <div>
       <div className={styles.header}>
-        <h3 className={styles.title}>🚗 My Vehicles</h3>
+        <h3 className={styles.title}>My vehicles</h3>
         <button className={styles.addBtn} onClick={openAddForm}>+ Add new vehicle</button>
       </div>
 
-      <div style={{ marginBottom: '1rem' }}>
+      <div className={styles.searchWrap}>
         <Input 
           placeholder="Search by plate or brand..." 
           value={searchTerm}
@@ -166,7 +171,7 @@ export const VehicleList: React.FC = () => {
       </div>
 
       {isLoading ? (
-        <div style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>Loading vehicles...</div>
+        <div className={styles.loading}>Loading vehicles...</div>
       ) : filteredVehicles.length === 0 ? (
         <div className={styles.empty}>
           {searchTerm ? 'No vehicles match your search.' : 'No vehicles yet. Add your first vehicle!'}
@@ -192,8 +197,8 @@ export const VehicleList: React.FC = () => {
                     {settingDefaultId === v.id ? 'Setting...' : 'Set default'}
                   </button>
                 )}
-                <button className={styles.actionBtn} onClick={() => openEditForm(v)}>✏️</button>
-                <button className={`${styles.actionBtn} ${styles.deleteBtn}`} onClick={() => confirmDelete(v)}>🗑️</button>
+                <button className={styles.actionBtn} onClick={() => openEditForm(v)} aria-label={`Edit ${v.licensePlate}`}>✏️</button>
+                <button className={`${styles.actionBtn} ${styles.deleteBtn}`} onClick={() => confirmDelete(v)} aria-label={`Delete ${v.licensePlate}`}>🗑️</button>
               </div>
             </div>
           ))}
@@ -221,7 +226,7 @@ export const VehicleList: React.FC = () => {
             onChange={e => setFormBrand(e.target.value)}
           />
           <div>
-            <label style={{ fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px', display: 'block' }}>
+            <label className={styles.fieldLabel}>
               Vehicle size
             </label>
             <div className={styles.sizeSelect}>
@@ -270,8 +275,8 @@ export const VehicleList: React.FC = () => {
         title="Confirm Deletion"
         size="sm"
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <p style={{ margin: 0, fontSize: '0.875rem', color: '#334155', lineHeight: '1.5' }}>
+        <div className={styles.confirmContent}>
+          <p className={styles.confirmText}>
             Are you sure you want to delete the vehicle <strong>{vehicleToDelete?.licensePlate} ({vehicleToDelete?.brand})</strong>? 
             This action cannot be undone.
           </p>

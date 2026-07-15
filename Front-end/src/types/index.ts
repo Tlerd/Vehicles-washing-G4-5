@@ -11,6 +11,7 @@ export interface Customer {
   tier: CustomerTier;
   accumulatedPoints: number;
   totalSpend: number;
+  totalWashes?: number;
   createdAt: string;
   role: UserRole;
 }
@@ -43,8 +44,6 @@ export interface ServiceItem {
 export interface LoyaltyTierDef {
   name: CustomerTier;
   multiplier: number;
-  bookingAdvanceLimit: number;
-  requiredPoints: number;
 }
 
 export interface Branch {
@@ -83,6 +82,7 @@ export interface Booking {
   totalPrice: number;
   status: BookingStatus;
   pointsEarned: number;
+  appliedVoucherId?: string;
   createdAt: string;
 }
 

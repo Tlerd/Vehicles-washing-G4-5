@@ -1,10 +1,16 @@
 import { CAR_MULTIPLIERS, SERVICES } from '../../config/constants';
 import { CarSize } from '../../types';
+import { catalogService } from './catalog.service';
+
+const getServiceCatalog = () => {
+  const liveCatalog = catalogService.getCachedServices();
+  return liveCatalog.length > 0 ? liveCatalog : SERVICES;
+};
 
 export const priceService = {
   calculateBasePrice(serviceIds: string[]): number {
     return serviceIds.reduce((total, id) => {
-      const service = SERVICES.find(s => s.id === id);
+      const service = getServiceCatalog().find(s => s.id === id);
       return total + (service?.basePrice || 0);
     }, 0);
   },
@@ -28,6 +34,6 @@ export const priceService = {
   },
 
   getServiceDetails(serviceIds: string[]) {
-    return serviceIds.map(id => SERVICES.find(s => s.id === id)).filter(Boolean);
+    return serviceIds.map(id => getServiceCatalog().find(s => s.id === id)).filter(Boolean);
   }
 };

@@ -1,9 +1,9 @@
 import { ServiceItem, Branch, Promotion, LoyaltyTierDef } from '../types';
 export const LOYALTY_TIERS: LoyaltyTierDef[] = [
-  { name: 'Member', multiplier: 1.0, bookingAdvanceLimit: 7, requiredPoints: 0 },
-  { name: 'Silver', multiplier: 1.1, bookingAdvanceLimit: 10, requiredPoints: 1000 },
-  { name: 'Gold', multiplier: 1.2, bookingAdvanceLimit: 12, requiredPoints: 3000 },
-  { name: 'Platinum', multiplier: 1.3, bookingAdvanceLimit: 14, requiredPoints: 7000 },
+  { name: 'Member', multiplier: 1.0 },
+  { name: 'Silver', multiplier: 1.1 },
+  { name: 'Gold', multiplier: 1.2 },
+  { name: 'Platinum', multiplier: 1.3 },
 ];
 
 export const CAR_MULTIPLIERS: Record<string, number> = {

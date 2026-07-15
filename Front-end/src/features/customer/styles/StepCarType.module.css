@@ -15,6 +15,23 @@
   margin: 0 0 24px;
 }
 
+.notice {
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  border: 1px solid #bae6fd;
+  border-radius: 10px;
+  background: #f0f9ff;
+  color: #0369a1;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.errorNotice {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -22,6 +39,7 @@
 }
 
 .card {
+  position: relative;
   background: #ffffff;
   border: 2px solid #e2e8f0;
   border-radius: 14px;
@@ -29,6 +47,18 @@
   text-align: center;
   cursor: pointer;
   transition: all 0.25s ease;
+}
+
+.defaultBadge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 10px;
+  font-weight: 700;
 }
 
 .card:hover {

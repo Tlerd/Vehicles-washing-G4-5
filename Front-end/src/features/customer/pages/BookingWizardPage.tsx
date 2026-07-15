@@ -26,9 +26,14 @@ interface BookingWizardPageProps {
 }
 
 export const BookingWizardPage: React.FC<BookingWizardPageProps> = ({ onComplete, onCancel }) => {
-  const { draft, nextStep, prevStep, goToStep } = useCustomerBooking();
+  const { draft, nextStep, prevStep, goToStep, resetDraft } = useCustomerBooking();
 
   const estimatedPrice = priceService.calculateFinalPrice(draft.selectedServices, draft.carSize);
+
+  const handleCancel = () => {
+    resetDraft();
+    onCancel();
+  };
 
   const canProceed = (): boolean => {
     switch (draft.currentStep) {
@@ -84,7 +89,7 @@ export const BookingWizardPage: React.FC<BookingWizardPageProps> = ({ onComplete
                 ← Back
               </Button>
             ) : (
-              <Button variant="ghost" onClick={onCancel}>
+              <Button variant="ghost" onClick={handleCancel}>
                 Cancel
               </Button>
             )}

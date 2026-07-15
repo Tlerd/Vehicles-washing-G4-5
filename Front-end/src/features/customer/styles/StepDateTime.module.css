@@ -26,9 +26,39 @@
 .calendar {
   display: flex;
   gap: 8px;
-  margin-bottom: 28px;
+  margin-bottom: 14px;
   overflow-x: auto;
   padding-bottom: 4px;
+}
+
+.customDate {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding: 12px 14px;
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+  background: #f8fbff;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.customDate input {
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #0f172a;
+  font: inherit;
+}
+
+.customDate input:focus {
+  border-color: #0ea5e9;
+  outline: 3px solid #e0f2fe;
 }
 
 .dayCard {
@@ -148,6 +178,12 @@
   font-size: 14px;
   background: #f8fafc;
   border-radius: 10px;
+}
+
+.errorNotice {
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
 }
 
 @media (max-width: 640px) {

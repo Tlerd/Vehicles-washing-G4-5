@@ -24,6 +24,8 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('auth_token');
+      localStorage.removeItem('user');
+      window.dispatchEvent(new Event('autowash:unauthorized'));
     }
     return Promise.reject(error);
   }

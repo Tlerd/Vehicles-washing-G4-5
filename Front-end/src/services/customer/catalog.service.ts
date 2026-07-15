@@ -1,9 +1,19 @@
 import apiClient from '../../config/axios';
-import { ServiceItem } from '../../types';
+import { Branch, ServiceItem } from '../../types';
 import { SERVICES } from '../../config/constants';
 
 interface ServiceApiResponse { serviceCode:string; serviceName:string; description?:string; basePrice:number; durationMinutes?:number; }
+interface BranchApiResponse {
+  branchId: number;
+  branchName: string;
+  address?: string;
+  phone?: string;
+  openTime?: string;
+  closeTime?: string;
+  status?: string;
+}
 let cached: ServiceItem[] = [];
+let cachedBranches: Branch[] = [];
 export const catalogService = {
   async getServices(): Promise<ServiceItem[]> {
     const { data } = await apiClient.get<ServiceApiResponse[]>('/catalog/services');
@@ -26,4 +36,20 @@ export const catalogService = {
     return cached;
   },
   getCachedServices: (): ServiceItem[] => cached,
+
+  async getBranches(): Promise<Branch[]> {
+    const { data } = await apiClient.get<BranchApiResponse[]>('/catalog/branches');
+    cachedBranches = data.map((branch) => ({
+      id: branch.branchId === 1 ? 'D1' : branch.branchId === 2 ? 'D7' : String(branch.branchId),
+      name: branch.branchName,
+      address: branch.address || '',
+      phone: branch.phone || '',
+      openTime: String(branch.openTime || '').slice(0, 5),
+      closeTime: String(branch.closeTime || '').slice(0, 5),
+      status: branch.status?.toUpperCase() === 'COMING_SOON' ? 'COMING_SOON' : 'ACTIVE',
+    }));
+    return cachedBranches;
+  },
+
+  getCachedBranches: (): Branch[] => cachedBranches,
 };

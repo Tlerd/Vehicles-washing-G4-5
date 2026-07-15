@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Route, Routes } from 'react-router-dom';
 import { DashboardPage } from '../features/customer/pages/DashboardPage';
 import { BookingWizardPage } from '../features/customer/pages/BookingWizardPage';
 import { VehicleList } from '../features/customer/components/VehicleList';
@@ -11,20 +11,53 @@ import { LoyaltyTierSection } from '../features/customer/components/LoyaltyTierS
 import { VoucherShop } from '../features/customer/components/VoucherShop';
 import { CustomerLayout } from '../layouts/CustomerLayout';
 import { bookingService } from '../services/customer/booking.service';
-import { mockStore } from '../services/mockStore';
+import { platformService } from '../services/platform.service';
 import { useAuth } from '../context/AuthContext';
+import { Booking, PointsTransaction } from '../types';
 
 type PageId = 'dashboard' | 'booking' | 'vehicles' | 'history' | 'promotions' | 'points';
 
 export const AppRouter: React.FC = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, refreshUser } = useAuth();
   const [activePage, setActivePage] = useState<PageId>('dashboard');
-  const [, setRefreshKey] = useState(0);
-  const liveCustomer = currentUser ? mockStore.getCustomerById(currentUser.id) || currentUser : null;
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [transactions, setTransactions] = useState<PointsTransaction[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleNavigate = (page: string) => {
-    setActivePage(page as PageId);
-  };
+  const loadCustomerActivity = useCallback(async () => {
+    if (!currentUser) return;
+    setLoading(true);
+    setError('');
+    try {
+      const [bookingRows, pointRows] = await Promise.all([
+        bookingService.getBookings(currentUser.id),
+        platformService.points(currentUser.id),
+      ]);
+      setBookings(bookingRows);
+      setTransactions(pointRows);
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : 'Could not load customer activity.');
+    } finally {
+      setLoading(false);
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (activePage === 'history' || activePage === 'points') void loadCustomerActivity();
+  }, [activePage, loadCustomerActivity]);
+
+  const handleNavigate = (page: string) => setActivePage(page as PageId);
+  const completedWashes = bookings.filter((booking) => booking.status === 'COMPLETED').length;
+
+  const activityState = loading ? (
+    <p role="status">Loading data from AutoWash Pro...</p>
+  ) : error ? (
+    <div role="alert">
+      <p>{error}</p>
+      <button type="button" onClick={() => void loadCustomerActivity()}>Try again</button>
+    </div>
+  ) : null;
 
   const renderPage = () => {
     switch (activePage) {
@@ -33,53 +66,42 @@ export const AppRouter: React.FC = () => {
       case 'booking':
         return (
           <BookingWizardPage
-            onComplete={() => setActivePage('dashboard')}
+            onComplete={() => {
+              setActivePage('dashboard');
+              void refreshUser();
+            }}
             onCancel={() => setActivePage('dashboard')}
           />
         );
       case 'vehicles':
         return <VehicleList />;
       case 'history':
-        return (
-          <div>
-            <BookingHistory
-              bookings={bookingService.getBookings(currentUser?.id || '')}
-            />
-          </div>
-        );
+        return activityState || <BookingHistory bookings={bookings} />;
       case 'promotions':
-        return (
-          <div style={{ maxWidth: 600 }}>
-            <PromotionDisplay />
-          </div>
-        );
+        return <PromotionDisplay />;
       case 'points':
+        if (activityState) return activityState;
         return (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <LoyaltyTierSection currentTier={liveCustomer?.tier} currentPoints={liveCustomer?.accumulatedPoints} />
-            {liveCustomer && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+            <LoyaltyTierSection
+              currentTier={currentUser?.tier}
+              currentPoints={currentUser?.accumulatedPoints}
+              totalSpend={currentUser?.totalSpend}
+              completedWashes={currentUser?.totalWashes ?? completedWashes}
+            />
+            {currentUser && (
               <VoucherShop
-                customerId={liveCustomer.id}
-                points={liveCustomer.accumulatedPoints}
-                onChanged={() => setRefreshKey(key => key + 1)}
+                customerId={currentUser.id}
+                points={currentUser.accumulatedPoints}
+                onChanged={async () => {
+                  await refreshUser();
+                  await loadCustomerActivity();
+                }}
               />
             )}
-            <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '24px' }}>
-              {liveCustomer && <ProfileCard customer={liveCustomer} />}
-            <div style={{
-              background: '#ffffff',
-              borderRadius: '12px',
-              border: '1px solid #f1f5f9',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-              padding: '20px',
-            }}>
-              <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a', marginBottom: '16px' }}>
-                ⭐ Points History
-              </h3>
-              <PointsHistory
-                transactions={mockStore.getTransactionsByCustomer(liveCustomer?.id || '')}
-              />
-            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(240px, 320px) minmax(0, 1fr)', gap: 24 }}>
+              {currentUser && <ProfileCard customer={currentUser} />}
+              <PointsHistory transactions={transactions} />
             </div>
           </div>
         );
@@ -90,9 +112,9 @@ export const AppRouter: React.FC = () => {
 
   return (
     <CustomerLayout activeNav={activePage} onNavChange={handleNavigate}>
-       <Routes>
-          <Route path="/*" element={renderPage()} />
-       </Routes>
+      <Routes>
+        <Route path="/*" element={renderPage()} />
+      </Routes>
     </CustomerLayout>
   );
 };

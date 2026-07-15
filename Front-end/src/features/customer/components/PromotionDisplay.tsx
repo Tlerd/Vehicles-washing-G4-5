@@ -1,25 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { platformService } from '../../../services/platform.service';
+import React from 'react';
 import styles from '../styles/PromotionDisplay.module.css';
 
-export const PromotionDisplay: React.FC = () => {
-  const [promotions,setPromotions]=useState<Array<Record<string,unknown>>>([]);useEffect(()=>{platformService.campaigns().then(setPromotions)},[]);
-  return (
-    <div className={styles.list}>
-      {promotions.map(promo => (
-        <div
-          key={String(promo.promotionId)}
-          className={styles.card}
-          style={{ background: 'linear-gradient(135deg, #0ea5e9, #6366f1)' }}
-        >
-          <span className={styles.cardIcon}>🎉</span>
-          <div className={styles.cardContent}>
-            <div className={styles.cardTitle}>{String(promo.promotionName)}</div>
-            <div className={styles.cardDesc}>{String(promo.description)}</div>
-          </div>
-          <span className={styles.cardBadge}>×{String(promo.discountPercent)} points</span>
+export const PromotionDisplay: React.FC = () => (
+  <div className={styles.list}>
+    <div
+      className={styles.card}
+      style={{ background: 'linear-gradient(135deg, #0f766e, #0f172a)' }}
+      role="status"
+    >
+      <span className={styles.cardIcon} aria-hidden="true">✦</span>
+      <div className={styles.cardContent}>
+        <div className={styles.cardTitle}>Customer promotion feed is not connected yet</div>
+        <div className={styles.cardDesc}>
+          The backend only exposes promotions through an admin-protected endpoint. A customer promotion API is required.
         </div>
-      ))}
+      </div>
+      <span className={styles.cardBadge}>API required</span>
     </div>
-  );
-};
+  </div>
+);

@@ -305,4 +305,23 @@
   border-radius: 0.25rem;
   font-family: monospace;
 }
-.loadError { color:#dc2626; font-weight:600; }
+.catalogNotice,
+.loadError {
+  margin: 0.75rem 0 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.catalogNotice {
+  border: 1px solid #bae6fd;
+  background: #f0f9ff;
+  color: #0369a1;
+}
+
+.loadError {
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { AdminCustomerRegistryPage } from '../features/admin/pages/AdminCustomerRegistryPage';
 import { CampaignBuilderPanel } from '../features/admin/pages/CampaignBuilderPanel';
@@ -7,7 +7,13 @@ import { TierManagementPanel } from '../features/admin/pages/TierManagementPanel
 import { VoucherManagementPanel } from '../features/admin/pages/VoucherManagementPanel';
 import { ArrowUpRight, BarChart3, Gift, LogOut, ShieldCheck, Sparkles, Users, type LucideIcon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { mockStore } from '../services/mockStore';
+import { platformService } from '../services/platform.service';
+import {
+  getAdminErrorMessage,
+  parseAdminBookingPage,
+  parseAdminCustomers,
+  parseAdminRevenue,
+} from '../features/admin/adminApi';
 import styles from './AdminRouter.module.css';
 
 type AdminPageId = 'customers' | 'campaigns' | 'revenue' | 'tiers' | 'vouchers';
@@ -22,14 +28,65 @@ type AdminPanel = {
   render: (logout: () => void) => React.ReactNode;
 };
 
+interface AdminShellMetrics {
+  customers: number;
+  activeBookings: number;
+  totalRevenue: number;
+}
+
+const emptyMetrics: AdminShellMetrics = {
+  customers: 0,
+  activeBookings: 0,
+  totalRevenue: 0,
+};
+
 export const AdminRouter: React.FC = () => {
   const { logout } = useAuth();
   const [activePage, setActivePage] = useState<AdminPageId>('customers');
-  const customersCount = mockStore.getCustomers().length;
-  const activeBookings = mockStore.getBookings().filter((booking) =>
-    ['PENDING', 'CONFIRMED', 'CHECKED_IN'].includes(booking.status),
-  ).length;
-  const totalRevenue = mockStore.getCustomers().reduce((sum, customer) => sum + customer.totalSpend, 0);
+  const [metrics, setMetrics] = useState<AdminShellMetrics>(emptyMetrics);
+  const [metricsLoading, setMetricsLoading] = useState(true);
+  const [metricsError, setMetricsError] = useState('');
+
+  useEffect(() => {
+    let active = true;
+
+    const loadMetrics = async () => {
+      setMetricsLoading(true);
+      setMetricsError('');
+
+      try {
+        const [customersPayload, revenuePayload, pendingPayload, confirmedPayload, checkedInPayload] =
+          await Promise.all([
+            platformService.customers(),
+            platformService.revenue('month'),
+            platformService.adminBookings(0, 'PENDING'),
+            platformService.adminBookings(0, 'CONFIRMED'),
+            platformService.adminBookings(0, 'CHECKED_IN'),
+          ]);
+
+        if (!active) return;
+        const activeBookings = [pendingPayload, confirmedPayload, checkedInPayload]
+          .map(parseAdminBookingPage)
+          .reduce((total, page) => total + page.totalItems, 0);
+
+        setMetrics({
+          customers: parseAdminCustomers(customersPayload).length,
+          activeBookings,
+          totalRevenue: parseAdminRevenue(revenuePayload).totalRevenue,
+        });
+      } catch (error) {
+        if (!active) return;
+        setMetricsError(getAdminErrorMessage(error, 'Admin overview could not be loaded from the API.'));
+      } finally {
+        if (active) setMetricsLoading(false);
+      }
+    };
+
+    void loadMetrics();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const adminPanels = [
     {
@@ -46,7 +103,7 @@ export const AdminRouter: React.FC = () => {
     {
       id: 'campaigns',
       label: 'Campaigns',
-      description: 'AI-assisted promotion planning',
+      description: 'Promotion planning and publishing',
       sectionEyebrow: 'Growth orchestration',
       sectionTitle: 'Shape premium campaign launches with clearer planning context.',
       sectionDescription:
@@ -63,13 +120,7 @@ export const AdminRouter: React.FC = () => {
       sectionDescription:
         'Track bookings, transactions, and customer-linked spend through premium summary surfaces that reduce scanning friction.',
       icon: BarChart3,
-      render: () => (
-        <RevenueAuditPanel
-          bookings={mockStore.getBookings()}
-          transactions={mockStore.getTransactions()}
-          getCustomerName={(id) => mockStore.getCustomerById(id)?.name || 'Unknown'}
-        />
-      ),
+      render: () => <RevenueAuditPanel />,
     },
     {
       id: 'tiers',
@@ -100,18 +151,22 @@ export const AdminRouter: React.FC = () => {
   const shellHighlights = [
     {
       label: 'Customers',
-      value: customersCount.toString(),
-      description: 'Profiles and loyalty activity tracked in the admin workspace.',
+      value: metricsLoading ? '…' : metricsError ? '—' : metrics.customers.toLocaleString('vi-VN'),
+      description: 'Customer profiles returned by the live admin API.',
     },
     {
-      label: 'Active bookings',
-      value: activeBookings.toString(),
-      description: 'Appointments currently moving through the service pipeline.',
+      label: "Today's active bookings",
+      value: metricsLoading ? '…' : metricsError ? '—' : metrics.activeBookings.toLocaleString('vi-VN'),
+      description: 'Pending, confirmed, and checked-in appointments from the booking API.',
     },
     {
-      label: 'Total spend',
-      value: `${new Intl.NumberFormat('en-US').format(totalRevenue)} VND`,
-      description: 'Revenue visibility tied directly to customer behavior.',
+      label: 'Completed revenue',
+      value: metricsLoading
+        ? '…'
+        : metricsError
+          ? '—'
+          : `${new Intl.NumberFormat('vi-VN').format(metrics.totalRevenue)} VND`,
+      description: 'Completed-booking revenue reported by the Back-end.',
     },
   ];
 
@@ -185,13 +240,20 @@ export const AdminRouter: React.FC = () => {
               </div>
               <div className={styles.heroBadge}>
                 <ArrowUpRight size={16} />
-                Shell harmonized
+                Live API workspace
               </div>
             </div>
             <p className={styles.heroDescription}>
               {activePanel.sectionDescription}
             </p>
           </article>
+
+          {metricsError && (
+            <div className={styles.apiError} role="alert">
+              <strong>Overview unavailable.</strong>
+              <span>{metricsError}</span>
+            </div>
+          )}
 
           <dl className={styles.metricGrid}>
             {shellHighlights.map((item) => (
