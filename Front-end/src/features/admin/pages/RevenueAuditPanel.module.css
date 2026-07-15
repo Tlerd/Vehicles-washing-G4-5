@@ -1,1 +1,86 @@
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.card{padding:1rem;border:1px solid #e2e8f0;border-radius:.75rem;background:#fff}.pre{max-height:360px;overflow:auto;background:#f8fafc;padding:1rem;border-radius:.75rem}@media(max-width:700px){.grid{grid-template-columns:1fr}}
+.panel {
+  --admin-ink: #102033;
+  --admin-muted: #637083;
+  --admin-line: #dbe7ed;
+  --admin-teal: #087f83;
+  --admin-blue: #245bff;
+  --admin-coral: #d96d4b;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(16, 32, 51, 0.09);
+  border-radius: 8px;
+  box-shadow: 0 22px 58px rgba(16, 32, 51, 0.11);
+  margin: 32px auto;
+  max-width: 1220px;
+  overflow: hidden;
+}
+
+.toolbar {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.64);
+  border-bottom: 1px solid rgba(16, 32, 51, 0.08);
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 190px 190px 190px 1fr;
+  padding: 16px;
+}
+
+.selectControl {
+  align-items: center;
+  background: rgba(247, 251, 252, 0.92);
+  border: 1px solid var(--admin-line);
+  border-radius: 8px;
+  color: #587084;
+  display: flex;
+  gap: 9px;
+  height: 44px;
+  padding: 0 12px;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+}
+.selectControl:focus-within { background: #fff; border-color: rgba(8, 127, 131, 0.45); box-shadow: 0 0 0 4px rgba(8, 127, 131, 0.1); }
+.selectControl select { background: transparent; border: 0; color: var(--admin-ink); font: inherit; outline: 0; width: 100%; }
+.disabledControl { background: #eef3f6; cursor: help; }
+.controlText { color: #718193; font-size: 13px; font-weight: 700; }
+
+.feedbackStack { background: #fff8f8; border-bottom: 1px solid #f2d3d3; display: grid; gap: 6px; padding: 12px 16px; }
+.errorBanner { color: #a33d3d; font-size: 13px; font-weight: 750; margin: 0; }
+.revenueGrid { display: grid; gap: 12px; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 16px; }
+.revenueCard {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(247, 251, 252, 0.9));
+  border: 1px solid rgba(16, 32, 51, 0.08);
+  border-radius: 8px;
+  box-shadow: 0 14px 30px rgba(16, 32, 51, 0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 132px;
+  overflow: hidden;
+  padding: 18px;
+  position: relative;
+}
+.revenueCard::after { background: linear-gradient(90deg, var(--admin-teal), var(--admin-blue), var(--admin-coral)); bottom: 0; content: ""; height: 3px; left: 0; position: absolute; right: 0; }
+.revenueCard span,
+.revenueCard small { color: var(--admin-muted); font-size: 12px; font-weight: 850; }
+.revenueCard span { letter-spacing: 0.06em; text-transform: uppercase; }
+.revenueCard strong { color: var(--admin-ink); font-size: 25px; line-height: 1.15; }
+.tableWrap { overflow-x: auto; }
+.auditTable { border-collapse: collapse; min-width: 940px; width: 100%; }
+.auditTable th { background: rgba(241, 247, 250, 0.88); color: #65788b; font-size: 11px; letter-spacing: 0.06em; padding: 13px 16px; text-align: left; text-transform: uppercase; }
+.auditTable td { border-top: 1px solid rgba(16, 32, 51, 0.07); color: #2d4258; font-size: 13px; padding: 16px; vertical-align: middle; }
+.auditTable tbody tr { transition: background 0.16s ease, box-shadow 0.16s ease; }
+.auditTable tbody tr:hover { background: rgba(8, 127, 131, 0.045); box-shadow: inset 3px 0 0 rgba(8, 127, 131, 0.55); }
+.auditTable td:first-child { color: var(--admin-ink); }
+.auditTable td:first-child strong,
+.auditTable td:first-child span { display: block; }
+.auditTable td:first-child span { color: #6d7e90; font-size: 12px; margin-top: 3px; }
+.pointsPositive { color: #11815f; }
+.pointsNegative { color: var(--admin-coral); }
+.emptyState { align-items: center; color: var(--admin-muted); display: flex; flex-direction: column; gap: 7px; padding: 50px 20px; text-align: center; }
+.emptyState strong { color: var(--admin-ink); }
+.spinner { animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 900px) {
+  .panel { margin: 18px; }
+  .toolbar,
+  .revenueGrid { grid-template-columns: 1fr; }
+}

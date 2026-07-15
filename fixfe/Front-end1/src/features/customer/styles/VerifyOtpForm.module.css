@@ -1,0 +1,259 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconBox {
+  display: flex;
+  height: 3.5rem;
+  width: 3.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1rem;
+  background-color: #f0f9ff; /* sky-50 */
+  color: #0369a1; /* sky-700 */
+  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.1);
+  border: 1px solid #e0f2fe; /* sky-100 */
+}
+
+.headerText {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--color-text-main, #0f172a);
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  color: #475569; /* slate-600 */
+  margin: 0;
+}
+
+.subtitle span {
+  font-weight: 600;
+  color: var(--color-text-main, #0f172a);
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.025em;
+  color: #334155; /* slate-700 */
+}
+
+.emailInput {
+  height: 3rem;
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid #e0f2fe;
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 0 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b; /* slate-800 */
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(4px);
+  transition: all 0.3s;
+}
+
+.emailInput:focus {
+  border-color: #38bdf8;
+  background-color: #ffffff;
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+}
+
+.otpGrid {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .otpGrid {
+    gap: 0.75rem;
+  }
+}
+
+.digitInput {
+  height: 3rem;
+  width: 2.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e0f2fe;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.3s;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+@media (min-width: 640px) {
+  .digitInput {
+    height: 3.5rem;
+    width: 3rem;
+  }
+}
+
+.digitInput:focus {
+  border-color: #38bdf8;
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+}
+
+.digitInputFilled {
+  border-color: #7dd3fc;
+  background-color: #f0f9ff;
+  color: #0f172a;
+}
+
+.errorText {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #e11d48;
+  margin-top: 0.25rem;
+}
+
+.timerBox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-radius: 1rem;
+  border: 1px solid #e0f2fe;
+  background-color: rgba(255, 255, 255, 0.6);
+  padding: 1rem;
+  font-size: 0.875rem;
+}
+
+.timerText {
+  color: #475569;
+}
+
+.timerText span {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.expiredText {
+  font-weight: 500;
+  color: #64748b;
+}
+
+.resendBtn {
+  background: none;
+  border: none;
+  font-weight: 600;
+  color: #0369a1; /* sky-700 */
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.resendBtn:hover:not(:disabled) {
+  color: #075985; /* sky-800 */
+}
+
+.resendBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.actionsGrid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .actionsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.btnBack {
+  height: 3rem;
+  border-radius: 9999px;
+  border: 1px solid #e0f2fe;
+  background-color: rgba(255, 255, 255, 0.7);
+  color: #334155;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btnBack:hover {
+  background-color: #f0f9ff;
+  transform: scale(1.02);
+}
+
+.btnBack:active {
+  transform: scale(0.98);
+}
+
+.btnVerify {
+  height: 3rem;
+  border-radius: 9999px;
+  font-size: 1rem;
+  font-weight: 700;
+  box-shadow: 0 12px 32px rgba(37, 99, 235, 0.24);
+  background-color: #1d4ed8;
+  color: white;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btnVerify:hover:not(:disabled) {
+  transform: scale(1.02);
+  background-color: #1e40af;
+}
+
+.btnVerify:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btnVerify:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.errorBox {
+  background-color: #fff1f2;
+  border: 1px solid #ffe4e6;
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #e11d48;
+}

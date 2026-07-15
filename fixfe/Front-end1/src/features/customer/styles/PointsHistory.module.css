@@ -1,0 +1,16 @@
+.list { display: flex; flex-direction: column; gap: 8px; }
+.item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; transition: background 0.2s ease; }
+.item:hover { background: #f8fafc; }
+.icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.iconEarn { background: #dcfce7; }
+.iconRedeem { background: #fee2e2; }
+.iconTierChange { background: #fef3c7; }
+.iconExpire { background: #f1f5f9; }
+.content { flex: 1; min-width: 0; }
+.desc { font-size: 13px; font-weight: 500; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.time { font-size: 11px; color: #94a3b8; }
+.points { font-size: 14px; font-weight: 700; white-space: nowrap; }
+.pointsPositive { color: #16a34a; }
+.pointsNegative { color: #dc2626; }
+.pointsNeutral { color: #64748b; }
+.empty { text-align: center; padding: 24px; color: #94a3b8; font-size: 13px; }

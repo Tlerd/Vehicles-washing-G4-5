@@ -1,126 +1,239 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { AlertCircle, LoaderCircle, RefreshCw } from 'lucide-react';
 import { platformService } from '../../../services/platform.service';
+import styles from '../styles/VoucherShop.module.css';
 
 interface VoucherShopProps {
   customerId: string;
   points: number;
-  onChanged: () => void;
+  onChanged: () => void | Promise<void>;
 }
 
-const voucherCatalog: Array<{
-  type: 'DISCOUNT_50K'|'FREE_BASIC'|'FREE_DETAIL';
+type VoucherType = 'DISCOUNT_50K' | 'FREE_BASIC' | 'FREE_DETAIL';
+
+interface VoucherCatalogItem {
+  type: VoucherType;
   title: string;
   pointsCost: number;
   description: string;
-}> = [
+}
+
+interface CustomerVoucher {
+  voucherId?: string | number;
+  voucherType?: string;
+  voucherCode?: string;
+  redeemedAt?: string;
+  expiredAt?: string;
+  status?: string;
+}
+
+interface ApiErrorShape {
+  message?: unknown;
+  response?: {
+    data?: {
+      error?: unknown;
+      message?: unknown;
+    };
+  };
+}
+
+const voucherCatalog: VoucherCatalogItem[] = [
   {
     type: 'DISCOUNT_50K',
     title: '50k Discount Voucher',
     pointsCost: 500,
-    description: 'Use on any wash bill from 200k.',
+    description: 'Reduces the booking total by 50,000 VND.',
   },
   {
     type: 'FREE_BASIC',
-    title: 'Free Basic Wash',
+    title: '100k Discount Voucher',
     pointsCost: 1200,
-    description: 'Redeem one standard exterior and interior basic wash.',
+    description: 'Reduces the booking total by 100,000 VND.',
   },
   {
     type: 'FREE_DETAIL',
-    title: 'Free Detail Upgrade',
+    title: '250k Discount Voucher',
     pointsCost: 2400,
-    description: 'Upgrade a basic wash to detail wash at checkout.',
+    description: 'Reduces the booking total by 250,000 VND.',
   },
 ];
 
-export const VoucherShop: React.FC<VoucherShopProps> = ({ customerId, points, onChanged }) => {
-  const [message, setMessage] = useState('');
-  const [vouchers,setVouchers]=useState<Array<Record<string,unknown>>>([]);const load=()=>platformService.vouchers(customerId).then(setVouchers);useEffect(()=>{void load()},[customerId]);
+const voucherTitles: Record<VoucherType, string> = Object.fromEntries(
+  voucherCatalog.map((item) => [item.type, item.title]),
+) as Record<VoucherType, string>;
 
-  const handleRedeem = async (item: (typeof voucherCatalog)[number]) => {
-    try { const voucher=await platformService.redeem(customerId,item.type,item.pointsCost);setMessage(`Redeemed ${item.title}. Code: ${voucher.voucherCode}`);await load();onChanged(); } catch { setMessage('Not enough points or voucher could not be redeemed.'); }
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (typeof error !== 'object' || error === null) return fallback;
+
+  const apiError = error as ApiErrorShape;
+  const responseMessage = apiError.response?.data?.message;
+  const responseError = apiError.response?.data?.error;
+  if (typeof responseError === 'string' && responseError.trim()) return responseError;
+  if (typeof responseMessage === 'string' && responseMessage.trim()) return responseMessage;
+  if (typeof apiError.message === 'string' && apiError.message.trim()) return apiError.message;
+  return fallback;
+};
+
+const getVoucherTitle = (type?: string) => {
+  if (type && type in voucherTitles) return voucherTitles[type as VoucherType];
+  return type ? type.replaceAll('_', ' ') : 'Reward voucher';
+};
+
+const getVoucherDate = (voucher: CustomerVoucher) => {
+  const rawDate = voucher.redeemedAt || voucher.expiredAt;
+  if (!rawDate) return voucher.status || 'Active';
+
+  const parsedDate = new Date(rawDate);
+  if (Number.isNaN(parsedDate.getTime())) return voucher.status || 'Active';
+
+  const label = voucher.redeemedAt ? 'Redeemed' : 'Expires';
+  return `${label} ${parsedDate.toLocaleDateString('vi-VN')}`;
+};
+
+export const VoucherShop: React.FC<VoucherShopProps> = ({ customerId, points, onChanged }) => {
+  const [message, setMessage] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
+  const [vouchers, setVouchers] = useState<CustomerVoucher[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState('');
+  const [redeemingType, setRedeemingType] = useState<VoucherType | null>(null);
+
+  const loadVouchers = useCallback(async () => {
+    if (!customerId) {
+      setVouchers([]);
+      setLoadError('');
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setLoadError('');
+
+    try {
+      const response: unknown = await platformService.vouchers(customerId);
+      if (!Array.isArray(response)) throw new Error('The voucher response was not valid.');
+      setVouchers(response as CustomerVoucher[]);
+    } catch (error) {
+      setLoadError(getErrorMessage(error, 'Could not load your vouchers.'));
+    } finally {
+      setIsLoading(false);
+    }
+  }, [customerId]);
+
+  useEffect(() => {
+    void loadVouchers();
+  }, [loadVouchers]);
+
+  const handleRedeem = async (item: VoucherCatalogItem) => {
+    if (points < item.pointsCost || redeemingType) return;
+
+    setRedeemingType(item.type);
+    setMessage(null);
+
+    try {
+      const voucher = (await platformService.redeem(
+        customerId,
+        item.type,
+        item.pointsCost,
+      )) as CustomerVoucher;
+      const code = voucher.voucherCode ? ` Code: ${voucher.voucherCode}` : '';
+      setMessage({ kind: 'success', text: `Redeemed ${item.title}.${code}` });
+      await onChanged();
+      await loadVouchers();
+    } catch (error) {
+      setMessage({
+        kind: 'error',
+        text: getErrorMessage(error, 'Not enough points or the voucher could not be redeemed.'),
+      });
+    } finally {
+      setRedeemingType(null);
+    }
   };
 
   return (
-    <div style={{
-      background: '#ffffff',
-      borderRadius: 12,
-      border: '1px solid #f1f5f9',
-      boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-      padding: 20,
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'center', marginBottom: 16 }}>
+    <div className={styles.shop}>
+      <div className={styles.header}>
         <div>
-          <h3 style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', margin: 0 }}>Voucher Store</h3>
-          <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: 12 }}>FR-008: exchange loyalty points for rewards.</p>
+          <h3 className={styles.title}>Voucher store</h3>
+          <p className={styles.subtitle}>Turn loyalty points into offers you can use on the next service visit.</p>
         </div>
-        <strong style={{ color: '#ea580c', fontSize: 18 }}>{points.toLocaleString('vi-VN')} pts</strong>
+        <strong className={styles.pointsBadge}>{points.toLocaleString('vi-VN')} pts</strong>
       </div>
 
       {message && (
-        <div style={{
-          border: '1px solid #bae6fd',
-          background: '#f0f9ff',
-          color: '#0369a1',
-          borderRadius: 8,
-          padding: '10px 12px',
-          fontSize: 12,
-          fontWeight: 700,
-          marginBottom: 14,
-        }}>
-          {message}
+        <div
+          className={`${styles.message} ${message.kind === 'error' ? styles.messageError : ''}`}
+          role={message.kind === 'error' ? 'alert' : 'status'}
+        >
+          {message.text}
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
-        {voucherCatalog.map(item => {
-          const disabled = points < item.pointsCost;
+      <p className={styles.catalogNotice}>
+        Exchange costs are Front-end reference values because the Back-end does not expose an authoritative voucher catalog API.
+      </p>
+
+      <div className={styles.catalogGrid}>
+        {voucherCatalog.map((item) => {
+          const disabled = points < item.pointsCost || redeemingType !== null;
+          const isRedeeming = redeemingType === item.type;
+
           return (
-            <div key={item.type} style={{ border: '1px solid #e2e8f0', borderRadius: 10, padding: 14 }}>
-              <div style={{ fontWeight: 800, color: '#0f172a', fontSize: 14 }}>{item.title}</div>
-              <p style={{ minHeight: 34, color: '#64748b', fontSize: 12, margin: '6px 0 12px' }}>{item.description}</p>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
-                <strong style={{ color: '#0f172a', fontSize: 13 }}>{item.pointsCost.toLocaleString('vi-VN')} pts</strong>
+            <article key={item.type} className={styles.catalogCard}>
+              <div className={styles.catalogTop}>
+                <div className={styles.catalogTitle}>{item.title}</div>
+                <span className={styles.catalogCost}>{item.pointsCost.toLocaleString('vi-VN')} pts</span>
+              </div>
+              <p className={styles.catalogDescription}>{item.description}</p>
+              <div className={styles.catalogFooter}>
+                <span className={styles.catalogHint}>
+                  {isRedeeming ? 'Creating voucher...' : points < item.pointsCost ? 'More points needed' : 'Ready to redeem'}
+                </span>
                 <button
                   type="button"
-                  onClick={() => handleRedeem(item)}
+                  onClick={() => void handleRedeem(item)}
                   disabled={disabled}
-                  style={{
-                    border: 0,
-                    borderRadius: 8,
-                    padding: '8px 10px',
-                    fontWeight: 800,
-                    color: disabled ? '#94a3b8' : '#ffffff',
-                    background: disabled ? '#e2e8f0' : '#0284c7',
-                    cursor: disabled ? 'not-allowed' : 'pointer',
-                  }}
+                  className={`${styles.redeemButton} ${disabled ? styles.redeemButtonDisabled : ''}`}
                 >
-                  Redeem
+                  {isRedeeming && <LoaderCircle size={14} className={styles.spinner} />}
+                  {isRedeeming ? 'Redeeming...' : 'Redeem'}
                 </button>
               </div>
-            </div>
+            </article>
           );
         })}
       </div>
 
-      <div style={{ marginTop: 18 }}>
-        <h4 style={{ fontSize: 13, fontWeight: 800, color: '#0f172a', marginBottom: 10 }}>My vouchers</h4>
-        {vouchers.length === 0 ? (
-          <p style={{ color: '#64748b', fontSize: 12, margin: 0 }}>No vouchers redeemed yet.</p>
+      <div className={styles.vouchersSection}>
+        <h4 className={styles.vouchersTitle}>My vouchers</h4>
+
+        {isLoading ? (
+          <div className={styles.loadingState} role="status">
+            <LoaderCircle size={18} className={styles.spinner} />
+            <span>Loading your vouchers...</span>
+          </div>
+        ) : loadError ? (
+          <div className={styles.errorState} role="alert">
+            <AlertCircle size={18} />
+            <span>{loadError}</span>
+            <button type="button" className={styles.reloadButton} onClick={() => void loadVouchers()}>
+              <RefreshCw size={14} />
+              Reload
+            </button>
+          </div>
+        ) : vouchers.length === 0 ? (
+          <p className={styles.empty}>No vouchers redeemed yet.</p>
         ) : (
-          <div style={{ display: 'grid', gap: 8 }}>
-            {vouchers.map(voucher => (
-              <div key={String(voucher.voucherId)} style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                gap: 10,
-                border: '1px dashed #cbd5e1',
-                borderRadius: 8,
-                padding: '9px 10px',
-                fontSize: 12,
-              }}>
-                <span style={{ color: '#0f172a', fontWeight: 700 }}>{String(voucher.voucherType)}</span>
-                <span style={{ color: '#0284c7', fontWeight: 800 }}>{String(voucher.voucherCode)}</span>
+          <div className={styles.voucherList}>
+            {vouchers.map((voucher, index) => (
+              <div
+                key={String(voucher.voucherId || voucher.voucherCode || `${voucher.voucherType}-${index}`)}
+                className={styles.voucherItem}
+              >
+                <div>
+                  <span className={styles.voucherName}>{getVoucherTitle(voucher.voucherType)}</span>
+                  <span className={styles.voucherDate}>{getVoucherDate(voucher)}</span>
+                </div>
+                <span className={styles.voucherCode}>{voucher.voucherCode || 'Code pending'}</span>
               </div>
             ))}
           </div>

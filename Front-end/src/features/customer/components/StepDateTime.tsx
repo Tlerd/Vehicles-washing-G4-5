@@ -3,31 +3,66 @@ import { TimeSlot } from '../../../types';
 import { useCustomerBooking } from '../../../context/CustomerBookingContext';
 import { bookingService } from '../../../services/customer/booking.service';
 import styles from '../styles/StepDateTime.module.css';
-import { useAuth } from '../../../context/AuthContext';
-import { LOYALTY_TIERS } from '../../../config/constants';
 
 export const StepDateTime: React.FC = () => {
   const { draft, updateDraft } = useCustomerBooking();
-  const { currentUser } = useAuth();
+  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
+  const [slotError, setSlotError] = useState('');
 
-  const bookingLimit=LOYALTY_TIERS.find(t=>t.name===currentUser?.tier)?.bookingAdvanceLimit||7;
-  const days = useMemo(() => bookingService.getNextDays(bookingLimit), [bookingLimit]);
+  const days = useMemo(() => bookingService.getNextDays(14), []);
+  const earliestDate = days[0]?.date;
 
-  const [timeSlots,setTimeSlots]=useState<TimeSlot[]>([]);
-  useEffect(()=>{if(draft.branchId&&draft.date&&draft.selectedServices.length)bookingService.getAvailableSlots(draft.branchId,draft.date,draft.selectedServices).then(setTimeSlots);else setTimeSlots([])},[draft.branchId,draft.date,draft.selectedServices]);
+  useEffect(() => {
+    let active = true;
+
+    if (!draft.branchId || !draft.date || draft.selectedServices.length === 0) {
+      setTimeSlots([]);
+      setSlotError('');
+      setIsLoadingSlots(false);
+      return () => {
+        active = false;
+      };
+    }
+
+    setIsLoadingSlots(true);
+    setSlotError('');
+    bookingService.getAvailableSlots(draft.branchId, draft.date, draft.selectedServices)
+      .then(slots => {
+        if (active) setTimeSlots(slots);
+      })
+      .catch(error => {
+        console.error('Failed to load booking availability', error);
+        if (active) {
+          setTimeSlots([]);
+          setSlotError('Unable to load available time slots. Please try another date.');
+        }
+      })
+      .finally(() => {
+        if (active) setIsLoadingSlots(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [draft.branchId, draft.date, draft.selectedServices]);
 
   const handleDateSelect = (date: string) => {
-    updateDraft({ date, time: null });
+    updateDraft({ date, time: null, endTime: undefined, durationMinutes: undefined });
   };
 
   const handleTimeSelect = (slot: TimeSlot) => {
-    updateDraft({ time:slot.time, endTime:slot.endTime, durationMinutes:slot.durationMinutes });
+    updateDraft({
+      time: slot.time,
+      endTime: slot.endTime,
+      durationMinutes: slot.durationMinutes,
+    });
   };
 
   return (
     <div className={styles.container}>
       <h3 className={styles.title}>Select Date & Time</h3>
-      <p className={styles.subtitle}>Choose the most convenient time slot</p>
+      <p className={styles.subtitle}>Choose a quick date or any future date accepted by the booking API.</p>
 
       <span className={styles.sectionLabel}>📅 Select date</span>
       <div className={styles.calendar}>
@@ -45,24 +80,42 @@ export const StepDateTime: React.FC = () => {
         ))}
       </div>
 
+      <label className={styles.customDate}>
+        <span>Choose another date</span>
+        <input
+          type="date"
+          min={earliestDate}
+          value={draft.date || ''}
+          onChange={event => handleDateSelect(event.target.value)}
+        />
+      </label>
+
       <span className={styles.sectionLabel}>🕐 Select time</span>
-      {draft.date ? (
+      {!draft.date ? (
+        <div className={styles.noDate}>📅 Please select a date first</div>
+      ) : isLoadingSlots ? (
+        <div className={styles.noDate}>Loading available time slots...</div>
+      ) : slotError ? (
+        <div className={`${styles.noDate} ${styles.errorNotice}`}>{slotError}</div>
+      ) : timeSlots.length === 0 ? (
+        <div className={styles.noDate}>No time slots are available for this date.</div>
+      ) : (
         <div className={styles.timeGrid}>
           {timeSlots.map(slot => (
             <button
-              key={slot.time}
+              type="button"
+              key={`${slot.time}-${slot.endTime}`}
               className={`${styles.timeSlot} ${
                 draft.time === slot.time ? styles.timeSlotSelected : ''
               } ${!slot.available ? styles.timeSlotDisabled : ''}`}
               onClick={() => slot.available && handleTimeSelect(slot)}
               disabled={!slot.available}
+              title={`${slot.durationMinutes} minutes`}
             >
               {slot.time} – {slot.endTime}
             </button>
           ))}
         </div>
-      ) : (
-        <div className={styles.noDate}>📅 Please select a date first</div>
       )}
     </div>
   );

@@ -46,7 +46,7 @@ export const BookingHistory: React.FC<BookingHistoryProps> = ({ bookings }) => {
       {bookings.map(booking => {
         const branch = BRANCHES.find(b => b.id === booking.branchId);
         const serviceNames = booking.services
-          .map(sid => SERVICES.find(s => s.id === sid)?.name)
+          .map(service => SERVICES.find(item => item.id === service)?.name ?? service)
           .filter(Boolean)
           .join(', ');
 

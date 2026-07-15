@@ -27,6 +27,26 @@
   gap: 1.5rem;
 }
 
+.paymentError {
+  padding: 0.875rem 1rem;
+  border: 1px solid #fecaca;
+  border-radius: 0.75rem;
+  background-color: #fef2f2;
+  color: #b91c1c;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.paymentNotice {
+  padding: 0.875rem 1rem;
+  border: 1px solid #bae6fd;
+  border-radius: 0.75rem;
+  background-color: #f0f9ff;
+  color: #075985;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
 @media (min-width: 768px) {
   .content {
     grid-template-columns: 1fr 1fr;
@@ -109,6 +129,21 @@
   width: 200px;
   height: 200px;
   object-fit: contain;
+}
+
+.qrUnavailable {
+  width: 200px;
+  min-height: 200px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #cbd5e1;
+  border-radius: 0.75rem;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 0.875rem;
+  text-align: center;
 }
 
 .paymentInfoList {

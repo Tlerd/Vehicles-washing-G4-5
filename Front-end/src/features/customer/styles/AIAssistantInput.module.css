@@ -73,6 +73,17 @@
   box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
 }
 
+.sendBtn:disabled,
+.input:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.sendBtn:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
 .badge {
   font-size: 10px;
   background: #e0f2fe;

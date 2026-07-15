@@ -19,9 +19,15 @@ export const bookingService = {
     const data = response.data;
     return {
       id: String(data.id), bookingRef: data.bookingRef, customerId: String(data.customerId),
-      vehicleId: String(data.vehicleId), services: draft.selectedServices, carSize: draft.carSize,
-      branchId: draft.branchId, date: data.bookingDate, time: data.bookingTime,
+      customerName: data.customerName, customerPhone: data.customerPhone,
+      vehicleId: String(data.vehicleId), licensePlate: data.licensePlate, vehicleBrand: data.vehicleBrand,
+      services: Array.isArray(data.serviceNames) ? data.serviceNames : draft.selectedServices,
+      carSize: String(data.vehicleSize || draft.carSize).toLowerCase() as Booking['carSize'],
+      branchId: String(data.branchId) === '1' ? 'D1' : String(data.branchId) === '2' ? 'D7' : String(data.branchId),
+      date: data.bookingDate, time: data.bookingTime, endTime: data.endTime,
+      durationMinutes: Number(data.durationMinutes || 0),
       totalPrice: Number(data.totalPrice), status: data.status, pointsEarned: data.pointsEarned,
+      appliedVoucherId: data.appliedVoucherId ? String(data.appliedVoucherId) : undefined,
       createdAt: data.createdAt, vietQrUrl: data.vietQrUrl,
     };
   },
@@ -36,9 +42,17 @@ export const bookingService = {
     const response = await apiClient.get(`/bookings/customer/${customerId}`);
     return response.data.map((data: Record<string, unknown>) => ({
       id: String(data.id), bookingRef: String(data.bookingRef), customerId: String(data.customerId),
-      vehicleId: String(data.vehicleId), services: [], carSize: 'sedan', branchId: String(data.branchId) === '1' ? 'D1' : 'D7',
-      date: String(data.bookingDate), time: String(data.bookingTime), totalPrice: Number(data.totalPrice),
-      status: data.status, pointsEarned: Number(data.pointsEarned), createdAt: String(data.createdAt),
+      customerName: String(data.customerName || ''), customerPhone: String(data.customerPhone || ''),
+      vehicleId: String(data.vehicleId), licensePlate: String(data.licensePlate || ''),
+      vehicleBrand: String(data.vehicleBrand || ''),
+      services: Array.isArray(data.serviceNames) ? data.serviceNames.map(String) : [],
+      carSize: String(data.vehicleSize || 'SEDAN').toLowerCase() as Booking['carSize'],
+      branchId: String(data.branchId) === '1' ? 'D1' : String(data.branchId) === '2' ? 'D7' : String(data.branchId),
+      date: String(data.bookingDate), time: String(data.bookingTime), endTime: String(data.endTime || ''),
+      durationMinutes: Number(data.durationMinutes || 0), totalPrice: Number(data.totalPrice),
+      status: data.status, pointsEarned: Number(data.pointsEarned),
+      appliedVoucherId: data.appliedVoucherId ? String(data.appliedVoucherId) : undefined,
+      createdAt: String(data.createdAt),
     })) as Booking[];
   },
 
