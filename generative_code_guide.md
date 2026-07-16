@@ -70,7 +70,7 @@ Khi sinh mã nguồn Back-end (BE), bạn bắt buộc phải tuân thủ nghiê
 - Build tool: Maven (`pom.xml`).
 - Cấu hình Database chung (MS SQL Server):
   * Port: 1433
-  * Username: sa | Password: 123456
+  * Username: sa | Password: 12345
   * Database Name: autowash_pro
 
 ### 2. Cấu trúc phân tầng chuẩn (Layered Architecture)
