@@ -39,3 +39,6 @@ firebase-service-account.json
 /Back-end/target/
 *.jar
 Back-end/src/main/resources/firebase-service-account.json
+
+# Local Claude Code instructions
+CLAUDE.md
