@@ -41,4 +41,8 @@ firebase-service-account.json
 Back-end/src/main/resources/firebase-service-account.json
 
 # Local Claude Code instructions
-CLAUDE.md
+
+.claude/settings.local.json
+CLAUDE.local.md
+.ua/intermediate/
+.ua/diff-overlay.json
