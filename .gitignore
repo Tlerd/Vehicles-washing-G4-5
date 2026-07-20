@@ -17,8 +17,6 @@ yarn-error.log*
 *.sln
 *.sw?
 
-mcp-settings.json
-
 # Local Environment Variables
 .env
 .env.local
