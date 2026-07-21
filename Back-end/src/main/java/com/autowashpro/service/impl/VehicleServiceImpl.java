@@ -5,6 +5,7 @@ import com.autowashpro.dto.vehicle.VehicleResponse;
 import com.autowashpro.entity.Customer;
 import com.autowashpro.entity.Vehicle;
 import com.autowashpro.entity.VehicleSize;
+import com.autowashpro.exception.custom.ForbiddenException;
 import com.autowashpro.repository.CustomerRepository;
 import com.autowashpro.repository.VehicleRepository;
 import com.autowashpro.service.VehicleService;
@@ -230,7 +231,7 @@ public void deleteVehicle(Long vehicleId, Long customerId) {
                         customerId
                 )
                 .orElseThrow(
-                        () -> new RuntimeException(
+                        () -> new ForbiddenException(
                                 "Unauthorized vehicle access or vehicle not found."
                         )
                 );

@@ -1,0 +1,30 @@
+
+> autowash-pro-frontend@2.0.0 dev
+> vite
+
+
+  VITE v6.4.3  ready in 545 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://192.168.2.6:5173/
+7:32:23 PM [vite] (client) page reload src/app/router.tsx
+7:32:23 PM [vite] (client) hmr update /src/app/layouts/CustomerLayout.tsx, /src/index.css
+7:32:23 PM [vite] (client) hmr update /src/features/auth/pages/LoginPage.tsx, /src/index.css
+7:32:23 PM [vite] (client) hmr update /src/features/landing/LandingPage.tsx, /src/index.css
+7:32:23 PM [vite] (client) hmr update /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\landing\components\Navbar.tsx, /src/index.css
+7:32:23 PM [vite] (client) page reload src/types/index.ts
+7:32:23 PM [vite] (client) hmr update /src/index.css, /src/features/booking/BookingWizardPage.tsx, /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\booking\steps\StepDateTime.tsx, /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\booking\steps\StepConfirm.tsx, /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\booking\steps\StepReview.tsx, /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\booking\steps\StepService.tsx, /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\booking\steps\StepBranch.tsx, /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\booking\steps\StepVehicle.tsx
+7:32:23 PM [vite] (client) hmr update /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\booking\steps\StepVehicle.tsx, /src/index.css
+7:32:23 PM [vite] (client) hmr update /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\landing\components\HeroSection.tsx, /src/index.css
+7:32:23 PM [vite] (client) hmr update /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\landing\components\BookingWidget.tsx, /src/index.css
+7:32:23 PM [vite] (client) hmr update /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\landing\components\FinalCTASection.tsx, /src/index.css
+7:32:23 PM [vite] (client) hmr update /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\landing\components\PackagesSection.tsx, /src/index.css
+7:32:23 PM [vite] (client) hmr update /src/features/booking/BookingWizardPage.tsx, /src/index.css
+7:32:23 PM [vite] (client) hmr update /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\booking\steps\StepReview.tsx, /src/index.css
+7:35:34 PM [vite] (client) page reload src/app/router.tsx
+7:35:34 PM [vite] (client) hmr update /src/features/customer/pages/DashboardPage.tsx, /src/index.css
+7:35:34 PM [vite] (client) hmr update /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\landing\BookingEntryContext.tsx, /src/index.css
+7:35:34 PM [vite] (client) hmr update /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\landing\components\BookingEntryModal.tsx, /src/index.css
+7:45:43 PM [vite] (client) Pre-transform error: Can't resolve 'tailwindcss' in 'D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src'
+  Plugin: @tailwindcss/vite:generate:serve
+  File: D:/demoSWP/demomain/Vehicles-washing-G4-5/Front-end/src/index.css

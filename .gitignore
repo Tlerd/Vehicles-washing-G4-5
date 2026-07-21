@@ -44,8 +44,11 @@ CLAUDE.local.md
 .ua/diff-overlay.json
 .ua/tmp/
 .ua/.trash-*/
+<<<<<<< Updated upstream
 
 .env
 **/target/
 *.log
 node_modules/
+=======
+>>>>>>> Stashed changes

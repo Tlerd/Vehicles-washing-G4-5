@@ -1,7 +1,85 @@
 # Progress — AutoWash Pro
 
 ## Current state
+<<<<<<< Updated upstream
 - Last AI-assisted work: 2026-07-21 — corrected public role routing and entry
+=======
+- Last AI-assisted work: 2026-07-21 — implemented FR-004 Phase 1 (owner
+  approved 5 decisions unblocking the plan doc) plus the separately-scoped
+  `BookingManagementService` 400→403 fix. **Backend**: `resolveVehicle()` and
+  `create()`'s voucher-ownership check now throw `ForbiddenException` instead
+  of `BadRequestException`, via TDD (RED confirmed — both new tests failed
+  with the actual `BadRequestException` type — then GREEN); added
+  `Back-end/src/test/java/com/autowashpro/service/BookingManagementServiceTest.java`.
+  `mvn -f Back-end/pom.xml test` passed 13/13 (11 pre-existing + 2 new).
+  **Frontend**: the booking wizard (`Front-end/src/features/booking/**`),
+  previously 100% mock across all 6 steps, is now wired end-to-end to the
+  real backend — real branches/services catalog, real 30-minute availability,
+  a saved-vehicle picker (via the existing real `lib/api/vehicles.ts`)
+  alongside manual entry, pricing that mirrors the backend's exact
+  sum-then-multiply-once formula, and real booking submission showing the
+  persisted `bookingRef` + `vietQrUrl`. Standardized the wizard's vehicle-size
+  taxonomy on the backend's real `HATCHBACK/SEDAN/SUV/PICKUP` enum (dropped
+  the old mock `S/M/L` model) and dropped combo services (single services
+  only, matching decision #4 — the real `Service` entity has no combo/category
+  concept at all). The mandatory pre-implementation audit wave surfaced a real
+  blocker: `/guest/booking` used to share the exact same interactive wizard
+  component as `/app/booking` with **no auth guard**, so wiring real
+  JWT-required APIs would have silently turned it from "working mock demo"
+  into "broken with 401s" — fixed by pointing `/guest/booking` at a new static
+  `GuestBookingPreviewPage` stub instead, which is what the owner's decision
+  #2 actually asked for. `npm --prefix Front-end run typecheck` and `run
+  build` both clean (first had to `npm ci` — `node_modules` was found
+  incomplete/stale). **Live-verified end-to-end in Chrome** against a real
+  running local backend: logged in, walked all 6 real wizard steps, submitted
+  a real booking, and confirmed via direct DB query that it persisted
+  correctly (real customer_id from JWT, correct multiplier-applied total, a
+  new ad-hoc vehicle row created). Independent code review and security
+  review (background agents) both returned no CRITICAL/HIGH findings; fixed
+  the two MEDIUM findings that were real bugs (deleted 4 now-fully-orphaned
+  booking components; fixed a real day/slot-staleness bug in the date/time
+  step where switching day tabs without re-picking a slot could silently
+  carry forward a stale day/time pair — live-verified the fix). Flagged, not
+  fixed (scope discipline per explicit instruction): `resolveVehicle()`'s
+  ad-hoc-vehicle path has no license-plate format validation, newly reachable
+  now that the wizard is live. See
+  docs/ai-logs/m1/2026-07-21-fr004-phase1-booking-fix.md. Not yet
+  owner-reviewed; no commit made. Backend (:8080) and frontend (:5173) dev
+  servers were left running locally for further manual testing if wanted.
+- Previous AI-assisted work: 2026-07-21 — continued Phase 1 (FR-001–004).
+  Fixed the FR-003 vehicle-ownership authorization bug: `VehicleServiceImpl
+  .findOwnedVehicle()` (backing `updateVehicle`/`deleteVehicle`/
+  `setDefaultVehicle`) threw a plain `RuntimeException` for both "not found"
+  and "not owned," which fell through `GlobalExceptionHandler`'s catch-all
+  handler as HTTP 500 instead of the FR-003-required 403. Added a new
+  `ForbiddenException` (mirroring the four existing custom exceptions), a
+  `handleForbidden` mapping to 403, and switched `findOwnedVehicle` to throw
+  it; followed TDD (watched RED for the correct reason, then GREEN).
+  `mvn -f Back-end/pom.xml test` passed 11/11 (7 pre-existing + 4 new).
+  Rewrote `docs/srs/FR-001-customer-registration-otp.md` and
+  `docs/srs/FR-002-customer-login.md` to describe the real backend-JWT
+  phone+password authentication (Firebase used only once, at registration,
+  to verify phone/email ownership) instead of the old aspirational
+  "Firebase-identity-token login" text; corrected two items I initially
+  mis-labeled as gaps (deferred Google phone, account linking) to cite
+  `docs/superpowers/specs/2026-07-21-google-signin-registration-design.md`
+  once found — those are owner-approved decisions, not unfinished work.
+  Audited FR-004 (booking wizard) via a 6-agent parallel background
+  Workflow (backend-lead/frontend-lead/testing-lead/security-reviewer for
+  the audit, code-reviewer/security-reviewer for independent review of the
+  above changes — both reviews returned `approved: true`, LOW/MEDIUM
+  findings only). Confirmed the wizard is still 100% mock, reconfirmed the
+  guest-booking rejection still holds, found a live backend/frontend
+  `VehicleSize` taxonomy mismatch, and found two new (unfixed, out-of-scope)
+  authorization bugs of the same class in `BookingManagementService`. Wrote
+  `docs/superpowers/specs/2026-07-21-fr004-real-booking-implementation-plan.md`
+  with 5 explicit owner decisions and a 3-phase incremental path; made no
+  FR-004 code changes since those decisions are unmade and implementing
+  around them would not satisfy "only implement when the contract is clear."
+  See docs/ai-logs/m1/2026-07-21-fr003-fix-fr001-002-docs-fr004-audit.md.
+  Not yet owner-reviewed; no commit made.
+- Previous AI-assisted work: 2026-07-21 — corrected public role routing and entry
+>>>>>>> Stashed changes
   points: the landing header now opens a guest overview through a person icon;
   public booking CTAs go directly to `/guest/booking` without the identity
   modal; post-login and post-registration redirect by the server-returned role
@@ -29,7 +107,16 @@
   blockers remain open
 - Baseline commit: see docs/tooling/BASELINE.md
 - Active scope: Owner-directed FR-001..FR-013 completion, phased with explicit
+<<<<<<< Updated upstream
   approval gates between phases. Audit + Phase 0 done; Phase 1 not started.
+=======
+  approval gates between phases. Audit + Phase 0 done. Phase 1: FR-003 fix,
+  FR-001/FR-002 doc correction, and FR-004 Phase 1 (real booking wizard +
+  BookingManagementService 400→403 fix) all implemented (2026-07-21, not yet
+  owner-reviewed). FR-004 Phase 2 (FR-005 v2 schema, VNPAY, real slot/bay
+  model) and Phase 3 (guest booking) remain blocked on separate owner sign-off
+  per docs/superpowers/specs/2026-07-21-fr004-real-booking-implementation-plan.md.
+>>>>>>> Stashed changes
 - Last AI-assisted work: 2026-07-21 — FR-001..FR-013 current-state audit
   (4-agent parallel dispatch: frontend-lead, backend-lead, testing-lead,
   security-reviewer, 245 tool calls) plus Phase 0 startup verification.
@@ -110,8 +197,16 @@
   (FR001_FR013 + FR004 scripts applied, idempotent); `mvn spring-boot:run`
   starts in ~4.5s with Firebase Admin SDK initialized and DB connected
   (Back-end/run-local.ps1 automates env loading + JWT secret generation).
+<<<<<<< Updated upstream
 - No Back-end/src/test tree exists. JUnit appears in pom.xml dependencies only;
   it is not test evidence.
+=======
+- Back-end/src/test exists with 3 files (AuthServiceImplTest,
+  VehicleServiceImplTest, GlobalExceptionHandlerTest), 11 tests total, all
+  plain JUnit 5 + Mockito unit tests with no Spring context, no MockMvc, no
+  Testcontainers, no spring-security-test dependency. `mvn -f Back-end/pom.xml
+  test` — exit 0, 11/11 passing (2026-07-21).
+>>>>>>> Stashed changes
 - Repository size as scanned on 2026-07-20: 195 files analysed, 66 filtered.
 - docs/srs/SRS.md, docs/design/architecture.md, docs/design/ERD.md,
   docs/design/state-diagram.md, docs/rubric/rubric-checklist.md,
@@ -239,8 +334,14 @@ Navigation data, not requirements. None of this satisfies a rubric item.
 3. [x] Frontend build/backend run commands executed and evidence recorded —
    see "Frontend build evidence" and "Local backend run evidence" above and
    docs/ai-logs/m1/2026-07-21-fe-rebuild-phase1.md /
+<<<<<<< Updated upstream
    2026-07-21-fe-rebuild-phase2.md. Still open: `mvn -f Back-end/pom.xml test`
    has not been run (no Back-end/src/test tree exists to run).
+=======
+   2026-07-21-fe-rebuild-phase2.md. Correction: `mvn -f Back-end/pom.xml test`
+   has since been run repeatedly and passes (11/11 as of 2026-07-21's FR-003
+   fix) — the "no test tree exists" note above was stale.
+>>>>>>> Stashed changes
 4. Human-review the generated graphs and docs/ONBOARDING.md, then decide whether
    to commit .ua/ artifacts to the repository.
 5. Decide whether the empty SRS, ERD, state-diagram and rubric stubs will be
@@ -252,10 +353,53 @@ Navigation data, not requirements. None of this satisfies a rubric item.
    record only observed results.
 7. Repair the Codex Windows sandbox-helper installation, then re-run the
    read-only sub-agent smoke test before treating Codex dispatch as verified.
+<<<<<<< Updated upstream
+=======
+8. [x] FR-004's 5 owner decisions were made and Phase 1 was implemented
+   2026-07-21 accordingly (see Current state and
+   docs/ai-logs/m1/2026-07-21-fr004-phase1-booking-fix.md). Still open: owner
+   review of the Phase 1 implementation itself, and separate sign-off before
+   Phase 2 (FR-005 v2 schema/VNPAY/real slot-bay model) or Phase 3 (guest
+   booking) can start.
+9. [x] `BookingManagementService.resolveVehicle()`/`create()`'s voucher check
+   400→403 fix implemented 2026-07-21 (see Current state above).
+10. New fast, tightly-scoped follow-up (found 2026-07-21 during FR-004 Phase 1
+    code review, not yet fixed, out of that task's named scope):
+    `BookingManagementService.resolveVehicle()`'s ad-hoc-vehicle-creation
+    branch (used when a booking supplies `licensePlate`/`brand`/`vehicleSize`
+    instead of an existing `vehicleId`) has no license-plate format
+    validation, unlike `VehicleServiceImpl.createVehicle()`'s regex check
+    (`^[0-9]{2}[A-Z]-[0-9]{3}\.?[0-9]{2}$`). This path pre-dates this session
+    but was unreachable while the wizard was 100% mock; it is now live.
+>>>>>>> Stashed changes
 
 ## Evidence
 - Link command logs, reports, pull requests, commits, screenshots, or exports.
 - Do not mark an item complete without evidence.
+<<<<<<< Updated upstream
+=======
+- 2026-07-21 FR-004 Phase 1 (real booking wizard) + BookingManagementService
+  403 fix: docs/ai-logs/m1/2026-07-21-fr004-phase1-booking-fix.md
+  `mvn -f Back-end/pom.xml test` — exit 0, 13/13 tests passing (RED confirmed
+  with the actual `BadRequestException` type before the fix, GREEN after).
+  `npm --prefix Front-end run typecheck` and `run build` — both clean, 0
+  errors (after `npm ci` recovered a stale/incomplete `node_modules`). Live
+  Chrome verification against a real running local backend: full 6-step
+  wizard walkthrough, real booking submitted and confirmed persisted via
+  direct DB query (booking_ref `AWP-6968C119`, correct JWT-derived
+  customer_id, correct multiplier-applied total, new vehicle row created);
+  `/guest/booking` re-verified to render the static stub, not the live
+  wizard. Independent code review + security review (background agents)
+  both returned no CRITICAL/HIGH findings; the two real MEDIUM findings
+  (orphaned dead components, a day/slot-staleness bug) were fixed and the
+  fix re-verified live in Chrome.
+- 2026-07-21 FR-003 fix, FR-001/FR-002 doc correction, FR-004 audit + plan:
+  docs/ai-logs/m1/2026-07-21-fr003-fix-fr001-002-docs-fr004-audit.md
+  `mvn -f Back-end/pom.xml test` — exit 0, 11/11 tests passing (RED confirmed
+  before the fix, GREEN after). Independent code review + security review
+  (background Workflow) both returned `approved: true`. No frontend files
+  changed this session, so no frontend build/typecheck evidence applies.
+>>>>>>> Stashed changes
 - 2026-07-21 FE rebuild Phase 2 (auth, customer console, theme, i18n):
   docs/ai-logs/m1/2026-07-21-fe-rebuild-phase2.md
   `npx tsc --noEmit` and `npm run build` both clean (0 errors) after an 18-agent

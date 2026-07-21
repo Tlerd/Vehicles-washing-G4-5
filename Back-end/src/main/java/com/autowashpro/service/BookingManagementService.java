@@ -46,7 +46,7 @@ public class BookingManagementService {
         BigDecimal total = services.stream().map(com.autowashpro.entity.Service::getBasePrice).reduce(BigDecimal.ZERO, BigDecimal::add).multiply(multiplier).setScale(0, RoundingMode.HALF_UP);
         Voucher voucher = null;
         if (r.getVoucherId() != null) {
-            voucher = voucherRepository.findByVoucherIdAndCustomerCustomerId(r.getVoucherId(), r.getCustomerId()).orElseThrow(() -> new BadRequestException("Voucher does not belong to customer"));
+            voucher = voucherRepository.findByVoucherIdAndCustomerCustomerId(r.getVoucherId(), r.getCustomerId()).orElseThrow(() -> new ForbiddenException("Voucher does not belong to customer"));
             if (!"ACTIVE".equalsIgnoreCase(voucher.getStatus()) || voucher.getExpiredAt().isBefore(LocalDate.now())) throw new BadRequestException("Voucher is not active");
             total = total.subtract(voucher.getDiscountAmount()).max(BigDecimal.ZERO);
             voucher.setStatus("LOCKED"); voucherRepository.save(voucher);
@@ -61,7 +61,7 @@ public class BookingManagementService {
 
     private Vehicle resolveVehicle(CreateBookingRequest r, Customer customer) {
         if (r.getVehicleId() != null) return vehicleRepository.findByVehicleIdAndCustomerCustomerId(r.getVehicleId(), r.getCustomerId())
-                .orElseThrow(() -> new BadRequestException("Vehicle does not belong to customer"));
+                .orElseThrow(() -> new ForbiddenException("Vehicle does not belong to customer"));
         if (r.getLicensePlate() == null || r.getLicensePlate().isBlank() || r.getBrand() == null || r.getBrand().isBlank() || r.getVehicleSize() == null)
             throw new BadRequestException("License plate, brand/model and vehicle size are required");
         String plate = r.getLicensePlate().trim().toUpperCase();

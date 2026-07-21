@@ -1,11 +1,18 @@
+<<<<<<< Updated upstream
 import { useState } from 'react';
+=======
+>>>>>>> Stashed changes
 import { ArrowLeft, ArrowRight, CheckCircle2, Droplets } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button, LanguageToggle, Stepper, ThemeToggle } from '@/components/ui';
 import { formatVND } from '@/lib/money';
 import { cn } from '@/lib/utils';
+<<<<<<< Updated upstream
 import { isValidVnPhone } from '@/lib/phone';
+=======
+import { useCreateBooking, type Booking } from '@/lib/api/bookings';
+>>>>>>> Stashed changes
 import { LAST_STEP, WIZARD_STEPS, useBookingStore } from './store';
 import { useCartSummary } from './selectors';
 import { StepBranch } from './steps/StepBranch';
@@ -20,7 +27,11 @@ export function BookingWizardPage() {
   const { t } = useTranslation('booking');
   const store = useBookingStore();
   const cart = useCartSummary();
+<<<<<<< Updated upstream
   const [confirmed, setConfirmed] = useState(false);
+=======
+  const createBooking = useCreateBooking();
+>>>>>>> Stashed changes
 
   const stepLabels = [
     t('wizard.steps.branch'),
@@ -36,6 +47,7 @@ export function BookingWizardPage() {
       case 0:
         return Boolean(store.branchId);
       case 1:
+<<<<<<< Updated upstream
         return cart.items.length > 0;
       case 2:
         return Boolean(store.slotTime);
@@ -46,14 +58,55 @@ export function BookingWizardPage() {
           store.vehicle.model.trim().length > 0 &&
           store.contact.name.trim().length > 1 &&
           isValidVnPhone(store.contact.phone)
+=======
+        return cart.lines.length > 0;
+      case 2:
+        return Boolean(store.dayKey && store.slotTime);
+      case 3:
+        return Boolean(
+          store.savedVehicleId ||
+            (store.manualVehicle.plate.trim().length > 0 && store.manualVehicle.brand.trim().length > 0),
+>>>>>>> Stashed changes
         );
       default:
         return true;
     }
   })();
 
+<<<<<<< Updated upstream
   if (confirmed) {
     return <BookingSuccess onHome={() => navigate('/')} onAgain={() => { store.reset(); setConfirmed(false); }} />;
+=======
+  const handleConfirm = () => {
+    if (!store.branchId || !store.dayKey || !store.slotTime) return;
+    createBooking.mutate({
+      vehicleId: store.savedVehicleId,
+      licensePlate: store.savedVehicleId ? undefined : store.manualVehicle.plate,
+      brand: store.savedVehicleId ? undefined : store.manualVehicle.brand,
+      vehicleSize: store.savedVehicleId ? undefined : store.manualVehicle.size,
+      branchId: store.branchId,
+      serviceCodes: store.serviceCodes,
+      bookingDate: store.dayKey,
+      bookingTime: store.slotTime,
+    });
+  };
+
+  if (createBooking.isSuccess) {
+    return (
+      <BookingSuccess
+        booking={createBooking.data}
+        onHome={() => {
+          store.reset();
+          createBooking.reset();
+          navigate('/');
+        }}
+        onAgain={() => {
+          store.reset();
+          createBooking.reset();
+        }}
+      />
+    );
+>>>>>>> Stashed changes
   }
 
   return (
@@ -92,7 +145,11 @@ export function BookingWizardPage() {
         {store.step === 2 && <StepDateTime />}
         {store.step === 3 && <StepVehicle />}
         {store.step === 4 && <StepReview />}
+<<<<<<< Updated upstream
         {store.step === 5 && <StepConfirm />}
+=======
+        {store.step === 5 && <StepConfirm error={createBooking.error} />}
+>>>>>>> Stashed changes
       </main>
 
       <footer
@@ -101,11 +158,19 @@ export function BookingWizardPage() {
         )}
       >
         {store.step > 0 && (
+<<<<<<< Updated upstream
           <Button variant="secondary" onClick={store.prev}>
             <ArrowLeft className="h-4 w-4" /> {t('wizard.back')}
           </Button>
         )}
         {cart.items.length > 0 && (
+=======
+          <Button variant="secondary" onClick={store.prev} disabled={createBooking.isPending}>
+            <ArrowLeft className="h-4 w-4" /> {t('wizard.back')}
+          </Button>
+        )}
+        {cart.lines.length > 0 && (
+>>>>>>> Stashed changes
           <div className="mr-auto text-sm">
             <span className="text-text-secondary">{t('wizard.cartTotalLabel')} </span>
             <span className="font-bold text-text-primary">{formatVND(cart.total)}</span>
@@ -116,8 +181,13 @@ export function BookingWizardPage() {
             {t('wizard.continue')} <ArrowRight className="h-4 w-4" />
           </Button>
         ) : (
+<<<<<<< Updated upstream
           <Button className="ml-auto" onClick={() => setConfirmed(true)}>
             {t('wizard.confirmBooking')}
+=======
+          <Button className="ml-auto" onClick={handleConfirm} disabled={createBooking.isPending}>
+            {createBooking.isPending ? t('wizard.submitting') : t('wizard.confirmBooking')}
+>>>>>>> Stashed changes
           </Button>
         )}
       </footer>
@@ -125,7 +195,19 @@ export function BookingWizardPage() {
   );
 }
 
+<<<<<<< Updated upstream
 function BookingSuccess({ onHome, onAgain }: { onHome: () => void; onAgain: () => void }) {
+=======
+function BookingSuccess({
+  booking,
+  onHome,
+  onAgain,
+}: {
+  booking: Booking;
+  onHome: () => void;
+  onAgain: () => void;
+}) {
+>>>>>>> Stashed changes
   const { t } = useTranslation('booking');
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6 text-center">
@@ -135,6 +217,15 @@ function BookingSuccess({ onHome, onAgain }: { onHome: () => void; onAgain: () =
       <h1 className="mb-2 font-display text-2xl font-bold text-text-primary">
         {t('wizard.success.title')}
       </h1>
+<<<<<<< Updated upstream
+=======
+      <p className="text-text-secondary">{t('wizard.success.ref', { ref: booking.bookingRef })}</p>
+      <img
+        src={booking.vietQrUrl}
+        alt="VietQR"
+        className="my-6 w-56 rounded-2xl border border-border"
+      />
+>>>>>>> Stashed changes
       <p className="mb-8 max-w-sm text-text-secondary">{t('wizard.success.description')}</p>
       <div className="flex gap-3">
         <Button variant="secondary" onClick={onHome}>

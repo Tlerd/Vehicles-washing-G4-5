@@ -2,6 +2,7 @@ package com.autowashpro.exception.handler;
 
 import com.autowashpro.exception.custom.BadRequestException;
 import com.autowashpro.exception.custom.ConflictException;
+import com.autowashpro.exception.custom.ForbiddenException;
 import com.autowashpro.exception.custom.ResourceNotFoundException;
 import com.autowashpro.exception.custom.UnauthorizedException;
 import org.springframework.http.HttpStatus;
@@ -43,6 +44,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<Map<String, Object>> handleUnauthorized(UnauthorizedException ex) {
         return buildAuthStyleError(HttpStatus.UNAUTHORIZED, ex.getMessage());
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<Map<String, Object>> handleForbidden(ForbiddenException ex) {
+        return buildAuthStyleError(HttpStatus.FORBIDDEN, ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
