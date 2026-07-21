@@ -29,6 +29,7 @@ final class BookingTestFixtures {
         Customer customer = new Customer();
         customer.setFullName("Test Customer");
         customer.setPhone(phone);
+        customer.setEmail(phone + "@test.local");
         customer.setPasswordHash("hash");
         customer.setTier("MEMBER");
         customer.setRole("CUSTOMER");
