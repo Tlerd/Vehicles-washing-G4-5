@@ -124,6 +124,13 @@ export function LoginPage() {
     }
   };
 
+  const handleBackToRegisterEntry = () => {
+    setError(null);
+    setFirebaseToken(null);
+    setAuthMethod('phone');
+    setStep('enter-phone');
+  };
+
   const handleCompleteRegistration = async (e: FormEvent) => {
     e.preventDefault();
     if (!firebaseToken) return;
@@ -337,6 +344,15 @@ export function LoginPage() {
               {busy && <Loader2 className="h-4 w-4 animate-spin" />}
               Hoàn tất đăng ký
             </Button>
+            {authMethod === 'google' && (
+              <button
+                type="button"
+                onClick={handleBackToRegisterEntry}
+                className="w-full text-center text-sm text-text-secondary hover:text-text-primary"
+              >
+                Quay lại
+              </button>
+            )}
           </form>
         )}
 
