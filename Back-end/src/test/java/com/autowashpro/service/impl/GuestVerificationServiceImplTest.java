@@ -17,12 +17,16 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -107,5 +111,69 @@ class GuestVerificationServiceImplTest {
                 .isInstanceOf(TooManyRequestsException.class)
                 .hasMessage("Too many verification requests. Please try again later.")
                 .satisfies(ex -> assertThat(ex.getMessage()).doesNotContain("0901234567").doesNotContain("+84901234567"));
+    }
+
+    @Test
+    void consumeProofForPhone_validProof_returnsNormalizedPhone() {
+        when(rateLimiter.tryConsume(anyString(), anyInt(), any())).thenReturn(true);
+        when(proofRepository.consumeIfValid(eq("token-1"), eq("+84901234567"), eq(VerificationPurpose.GUEST_BOOKING), any()))
+                .thenReturn(1);
+
+        String phone = service.consumeProofForPhone("token-1", "0901234567", VerificationPurpose.GUEST_BOOKING);
+
+        assertThat(phone).isEqualTo("+84901234567");
+    }
+
+    @Test
+    void consumeProofForPhone_invalidProof_throwsGenericBadRequest() {
+        when(rateLimiter.tryConsume(anyString(), anyInt(), any())).thenReturn(true);
+        when(proofRepository.consumeIfValid(anyString(), anyString(), any(), any())).thenReturn(0);
+
+        assertThatThrownBy(() -> service.consumeProofForPhone("token-1", "0901234567", VerificationPurpose.GUEST_BOOKING))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("Invalid or expired verification proof.");
+    }
+
+    @Test
+    void consumeProofForPhone_rateLimitExceeded_throwsTooManyRequests() {
+        when(rateLimiter.tryConsume(anyString(), anyInt(), any())).thenReturn(false);
+
+        assertThatThrownBy(() -> service.consumeProofForPhone("token-1", "0901234567", VerificationPurpose.GUEST_BOOKING))
+                .isInstanceOf(TooManyRequestsException.class);
+    }
+
+    @Test
+    void consumeProofForLookup_validProof_returnsPhoneFromRecord() {
+        when(rateLimiter.tryConsume(anyString(), anyInt(), any())).thenReturn(true);
+        when(proofRepository.consumeIfValidForPurpose(eq("token-2"), eq(VerificationPurpose.GUEST_BOOKING_LOOKUP), any()))
+                .thenReturn(1);
+        PhoneVerificationProof stored = new PhoneVerificationProof();
+        stored.setProofToken("token-2");
+        stored.setPhone("+84901234567");
+        stored.setPurpose(VerificationPurpose.GUEST_BOOKING_LOOKUP);
+        when(proofRepository.findById("token-2")).thenReturn(Optional.of(stored));
+
+        String phone = service.consumeProofForLookup("token-2", VerificationPurpose.GUEST_BOOKING_LOOKUP);
+
+        assertThat(phone).isEqualTo("+84901234567");
+    }
+
+    @Test
+    void consumeProofForLookup_invalidProof_throwsGenericBadRequest() {
+        when(rateLimiter.tryConsume(anyString(), anyInt(), any())).thenReturn(true);
+        when(proofRepository.consumeIfValidForPurpose(anyString(), any(), any())).thenReturn(0);
+
+        assertThatThrownBy(() -> service.consumeProofForLookup("token-3", VerificationPurpose.GUEST_BOOKING_LOOKUP))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("Invalid or expired verification proof.");
+    }
+
+    @Test
+    void consumeProofForLookup_blankToken_throwsGenericBadRequestWithoutQueryingRepository() {
+        assertThatThrownBy(() -> service.consumeProofForLookup("   ", VerificationPurpose.GUEST_BOOKING_LOOKUP))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("Invalid or expired verification proof.");
+
+        verifyNoInteractions(proofRepository, rateLimiter);
     }
 }

@@ -27,6 +27,9 @@ public class GuestVerificationServiceImpl implements GuestVerificationService {
     private static final Duration ISSUANCE_WINDOW = Duration.ofMinutes(15);
     private static final String GENERIC_TOKEN_ERROR = "Invalid or expired verification token.";
     private static final String GENERIC_RATE_LIMIT_ERROR = "Too many verification requests. Please try again later.";
+    private static final int CONSUMPTION_MAX_ATTEMPTS = 10;
+    private static final Duration CONSUMPTION_WINDOW = Duration.ofMinutes(15);
+    private static final String GENERIC_PROOF_ERROR = "Invalid or expired verification proof.";
 
     private final FirebaseTokenVerifier firebaseTokenVerifier;
     private final PhoneVerificationProofRepository proofRepository;
@@ -81,5 +84,47 @@ public class GuestVerificationServiceImpl implements GuestVerificationService {
         proofRepository.save(proof);
 
         return new VerificationProofResponse(proof.getProofToken(), proof.getExpiresAt());
+    }
+
+    @Override
+    @Transactional
+    public String consumeProofForPhone(String proofToken, String phone, VerificationPurpose purpose) {
+        if (proofToken == null || proofToken.isBlank()) {
+            throw new BadRequestException(GENERIC_PROOF_ERROR);
+        }
+        String normalizedPhone = PhoneNormalizer.toE164(phone);
+        // Keyed on the token, not the phone (see the Global Constraints rate-limit table) — an
+        // attacker with no valid token for a phone cannot exhaust that phone's consumption budget
+        // using garbage tokens, the same class of lockout the issuance-side reordering above closes.
+        enforceConsumptionRateLimit("consume|" + proofToken);
+
+        int updated = proofRepository.consumeIfValid(proofToken, normalizedPhone, purpose, LocalDateTime.now());
+        if (updated != 1) {
+            throw new BadRequestException(GENERIC_PROOF_ERROR);
+        }
+        return normalizedPhone;
+    }
+
+    @Override
+    @Transactional
+    public String consumeProofForLookup(String proofToken, VerificationPurpose purpose) {
+        if (proofToken == null || proofToken.isBlank()) {
+            throw new BadRequestException(GENERIC_PROOF_ERROR);
+        }
+        enforceConsumptionRateLimit("lookup|" + proofToken);
+
+        int updated = proofRepository.consumeIfValidForPurpose(proofToken, purpose, LocalDateTime.now());
+        if (updated != 1) {
+            throw new BadRequestException(GENERIC_PROOF_ERROR);
+        }
+        return proofRepository.findById(proofToken)
+                .map(PhoneVerificationProof::getPhone)
+                .orElseThrow(() -> new BadRequestException(GENERIC_PROOF_ERROR));
+    }
+
+    private void enforceConsumptionRateLimit(String key) {
+        if (!rateLimiter.tryConsume(key, CONSUMPTION_MAX_ATTEMPTS, CONSUMPTION_WINDOW)) {
+            throw new TooManyRequestsException(GENERIC_RATE_LIMIT_ERROR);
+        }
     }
 }
