@@ -1,0 +1,17 @@
+
+> autowash-pro-frontend@2.0.0 dev
+> vite
+
+
+  VITE v6.4.3  ready in 378 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://192.168.2.6:5173/
+10:52:41 PM [vite] (client) page reload src/features/booking/components/ServicePickerSheet.tsx
+10:52:41 PM [vite] (client) page reload src/features/booking/components/ServiceIconGrid.tsx
+10:52:41 PM [vite] (client) page reload src/features/booking/components/CategoryIcon.tsx
+10:52:41 PM [vite] (client) page reload src/features/booking/components/WeekGrid.tsx
+10:52:55 PM [vite] (client) hmr update /src/index.css, /src/features/guest/GuestBookingPreviewPage.tsx, /src/features/booking/BookingWizardPage.tsx, /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\booking\steps\StepReview.tsx, /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\booking\steps\StepConfirm.tsx, /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\booking\steps\StepDateTime.tsx, /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\booking\steps\StepService.tsx, /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\booking\steps\StepVehicle.tsx, /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\booking\steps\StepBranch.tsx
+10:53:00 PM [vite] (client) hmr update /src/index.css, /src/features/guest/GuestBookingPreviewPage.tsx, /src/features/booking/BookingWizardPage.tsx, /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\booking\steps\StepReview.tsx, /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\booking\steps\StepConfirm.tsx, /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\booking\steps\StepDateTime.tsx, /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\booking\steps\StepService.tsx, /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\booking\steps\StepVehicle.tsx, /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\booking\steps\StepBranch.tsx
+10:53:09 PM [vite] (client) hmr update /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\booking\steps\StepDateTime.tsx, /src/index.css
+10:53:14 PM [vite] (client) hmr update /@fs/D:\demoSWP\demomain\Vehicles-washing-G4-5\Front-end\src\features\booking\steps\StepDateTime.tsx, /src/index.css

@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import type { VehicleSize } from '@/types';
 
 /** BR-001 size multipliers. */
@@ -21,6 +22,28 @@ export function priceForSize(
 ): number {
   if (!isSizeDependent) return basePrice;
   return Math.round((basePrice * SIZE_MULTIPLIER[size]) / 1000) * 1000;
+=======
+import type { VehicleSizeCode } from './api/vehicles';
+
+/** Mirrors BookingManagementService.create()'s multiplier, applied once to
+ *  the summed service total — not per line item. */
+const SIZE_MULTIPLIER: Record<VehicleSizeCode, number> = {
+  HATCHBACK: 0.9,
+  SEDAN: 1.0,
+  SUV: 1.2,
+  PICKUP: 1.4,
+};
+
+export const SIZE_LABEL: Record<VehicleSizeCode, string> = {
+  HATCHBACK: 'Hatchback',
+  SEDAN: 'Sedan',
+  SUV: 'SUV / Crossover',
+  PICKUP: 'Bán tải',
+};
+
+export function sizeMultiplier(size: VehicleSizeCode): number {
+  return SIZE_MULTIPLIER[size];
+>>>>>>> Stashed changes
 }
 
 export function formatVND(amount: number): string {
@@ -30,6 +53,7 @@ export function formatVND(amount: number): string {
     maximumFractionDigits: 0,
   }).format(amount);
 }
+<<<<<<< Updated upstream
 
 /** Deposit tier (D-26). deposit = MIN(tier, total). */
 export function depositForTotal(total: number): number {
@@ -39,3 +63,5 @@ export function depositForTotal(total: number): number {
   else tier = 500_000;
   return Math.min(tier, total);
 }
+=======
+>>>>>>> Stashed changes

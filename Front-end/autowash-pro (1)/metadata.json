@@ -1,0 +1,6 @@
+{
+  "name": "AutoWash Pro",
+  "description": "Premium car wash booking landing page",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

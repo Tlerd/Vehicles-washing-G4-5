@@ -11,6 +11,10 @@ import { VouchersPage } from '@/features/customer/pages/VouchersPage';
 import { HistoryPage } from '@/features/customer/pages/HistoryPage';
 import { BookingDetailPage } from '@/features/customer/pages/BookingDetailPage';
 import { GuestOverviewPage } from '@/features/guest/GuestOverviewPage';
+<<<<<<< Updated upstream
+=======
+import { GuestBookingPreviewPage } from '@/features/guest/GuestBookingPreviewPage';
+>>>>>>> Stashed changes
 import { RoleOverviewPage } from '@/features/roles/RoleOverviewPage';
 
 export const router = createBrowserRouter([
@@ -19,7 +23,11 @@ export const router = createBrowserRouter([
     children: [
       { path: '/', element: <LandingPage /> },
       { path: '/guest', element: <GuestOverviewPage /> },
+<<<<<<< Updated upstream
       { path: '/guest/booking', element: <BookingWizardPage /> },
+=======
+      { path: '/guest/booking', element: <GuestBookingPreviewPage /> },
+>>>>>>> Stashed changes
       { path: '/booking', element: <Navigate to="/guest/booking" replace /> },
       { path: '/login', element: <LoginPage /> },
       {

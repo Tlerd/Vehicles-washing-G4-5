@@ -1,0 +1,1008 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------------< com.autowashpro:backend >-----------------------
+[INFO] Building backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.5.6:run (default-cli) > test-compile @ backend >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ backend ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ backend ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 70 source files with javac [debug parameters release 17] to target\classes
+[WARNING] /D:/demoSWP/demomain/Vehicles-washing-G4-5/Back-end/src/main/java/com/autowashpro/mapper/CustomerMapper.java:[16,14] Unmapped target properties: "role, vehicles".
+[WARNING] /D:/demoSWP/demomain/Vehicles-washing-G4-5/Back-end/src/main/java/com/autowashpro/mapper/AuthMapper.java:[27,14] Unmapped target property: "vehicles".
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ backend ---
+[INFO] skip non existing resourceDirectory D:\demoSWP\demomain\Vehicles-washing-G4-5\Back-end\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ backend ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 4 source files with javac [debug parameters release 17] to target\test-classes
+[INFO] 
+[INFO] <<< spring-boot:3.5.6:run (default-cli) < test-compile @ backend <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.5.6:run (default-cli) @ backend ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.6)
+
+2026-07-21T22:36:24.702+07:00  INFO 16992 --- [           main] com.autowashpro.BackendApplication       : Starting BackendApplication using Java 17.0.12 with PID 16992 (D:\demoSWP\demomain\Vehicles-washing-G4-5\Back-end\target\classes started by nguye in D:\demoSWP\demomain\Vehicles-washing-G4-5\Back-end)
+2026-07-21T22:36:24.704+07:00  INFO 16992 --- [           main] com.autowashpro.BackendApplication       : No active profile set, falling back to 1 default profile: "default"
+2026-07-21T22:36:25.508+07:00  INFO 16992 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-07-21T22:36:25.578+07:00  INFO 16992 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 55 ms. Found 9 JPA repository interfaces.
+2026-07-21T22:36:26.023+07:00  INFO 16992 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-07-21T22:36:26.034+07:00  INFO 16992 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-07-21T22:36:26.034+07:00  INFO 16992 --- [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.46]
+2026-07-21T22:36:26.092+07:00  INFO 16992 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-07-21T22:36:26.092+07:00  INFO 16992 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1357 ms
+2026-07-21T22:36:26.345+07:00  INFO 16992 --- [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-07-21T22:36:26.401+07:00  INFO 16992 --- [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.29.Final
+2026-07-21T22:36:26.426+07:00  INFO 16992 --- [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-07-21T22:36:26.614+07:00  INFO 16992 --- [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-07-21T22:36:26.625+07:00  INFO 16992 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-07-21T22:36:27.032+07:00  INFO 16992 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: d0b50b85-b0e3-4370-9612-7443774ba410
+2026-07-21T22:36:27.032+07:00  INFO 16992 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-07-21T22:36:27.149+07:00  INFO 16992 --- [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 16.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-07-21T22:36:27.927+07:00  INFO 16992 --- [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-21T22:36:27.931+07:00  INFO 16992 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-07-21T22:36:28.004+07:00  INFO 16992 --- [           main] com.autowashpro.config.FirebaseConfig    : Firebase Admin SDK initialized successfully.
+2026-07-21T22:36:28.661+07:00  INFO 16992 --- [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-07-21T22:36:28.684+07:00  WARN 16992 --- [           main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 0a02a11b-2d58-4b1c-a604-1c94e8e57692
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-07-21T22:36:28.691+07:00  INFO 16992 --- [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-07-21T22:36:29.048+07:00  INFO 16992 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-07-21T22:36:29.063+07:00  INFO 16992 --- [           main] com.autowashpro.BackendApplication       : Started BackendApplication in 4.698 seconds (process running for 4.987)
+Hibernate: 
+    select
+        top (?) c1_0.customer_id 
+    from
+        customers c1_0 
+    where
+        c1_0.phone=?
+Hibernate: 
+    select
+        top (?) c1_0.customer_id 
+    from
+        customers c1_0 
+    where
+        c1_0.phone=?
+2026-07-21T22:36:34.001+07:00  INFO 16992 --- [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-07-21T22:36:34.001+07:00  INFO 16992 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-07-21T22:36:34.004+07:00  INFO 16992 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 3 ms
+Hibernate: 
+    select
+        c1_0.customer_id,
+        c1_0.accumulated_points,
+        c1_0.created_at,
+        c1_0.email,
+        c1_0.full_name,
+        c1_0.password_hash,
+        c1_0.phone,
+        c1_0.role,
+        c1_0.tier,
+        c1_0.total_spent,
+        c1_0.total_washes,
+        c1_0.updated_at 
+    from
+        customers c1_0 
+    where
+        c1_0.phone=?
+Hibernate: 
+    select
+        c1_0.customer_id,
+        c1_0.accumulated_points,
+        c1_0.created_at,
+        c1_0.email,
+        c1_0.full_name,
+        c1_0.password_hash,
+        c1_0.phone,
+        c1_0.role,
+        c1_0.tier,
+        c1_0.total_spent,
+        c1_0.total_washes,
+        c1_0.updated_at 
+    from
+        customers c1_0 
+    where
+        c1_0.phone=?
+Hibernate: 
+    select
+        c1_0.customer_id,
+        c1_0.accumulated_points,
+        c1_0.created_at,
+        c1_0.email,
+        c1_0.full_name,
+        c1_0.password_hash,
+        c1_0.phone,
+        c1_0.role,
+        c1_0.tier,
+        c1_0.total_spent,
+        c1_0.total_washes,
+        c1_0.updated_at 
+    from
+        customers c1_0 
+    where
+        c1_0.phone=?
+Hibernate: 
+    select
+        b1_0.branch_id,
+        b1_0.address,
+        b1_0.branch_name,
+        b1_0.close_time,
+        b1_0.open_time,
+        b1_0.phone,
+        b1_0.status 
+    from
+        branches b1_0 
+    where
+        upper(b1_0.status)=upper(?)
+Hibernate: 
+    select
+        s1_0.service_id,
+        s1_0.base_price,
+        s1_0.description,
+        s1_0.duration_minutes,
+        s1_0.service_code,
+        s1_0.service_name,
+        s1_0.status 
+    from
+        services s1_0 
+    where
+        upper(s1_0.status)=upper(?)
+Hibernate: 
+    select
+        c1_0.customer_id,
+        c1_0.accumulated_points,
+        c1_0.created_at,
+        c1_0.email,
+        c1_0.full_name,
+        c1_0.password_hash,
+        c1_0.phone,
+        c1_0.role,
+        c1_0.tier,
+        c1_0.total_spent,
+        c1_0.total_washes,
+        c1_0.updated_at 
+    from
+        customers c1_0 
+    where
+        c1_0.phone=?
+Hibernate: 
+    select
+        b1_0.branch_id,
+        b1_0.address,
+        b1_0.branch_name,
+        b1_0.close_time,
+        b1_0.open_time,
+        b1_0.phone,
+        b1_0.status 
+    from
+        branches b1_0 
+    where
+        upper(b1_0.status)=upper(?)
+Hibernate: 
+    select
+        s1_0.service_id,
+        s1_0.base_price,
+        s1_0.description,
+        s1_0.duration_minutes,
+        s1_0.service_code,
+        s1_0.service_name,
+        s1_0.status 
+    from
+        services s1_0 
+    where
+        upper(s1_0.status)=upper(?)
+Hibernate: 
+    select
+        count_big(*) 
+    from
+        customers c1_0 
+    where
+        c1_0.customer_id=?
+Hibernate: 
+    select
+        v1_0.vehicle_id,
+        v1_0.brand,
+        v1_0.customer_id,
+        v1_0.is_default,
+        v1_0.license_plate,
+        v1_0.notes,
+        v1_0.vehicle_size 
+    from
+        vehicles v1_0 
+    left join
+        customers c1_0 
+            on c1_0.customer_id=v1_0.customer_id 
+    where
+        c1_0.customer_id=?
+Hibernate: 
+    select
+        s1_0.service_id,
+        s1_0.base_price,
+        s1_0.description,
+        s1_0.duration_minutes,
+        s1_0.service_code,
+        s1_0.service_name,
+        s1_0.status 
+    from
+        services s1_0 
+    where
+        upper(s1_0.status)=upper(?)
+Hibernate: 
+    select
+        b1_0.branch_id,
+        b1_0.address,
+        b1_0.branch_name,
+        b1_0.close_time,
+        b1_0.open_time,
+        b1_0.phone,
+        b1_0.status 
+    from
+        branches b1_0 
+    where
+        upper(b1_0.status)=upper(?)
+Hibernate: 
+    select
+        b1_0.branch_id,
+        b1_0.address,
+        b1_0.branch_name,
+        b1_0.close_time,
+        b1_0.open_time,
+        b1_0.phone,
+        b1_0.status 
+    from
+        branches b1_0 
+    where
+        b1_0.branch_id=?
+Hibernate: 
+    select
+        s1_0.service_id,
+        s1_0.base_price,
+        s1_0.description,
+        s1_0.duration_minutes,
+        s1_0.service_code,
+        s1_0.service_name,
+        s1_0.status 
+    from
+        services s1_0 
+    where
+        s1_0.service_code in (?, ?)
+Hibernate: 
+    select
+        b1_0.booking_id,
+        b1_0.applied_promotion_id,
+        b1_0.applied_voucher_id,
+        b1_0.booking_date,
+        b1_0.booking_ref,
+        b1_0.booking_time,
+        b1_0.branch_id,
+        b1_0.created_at,
+        b1_0.customer_id,
+        b1_0.duration_minutes,
+        b1_0.end_time,
+        b1_0.points_earned,
+        b1_0.status,
+        b1_0.total_price,
+        b1_0.vehicle_id 
+    from
+        bookings b1_0 
+    where
+        b1_0.booking_date=? 
+    order by
+        b1_0.booking_time
+Hibernate: 
+    select
+        count_big(*) 
+    from
+        customers c1_0 
+    where
+        c1_0.customer_id=?
+Hibernate: 
+    select
+        v1_0.vehicle_id,
+        v1_0.brand,
+        v1_0.customer_id,
+        v1_0.is_default,
+        v1_0.license_plate,
+        v1_0.notes,
+        v1_0.vehicle_size 
+    from
+        vehicles v1_0 
+    left join
+        customers c1_0 
+            on c1_0.customer_id=v1_0.customer_id 
+    where
+        c1_0.customer_id=?
+Hibernate: 
+    select
+        b1_0.branch_id,
+        b1_0.address,
+        b1_0.branch_name,
+        b1_0.close_time,
+        b1_0.open_time,
+        b1_0.phone,
+        b1_0.status 
+    from
+        branches b1_0 
+    where
+        upper(b1_0.status)=upper(?)
+Hibernate: 
+    select
+        s1_0.service_id,
+        s1_0.base_price,
+        s1_0.description,
+        s1_0.duration_minutes,
+        s1_0.service_code,
+        s1_0.service_name,
+        s1_0.status 
+    from
+        services s1_0 
+    where
+        upper(s1_0.status)=upper(?)
+Hibernate: 
+    select
+        count_big(*) 
+    from
+        customers c1_0 
+    where
+        c1_0.customer_id=?
+Hibernate: 
+    select
+        v1_0.vehicle_id,
+        v1_0.brand,
+        v1_0.customer_id,
+        v1_0.is_default,
+        v1_0.license_plate,
+        v1_0.notes,
+        v1_0.vehicle_size 
+    from
+        vehicles v1_0 
+    left join
+        customers c1_0 
+            on c1_0.customer_id=v1_0.customer_id 
+    where
+        c1_0.customer_id=?
+Hibernate: 
+    select
+        c1_0.customer_id,
+        c1_0.accumulated_points,
+        c1_0.created_at,
+        c1_0.email,
+        c1_0.full_name,
+        c1_0.password_hash,
+        c1_0.phone,
+        c1_0.role,
+        c1_0.tier,
+        c1_0.total_spent,
+        c1_0.total_washes,
+        c1_0.updated_at 
+    from
+        customers c1_0 
+    where
+        c1_0.customer_id=?
+Hibernate: 
+    select
+        top (?) b1_0.booking_id 
+    from
+        bookings b1_0 
+    left join
+        customers c1_0 
+            on c1_0.customer_id=b1_0.customer_id 
+    where
+        c1_0.customer_id=? 
+        and b1_0.status in (?, ?)
+Hibernate: 
+    select
+        top (?) v1_0.vehicle_id 
+    from
+        vehicles v1_0 
+    left join
+        customers c1_0 
+            on c1_0.customer_id=v1_0.customer_id 
+    where
+        c1_0.customer_id=? 
+        and upper(v1_0.license_plate)=upper(?)
+Hibernate: 
+    select
+        count_big(v1_0.vehicle_id) 
+    from
+        vehicles v1_0 
+    left join
+        customers c1_0 
+            on c1_0.customer_id=v1_0.customer_id 
+    where
+        c1_0.customer_id=?
+Hibernate: 
+    insert 
+    into
+        vehicles
+        (brand, customer_id, is_default, license_plate, notes, vehicle_size) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    select
+        b1_0.branch_id,
+        b1_0.address,
+        b1_0.branch_name,
+        b1_0.close_time,
+        b1_0.open_time,
+        b1_0.phone,
+        b1_0.status 
+    from
+        branches b1_0 
+    where
+        b1_0.branch_id=?
+Hibernate: 
+    select
+        s1_0.service_id,
+        s1_0.base_price,
+        s1_0.description,
+        s1_0.duration_minutes,
+        s1_0.service_code,
+        s1_0.service_name,
+        s1_0.status 
+    from
+        services s1_0 
+    where
+        s1_0.service_code in (?, ?)
+Hibernate: 
+    select
+        b1_0.booking_id,
+        b1_0.applied_promotion_id,
+        b1_0.applied_voucher_id,
+        b1_0.booking_date,
+        b1_0.booking_ref,
+        b1_0.booking_time,
+        b1_0.branch_id,
+        b1_0.created_at,
+        b1_0.customer_id,
+        b1_0.duration_minutes,
+        b1_0.end_time,
+        b1_0.points_earned,
+        b1_0.status,
+        b1_0.total_price,
+        b1_0.vehicle_id 
+    from
+        bookings b1_0 
+    left join
+        branches b2_0 
+            on b2_0.branch_id=b1_0.branch_id 
+    where
+        b2_0.branch_id=? 
+        and b1_0.booking_date=? 
+        and b1_0.status<>?
+Hibernate: 
+    insert 
+    into
+        bookings
+        (applied_promotion_id, applied_voucher_id, booking_date, booking_ref, booking_time, branch_id, created_at, customer_id, duration_minutes, end_time, points_earned, status, total_price, vehicle_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    select
+        bs1_0.booking_id,
+        bs1_0.service_id,
+        b1_0.booking_id,
+        ap1_0.promotion_id,
+        ap1_0.description,
+        ap1_0.discount_percent,
+        ap1_0.end_date,
+        ap1_0.end_time,
+        ap1_0.promotion_name,
+        ap1_0.start_date,
+        ap1_0.start_time,
+        ap1_0.status,
+        ap1_0.target_tier,
+        av1_0.voucher_id,
+        av1_0.customer_id,
+        c1_0.customer_id,
+        c1_0.accumulated_points,
+        c1_0.created_at,
+        c1_0.email,
+        c1_0.full_name,
+        c1_0.password_hash,
+        c1_0.phone,
+        c1_0.role,
+        c1_0.tier,
+        c1_0.total_spent,
+        c1_0.total_washes,
+        c1_0.updated_at,
+        av1_0.discount_amount,
+        av1_0.expired_at,
+        av1_0.redeemed_at,
+        av1_0.status,
+        av1_0.voucher_code,
+        av1_0.voucher_type,
+        b1_0.booking_date,
+        b1_0.booking_ref,
+        b1_0.booking_time,
+        b1_0.branch_id,
+        b2_0.branch_id,
+        b2_0.address,
+        b2_0.branch_name,
+        b2_0.close_time,
+        b2_0.open_time,
+        b2_0.phone,
+        b2_0.status,
+        b1_0.created_at,
+        b1_0.customer_id,
+        c2_0.customer_id,
+        c2_0.accumulated_points,
+        c2_0.created_at,
+        c2_0.email,
+        c2_0.full_name,
+        c2_0.password_hash,
+        c2_0.phone,
+        c2_0.role,
+        c2_0.tier,
+        c2_0.total_spent,
+        c2_0.total_washes,
+        c2_0.updated_at,
+        b1_0.duration_minutes,
+        b1_0.end_time,
+        b1_0.points_earned,
+        b1_0.status,
+        b1_0.total_price,
+        b1_0.vehicle_id,
+        v1_0.vehicle_id,
+        v1_0.brand,
+        v1_0.customer_id,
+        v1_0.is_default,
+        v1_0.license_plate,
+        v1_0.notes,
+        v1_0.vehicle_size,
+        s1_0.service_id,
+        s1_0.base_price,
+        s1_0.description,
+        s1_0.duration_minutes,
+        s1_0.service_code,
+        s1_0.service_name,
+        s1_0.status 
+    from
+        booking_services bs1_0 
+    join
+        bookings b1_0 
+            on b1_0.booking_id=bs1_0.booking_id 
+    left join
+        promotions ap1_0 
+            on ap1_0.promotion_id=b1_0.applied_promotion_id 
+    left join
+        vouchers av1_0 
+            on av1_0.voucher_id=b1_0.applied_voucher_id 
+    left join
+        customers c1_0 
+            on c1_0.customer_id=av1_0.customer_id 
+    join
+        branches b2_0 
+            on b2_0.branch_id=b1_0.branch_id 
+    join
+        customers c2_0 
+            on c2_0.customer_id=b1_0.customer_id 
+    join
+        vehicles v1_0 
+            on v1_0.vehicle_id=b1_0.vehicle_id 
+    join
+        services s1_0 
+            on s1_0.service_id=bs1_0.service_id 
+    where
+        (
+            (
+                bs1_0.booking_id=? 
+                and bs1_0.service_id=?
+            )
+        )
+Hibernate: 
+    select
+        bs1_0.booking_id,
+        bs1_0.service_id,
+        b1_0.booking_id,
+        ap1_0.promotion_id,
+        ap1_0.description,
+        ap1_0.discount_percent,
+        ap1_0.end_date,
+        ap1_0.end_time,
+        ap1_0.promotion_name,
+        ap1_0.start_date,
+        ap1_0.start_time,
+        ap1_0.status,
+        ap1_0.target_tier,
+        av1_0.voucher_id,
+        av1_0.customer_id,
+        c1_0.customer_id,
+        c1_0.accumulated_points,
+        c1_0.created_at,
+        c1_0.email,
+        c1_0.full_name,
+        c1_0.password_hash,
+        c1_0.phone,
+        c1_0.role,
+        c1_0.tier,
+        c1_0.total_spent,
+        c1_0.total_washes,
+        c1_0.updated_at,
+        av1_0.discount_amount,
+        av1_0.expired_at,
+        av1_0.redeemed_at,
+        av1_0.status,
+        av1_0.voucher_code,
+        av1_0.voucher_type,
+        b1_0.booking_date,
+        b1_0.booking_ref,
+        b1_0.booking_time,
+        b1_0.branch_id,
+        b2_0.branch_id,
+        b2_0.address,
+        b2_0.branch_name,
+        b2_0.close_time,
+        b2_0.open_time,
+        b2_0.phone,
+        b2_0.status,
+        b1_0.created_at,
+        b1_0.customer_id,
+        c2_0.customer_id,
+        c2_0.accumulated_points,
+        c2_0.created_at,
+        c2_0.email,
+        c2_0.full_name,
+        c2_0.password_hash,
+        c2_0.phone,
+        c2_0.role,
+        c2_0.tier,
+        c2_0.total_spent,
+        c2_0.total_washes,
+        c2_0.updated_at,
+        b1_0.duration_minutes,
+        b1_0.end_time,
+        b1_0.points_earned,
+        b1_0.status,
+        b1_0.total_price,
+        b1_0.vehicle_id,
+        v1_0.vehicle_id,
+        v1_0.brand,
+        v1_0.customer_id,
+        v1_0.is_default,
+        v1_0.license_plate,
+        v1_0.notes,
+        v1_0.vehicle_size,
+        s1_0.service_id,
+        s1_0.base_price,
+        s1_0.description,
+        s1_0.duration_minutes,
+        s1_0.service_code,
+        s1_0.service_name,
+        s1_0.status 
+    from
+        booking_services bs1_0 
+    join
+        bookings b1_0 
+            on b1_0.booking_id=bs1_0.booking_id 
+    left join
+        promotions ap1_0 
+            on ap1_0.promotion_id=b1_0.applied_promotion_id 
+    left join
+        vouchers av1_0 
+            on av1_0.voucher_id=b1_0.applied_voucher_id 
+    left join
+        customers c1_0 
+            on c1_0.customer_id=av1_0.customer_id 
+    join
+        branches b2_0 
+            on b2_0.branch_id=b1_0.branch_id 
+    join
+        customers c2_0 
+            on c2_0.customer_id=b1_0.customer_id 
+    join
+        vehicles v1_0 
+            on v1_0.vehicle_id=b1_0.vehicle_id 
+    join
+        services s1_0 
+            on s1_0.service_id=bs1_0.service_id 
+    where
+        (
+            (
+                bs1_0.booking_id=? 
+                and bs1_0.service_id=?
+            )
+        )
+Hibernate: 
+    insert 
+    into
+        booking_services
+        (booking_id, service_id) 
+    values
+        (?, ?)
+Hibernate: 
+    insert 
+    into
+        booking_services
+        (booking_id, service_id) 
+    values
+        (?, ?)
+Hibernate: 
+    select
+        bs1_0.booking_id,
+        bs1_0.service_id 
+    from
+        booking_services bs1_0 
+    left join
+        bookings b1_0 
+            on b1_0.booking_id=bs1_0.booking_id 
+    where
+        b1_0.booking_id=?
+Hibernate: 
+    select
+        count_big(*) 
+    from
+        customers c1_0 
+    where
+        c1_0.customer_id=?
+Hibernate: 
+    select
+        v1_0.vehicle_id,
+        v1_0.brand,
+        v1_0.customer_id,
+        v1_0.is_default,
+        v1_0.license_plate,
+        v1_0.notes,
+        v1_0.vehicle_size 
+    from
+        vehicles v1_0 
+    left join
+        customers c1_0 
+            on c1_0.customer_id=v1_0.customer_id 
+    where
+        c1_0.customer_id=?
+Hibernate: 
+    select
+        s1_0.service_id,
+        s1_0.base_price,
+        s1_0.description,
+        s1_0.duration_minutes,
+        s1_0.service_code,
+        s1_0.service_name,
+        s1_0.status 
+    from
+        services s1_0 
+    where
+        upper(s1_0.status)=upper(?)
+Hibernate: 
+    select
+        b1_0.branch_id,
+        b1_0.address,
+        b1_0.branch_name,
+        b1_0.close_time,
+        b1_0.open_time,
+        b1_0.phone,
+        b1_0.status 
+    from
+        branches b1_0 
+    where
+        upper(b1_0.status)=upper(?)
+Hibernate: 
+    select
+        count_big(*) 
+    from
+        customers c1_0 
+    where
+        c1_0.customer_id=?
+Hibernate: 
+    select
+        v1_0.vehicle_id,
+        v1_0.brand,
+        v1_0.customer_id,
+        v1_0.is_default,
+        v1_0.license_plate,
+        v1_0.notes,
+        v1_0.vehicle_size 
+    from
+        vehicles v1_0 
+    left join
+        customers c1_0 
+            on c1_0.customer_id=v1_0.customer_id 
+    where
+        c1_0.customer_id=?
+Hibernate: 
+    select
+        b1_0.branch_id,
+        b1_0.address,
+        b1_0.branch_name,
+        b1_0.close_time,
+        b1_0.open_time,
+        b1_0.phone,
+        b1_0.status 
+    from
+        branches b1_0 
+    where
+        b1_0.branch_id=?
+Hibernate: 
+    select
+        s1_0.service_id,
+        s1_0.base_price,
+        s1_0.description,
+        s1_0.duration_minutes,
+        s1_0.service_code,
+        s1_0.service_name,
+        s1_0.status 
+    from
+        services s1_0 
+    where
+        s1_0.service_code in (?)
+Hibernate: 
+    select
+        b1_0.booking_id,
+        b1_0.applied_promotion_id,
+        b1_0.applied_voucher_id,
+        b1_0.booking_date,
+        b1_0.booking_ref,
+        b1_0.booking_time,
+        b1_0.branch_id,
+        b1_0.created_at,
+        b1_0.customer_id,
+        b1_0.duration_minutes,
+        b1_0.end_time,
+        b1_0.points_earned,
+        b1_0.status,
+        b1_0.total_price,
+        b1_0.vehicle_id 
+    from
+        bookings b1_0 
+    where
+        b1_0.booking_date=? 
+    order by
+        b1_0.booking_time
+Hibernate: 
+    select
+        b1_0.branch_id,
+        b1_0.address,
+        b1_0.branch_name,
+        b1_0.close_time,
+        b1_0.open_time,
+        b1_0.phone,
+        b1_0.status 
+    from
+        branches b1_0 
+    where
+        b1_0.branch_id=?
+Hibernate: 
+    select
+        c1_0.customer_id,
+        c1_0.accumulated_points,
+        c1_0.created_at,
+        c1_0.email,
+        c1_0.full_name,
+        c1_0.password_hash,
+        c1_0.phone,
+        c1_0.role,
+        c1_0.tier,
+        c1_0.total_spent,
+        c1_0.total_washes,
+        c1_0.updated_at 
+    from
+        customers c1_0 
+    where
+        c1_0.customer_id=?
+Hibernate: 
+    select
+        v1_0.vehicle_id,
+        v1_0.brand,
+        v1_0.customer_id,
+        v1_0.is_default,
+        v1_0.license_plate,
+        v1_0.notes,
+        v1_0.vehicle_size 
+    from
+        vehicles v1_0 
+    where
+        v1_0.vehicle_id=?
+Hibernate: 
+    select
+        bs1_0.booking_id,
+        bs1_0.service_id 
+    from
+        booking_services bs1_0 
+    left join
+        bookings b1_0 
+            on b1_0.booking_id=bs1_0.booking_id 
+    where
+        b1_0.booking_id=?
+Hibernate: 
+    select
+        s1_0.service_id,
+        s1_0.base_price,
+        s1_0.description,
+        s1_0.duration_minutes,
+        s1_0.service_code,
+        s1_0.service_name,
+        s1_0.status 
+    from
+        services s1_0 
+    where
+        s1_0.service_id=?
+Hibernate: 
+    select
+        s1_0.service_id,
+        s1_0.base_price,
+        s1_0.description,
+        s1_0.duration_minutes,
+        s1_0.service_code,
+        s1_0.service_name,
+        s1_0.status 
+    from
+        services s1_0 
+    where
+        s1_0.service_id=?
+Hibernate: 
+    select
+        b1_0.branch_id,
+        b1_0.address,
+        b1_0.branch_name,
+        b1_0.close_time,
+        b1_0.open_time,
+        b1_0.phone,
+        b1_0.status 
+    from
+        branches b1_0 
+    where
+        b1_0.branch_id=?
+Hibernate: 
+    select
+        s1_0.service_id,
+        s1_0.base_price,
+        s1_0.description,
+        s1_0.duration_minutes,
+        s1_0.service_code,
+        s1_0.service_name,
+        s1_0.status 
+    from
+        services s1_0 
+    where
+        s1_0.service_code in (?)
+Hibernate: 
+    select
+        b1_0.booking_id,
+        b1_0.applied_promotion_id,
+        b1_0.applied_voucher_id,
+        b1_0.booking_date,
+        b1_0.booking_ref,
+        b1_0.booking_time,
+        b1_0.branch_id,
+        b1_0.created_at,
+        b1_0.customer_id,
+        b1_0.duration_minutes,
+        b1_0.end_time,
+        b1_0.points_earned,
+        b1_0.status,
+        b1_0.total_price,
+        b1_0.vehicle_id 
+    from
+        bookings b1_0 
+    where
+        b1_0.booking_date=? 
+    order by
+        b1_0.booking_time
+2026-07-21T22:56:24.965+07:00  INFO 16992 --- [io-8080-exec-10] o.springdoc.api.AbstractOpenApiResource  : Init duration for springdoc-openapi is: 309 ms
