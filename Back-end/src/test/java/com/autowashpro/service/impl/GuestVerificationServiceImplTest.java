@@ -143,6 +143,15 @@ class GuestVerificationServiceImplTest {
     }
 
     @Test
+    void consumeProofForPhone_blankToken_throwsGenericBadRequestWithoutQueryingRepository() {
+        assertThatThrownBy(() -> service.consumeProofForPhone("   ", "0901234567", VerificationPurpose.GUEST_BOOKING))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("Invalid or expired verification proof.");
+
+        verifyNoInteractions(proofRepository, rateLimiter);
+    }
+
+    @Test
     void consumeProofForLookup_validProof_returnsPhoneFromRecord() {
         when(rateLimiter.tryConsume(anyString(), anyInt(), any())).thenReturn(true);
         when(proofRepository.consumeIfValidForPurpose(eq("token-2"), eq(VerificationPurpose.GUEST_BOOKING_LOOKUP), any()))
