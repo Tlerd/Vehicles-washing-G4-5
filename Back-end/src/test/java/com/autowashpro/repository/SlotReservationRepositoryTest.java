@@ -11,12 +11,16 @@ import com.autowashpro.repository.BookingRepository;
 import com.autowashpro.repository.BranchRepository;
 import com.autowashpro.repository.CustomerRepository;
 import com.autowashpro.repository.VehicleRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class SlotReservationRepositoryTest extends RepositoryIntegrationTest {
@@ -38,6 +42,9 @@ class SlotReservationRepositoryTest extends RepositoryIntegrationTest {
 
     @Autowired
     private SlotReservationRepository slotReservationRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Test
     void save_secondReservationForSameBaySlotTime_violatesUniqueConstraint() {
@@ -78,6 +85,17 @@ class SlotReservationRepositoryTest extends RepositoryIntegrationTest {
         second.setExpiresAt(LocalDateTime.now().plusMinutes(15));
 
         assertThatThrownBy(() -> slotReservationRepository.saveAndFlush(second))
-                .isInstanceOf(DataIntegrityViolationException.class);
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("UX_bay_slot");
+
+        // The failed flush leaves `second` attached to the persistence context with a null
+        // identifier; clear() detaches it without attempting another flush, so the follow-up
+        // query below doesn't trip Hibernate's "flushed after an exception" assertion failure.
+        entityManager.clear();
+
+        List<SlotReservation> reservationsAtSlot = slotReservationRepository.findByBayBayIdAndSlotTimeBetween(
+                bay.getBayId(), slotTime.minusMinutes(1), slotTime.plusMinutes(1));
+        assertThat(reservationsAtSlot).hasSize(1);
+        assertThat(reservationsAtSlot.get(0).getBooking().getBookingId()).isEqualTo(bookingA.getBookingId());
     }
 }
