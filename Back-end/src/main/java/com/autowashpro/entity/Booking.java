@@ -24,12 +24,16 @@ public class Booking {
     private String bookingRef;
 
     @ManyToOne
-    @JoinColumn(name = "customer_id", nullable = false)
+    @JoinColumn(name = "customer_id")
     private Customer customer;
 
     @ManyToOne
     @JoinColumn(name = "vehicle_id", nullable = false)
     private Vehicle vehicle;
+
+    @ManyToOne
+    @JoinColumn(name = "guest_id")
+    private Guest guest;
 
     @ManyToOne
     @JoinColumn(name = "branch_id", nullable = false)
