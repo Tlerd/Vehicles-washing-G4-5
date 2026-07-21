@@ -1,6 +1,74 @@
 # Progress — AutoWash Pro
 
 ## Current state
+- 2026-07-22 — FR-004/FR-005 v2 backend Phase 2 (guest identity & OTP/Firebase
+  verification-proof foundation) is **complete**, committed, and reviewed
+  under `docs/superpowers/plans/2026-07-22-fr004v2-phase2-guest-verification.md`.
+  All 9 application-code tasks done: server-side Firebase identity
+  verification that never trusts a client `otpVerified` flag
+  (`GuestVerificationService.issueProof`); a short-lived (5-minute),
+  single-use, phone-and-purpose-bound verification proof persisted in a new
+  `phone_verification_proofs` SQL Server table, with atomic
+  conditional-UPDATE single-use consumption proven under real concurrent
+  threads (`PhoneVerificationProofConcurrencyTest`, 10 threads, exactly one
+  winner); a deterministic in-memory `RateLimiter`; and a tested
+  `GuestBookingLookupAuthorizationService` primitive for a future guest
+  booking-lookup endpoint — this phase adds **no HTTP controller**, no
+  VNPAY, no slot allocation, no Swagger, no frontend change. Evidence:
+  `mvn -f Back-end/pom.xml test` — BUILD SUCCESS, **59/59** passing (26
+  pre-existing from Phase 1 + 33 new: the plan predicted 32, and a review
+  found one more real gap — `consumeProofForPhone`'s untested blank-token
+  short-circuit — closed with one additional test). `AuthServiceImplTest`
+  re-run in isolation first (7/7, unchanged) to prove the existing
+  registration Firebase flow has no regression. Both databases confirmed to
+  have the new table via `sys.tables`; `phone_verification_proofs` row
+  count is 0 on both (expected — no controller exists yet to issue a real
+  proof against the dev DB, and `@DataJpaTest`/manual `@AfterEach` cleanup
+  leave the test DB clean).
+
+  This phase went through a heavier process than Phase 1, warranted by its
+  security sensitivity: a 4-agent parallel investigation established ground
+  truth on the existing codebase before any plan was written (found that a
+  canonical `PhoneNormalizer.toE164` utility and a `FirebaseTokenVerifier`
+  seam already existed — Phase 2 reuses both rather than reinventing them);
+  a planner then drafted the full plan; **3 parallel adversarial reviewers
+  (JPA/Hibernate correctness, security design, test-coverage completeness)
+  reviewed the draft plan itself before any code was written**, and found
+  real problems: a `@Modifying` bulk-update missing `clearAutomatically =
+  true` that would have broken the first task's own test; a repository
+  method with zero real-database test coverage on the exact query the
+  IDOR/lookup path depends on; a rate-limiting design that let an attacker
+  lock out a victim's real phone using garbage tokens before Firebase
+  verification ran; and an undocumented transactional invariant on the
+  lookup-authorization primitive that could silently reopen a replay hole
+  if a future maintainer added `@Transactional` to it. All four were fixed
+  in the plan before implementation began. **A fifth, distinct bug was
+  found empirically during implementation, not in planning**: Task 3's
+  `@Modifying` consumption methods worked under `@DataJpaTest` (which
+  auto-wraps every test in a transaction) but threw
+  `TransactionRequiredException` under Task 4's `@SpringBootTest` (which
+  doesn't) — the implementer correctly reported this as BLOCKED instead of
+  forcing a pass; fixed by adding `@Transactional` directly to the
+  repository's consumption methods, re-verified with no regression on
+  Task 3's own 8 tests. Every task went through the same fresh-implementer +
+  independent-task-reviewer loop as Phase 1; the two security-fix outcomes
+  (Task 6's `issueProof` reordering, Task 9's non-transactional `authorize()`)
+  were each independently re-verified correct in the *actual implementation*
+  by a reviewer, not just accepted as designed-correctly-on-paper. One
+  incident along the way, unrelated to Phase 2's own code: committing a
+  file Task 2 needed to touch surfaced a `ForbiddenException`/`handleForbidden`
+  addition from an earlier session's documented-but-never-committed FR-003
+  fix, sitting in the same file; separated into its own accurately-labeled
+  commit rather than silently absorbed into Task 2's.
+
+  Full findings, the complete investigation/review trail, and per-task
+  evidence are recorded in `.superpowers/sdd/progress.md` and
+  `docs/ai-logs/m1/2026-07-22-fr004v2-phase2-guest-verification.md`.
+  **No HTTP endpoint exists for any of this yet** — proof issuance/
+  consumption and the lookup authorization primitive are tested
+  service-layer components only, ready for whichever phase builds guest
+  booking creation and the real `GET /api/v1/bookings/{ref}` endpoint.
+  **The Backend + Swagger gate has NOT passed.**
 - 2026-07-22 — FR-004/FR-005 v2 backend Phase 1 (schema + entity/repository
   layer) is **complete**, committed, and reviewed under
   `docs/superpowers/plans/2026-07-22-fr004v2-phase1-schema-entities.md`. All
