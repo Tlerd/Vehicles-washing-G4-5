@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseAuthException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -119,6 +120,13 @@ class AuthServiceImplTest {
 
         assertThat(response.isSuccess()).isTrue();
         assertThat(response.getCustomerId()).isEqualTo("2");
+
+        ArgumentCaptor<Customer> customerCaptor = ArgumentCaptor.forClass(Customer.class);
+        verify(customerRepository).save(customerCaptor.capture());
+        Customer savedCustomer = customerCaptor.getValue();
+        assertThat(savedCustomer.getEmail()).isEqualTo("vanb@gmail.com");
+        assertThat(savedCustomer.getPhone()).isEqualTo("+84909876543");
+        assertThat(savedCustomer.getFullName()).isEqualTo("Nguyen Van B");
     }
 
     @Test
