@@ -14,6 +14,7 @@ public class FirebaseTokenVerifierImpl implements FirebaseTokenVerifier {
     public VerifiedFirebaseIdentity verify(String token) throws FirebaseAuthException {
         FirebaseToken decoded = FirebaseAuth.getInstance().verifyIdToken(token);
         String phoneNumber = (String) decoded.getClaims().get("phone_number");
-        return new VerifiedFirebaseIdentity(phoneNumber, decoded.getEmail());
+        String email = decoded.isEmailVerified() ? decoded.getEmail() : null;
+        return new VerifiedFirebaseIdentity(phoneNumber, email);
     }
 }

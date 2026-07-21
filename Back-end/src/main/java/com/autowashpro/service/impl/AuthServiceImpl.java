@@ -55,7 +55,7 @@ public class AuthServiceImpl implements AuthService {
         String phone = PhoneNormalizer.toE164(request.getPhone());
 
         if (customerRepository.existsByPhone(phone)) {
-            throw new ConflictException("Phone number already registered.");
+            throw new ConflictException("Số điện thoại đã được đăng ký.");
         }
 
         VerifiedFirebaseIdentity identity;
@@ -68,10 +68,9 @@ public class AuthServiceImpl implements AuthService {
         String email = request.getEmail();
 
         if (identity.phoneNumber() != null) {
-            String requestPhone = PhoneNormalizer.toE164(phone);
             String firebaseVerifiedPhone = PhoneNormalizer.toE164(identity.phoneNumber());
 
-            if (!requestPhone.equals(firebaseVerifiedPhone)) {
+            if (!phone.equals(firebaseVerifiedPhone)) {
                 throw new BadRequestException("Số điện thoại đăng ký không trùng khớp với số điện thoại xác minh trên Firebase.");
             }
         } else if (identity.email() != null) {
@@ -84,7 +83,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         if (email != null && !email.isBlank() && customerRepository.existsByEmail(email)) {
-            throw new ConflictException("Email already registered.");
+            throw new ConflictException("Email đã được đăng ký.");
         }
 
         Customer customer = new Customer();
