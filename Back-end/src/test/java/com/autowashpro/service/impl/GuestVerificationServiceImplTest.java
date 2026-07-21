@@ -1,0 +1,111 @@
+package com.autowashpro.service.impl;
+
+import com.autowashpro.dto.response.VerificationProofResponse;
+import com.autowashpro.entity.PhoneVerificationProof;
+import com.autowashpro.entity.VerificationPurpose;
+import com.autowashpro.exception.custom.BadRequestException;
+import com.autowashpro.exception.custom.TooManyRequestsException;
+import com.autowashpro.repository.PhoneVerificationProofRepository;
+import com.autowashpro.service.FirebaseTokenVerifier;
+import com.autowashpro.service.RateLimiter;
+import com.autowashpro.service.VerifiedFirebaseIdentity;
+import com.google.firebase.auth.FirebaseAuthException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class GuestVerificationServiceImplTest {
+
+    @Mock
+    private FirebaseTokenVerifier firebaseTokenVerifier;
+
+    @Mock
+    private PhoneVerificationProofRepository proofRepository;
+
+    @Mock
+    private RateLimiter rateLimiter;
+
+    private GuestVerificationServiceImpl service;
+
+    @BeforeEach
+    void setUp() {
+        service = new GuestVerificationServiceImpl(firebaseTokenVerifier, proofRepository, rateLimiter);
+    }
+
+    // Stub ordering below matches issueProof's actual execution order (Firebase verification runs
+    // BEFORE the rate-limit check — see the reordering note above Step 6). Tests for failures that
+    // occur before the rate-limit check deliberately do NOT stub rateLimiter.tryConsume at all: under
+    // MockitoExtension's default STRICT_STUBS, a stub that is set up but never invoked fails the test
+    // class with UnnecessaryStubbingException, so an unreachable stub must be omitted, not just unused.
+
+    @Test
+    void issueProof_validFirebaseVerification_returnsProofBoundToNormalizedPhoneAndPurpose() throws FirebaseAuthException {
+        when(firebaseTokenVerifier.verify("valid-token"))
+                .thenReturn(new VerifiedFirebaseIdentity("+84901234567", null));
+        when(rateLimiter.tryConsume(anyString(), anyInt(), any())).thenReturn(true);
+
+        VerificationProofResponse response = service.issueProof("0901234567", "valid-token", VerificationPurpose.GUEST_BOOKING);
+
+        assertThat(response.getProofToken()).isNotBlank();
+        assertThat(response.getExpiresAt()).isNotNull();
+
+        ArgumentCaptor<PhoneVerificationProof> captor = ArgumentCaptor.forClass(PhoneVerificationProof.class);
+        verify(proofRepository).save(captor.capture());
+        assertThat(captor.getValue().getPhone()).isEqualTo("+84901234567");
+        assertThat(captor.getValue().getPurpose()).isEqualTo(VerificationPurpose.GUEST_BOOKING);
+        assertThat(captor.getValue().getConsumedAt()).isNull();
+    }
+
+    @Test
+    void issueProof_invalidFirebaseToken_throwsBadRequestWithGenericMessage() throws FirebaseAuthException {
+        when(firebaseTokenVerifier.verify("bad-token")).thenThrow(FirebaseAuthException.class);
+
+        assertThatThrownBy(() -> service.issueProof("0901234567", "bad-token", VerificationPurpose.GUEST_BOOKING))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("Invalid or expired verification token.");
+    }
+
+    @Test
+    void issueProof_firebaseIdentityMissingPhone_throwsBadRequest() throws FirebaseAuthException {
+        when(firebaseTokenVerifier.verify("google-token"))
+                .thenReturn(new VerifiedFirebaseIdentity(null, "user@example.com"));
+
+        assertThatThrownBy(() -> service.issueProof("0901234567", "google-token", VerificationPurpose.GUEST_BOOKING))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("Invalid or expired verification token.");
+    }
+
+    @Test
+    void issueProof_verifiedPhoneMismatch_throwsBadRequest() throws FirebaseAuthException {
+        when(firebaseTokenVerifier.verify("valid-token"))
+                .thenReturn(new VerifiedFirebaseIdentity("+84909999999", null));
+
+        assertThatThrownBy(() -> service.issueProof("0901234567", "valid-token", VerificationPurpose.GUEST_BOOKING))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("Verified phone does not match the phone number provided.");
+    }
+
+    @Test
+    void issueProof_rateLimitExceeded_throwsTooManyRequestsWithGenericMessageOnly() throws FirebaseAuthException {
+        when(firebaseTokenVerifier.verify("any-token"))
+                .thenReturn(new VerifiedFirebaseIdentity("+84901234567", null));
+        when(rateLimiter.tryConsume(anyString(), anyInt(), any())).thenReturn(false);
+
+        assertThatThrownBy(() -> service.issueProof("0901234567", "any-token", VerificationPurpose.GUEST_BOOKING))
+                .isInstanceOf(TooManyRequestsException.class)
+                .hasMessage("Too many verification requests. Please try again later.")
+                .satisfies(ex -> assertThat(ex.getMessage()).doesNotContain("0901234567").doesNotContain("+84901234567"));
+    }
+}
