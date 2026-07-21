@@ -25,6 +25,21 @@
   implementer subagent (TDD RED/GREEN) followed by an independent task
   reviewer (spec compliance + code quality); all 4 tasks in this session
   (9–12) reviewed clean/Approved with no Critical or Important findings.
+  A final whole-branch review (opus, full 13-commit Phase 1 diff) returned
+  **Ready to merge** — no Critical findings, and nothing built in Phase 1 is
+  a defect. It raised 3 Important findings that are binding design input
+  for later phases, not Phase 1 fixes: (1) `Booking.vehicle_id` is still
+  `nullable = false`, so a real guest booking with no owned vehicle cannot
+  yet persist — Phase 2's guest-booking plan must resolve this; (2)
+  `IdempotencyRecord` will hold response-body PII for 24h keyed only by a
+  client-supplied header with no principal-scoped lookup yet — Phase 3's
+  idempotency check must scope replay to the requesting principal; (3) the
+  test suite is no longer hermetic (11 of 13 new tests need a live SQL
+  Server `autowash_pro_test` + `DB_PASSWORD`) and that prerequisite isn't
+  documented anywhere committed yet (only in the plan file) — worth adding
+  to the README/AGENTS.md before another contributor hits a red build on a
+  fresh checkout. Full findings (plus 5 non-blocking Minor notes) recorded
+  in `.superpowers/sdd/progress.md` and the AI log below.
   **No business logic has been implemented yet** — OTP, slot/bay allocation,
   pricing, VNPAY, and the RBAC state machine are deferred to Phase 2+, each
   requiring its own plan. **The Backend + Swagger gate has NOT passed.** Full

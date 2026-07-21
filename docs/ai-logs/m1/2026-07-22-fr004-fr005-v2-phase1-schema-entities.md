@@ -167,6 +167,79 @@ The controller performed every `git add`/`git commit` itself, each scoped to
 an explicit pathspec naming only that task's files, consistent with the
 mitigation adopted after the Tasks 1–2 incident described below.
 
+## Final whole-branch review
+
+After all 12 tasks were individually reviewed, a final whole-branch review
+was dispatched on the most capable available model (opus), covering the
+complete Phase 1 diff as one unit (13 commits, `7db2916..e6097f3` — the
+range starting right after the prior, separately-completed Google Sign-In
+feature on this same branch, so it does not re-review that unrelated work).
+Its job was different from the per-task reviews: look for problems only
+visible with the whole plan's diff in view at once — cross-task
+consistency, migration-to-entity fidelity checked holistically in one pass,
+and whether the collective test suite gives real confidence.
+
+**Verdict: Ready to merge.** No Critical findings. The reviewer confirmed,
+in one pass across all 8 entities: migration↔entity field-by-field fidelity
+holds everywhere; zero Lombok/JPA convention drift across the 12 tasks; the
+scope boundary held across all 13 commits (no controller/service/DTO leaked
+in, the pre-existing ~150-file pile stayed uncontaminated); and the
+evidence recorded in PROGRESS.md/this log (26 tests / 13 new, the corrected
+plan arithmetic, the `BaySeeder` live-boot evidence) is internally
+consistent with the diff, not inflated.
+
+**3 Important findings** — explicitly *not* Phase 1 defects or blockers;
+binding design input for whichever later phase they belong to:
+
+1. **Guest bookings cannot actually persist yet.** `Booking.vehicle_id`
+   remains `@JoinColumn(nullable = false)` (unchanged by Task 10), while
+   `guests` carries its own inline `license_plate`/`vehicle_size` — meaning
+   the intended design is that guests describe their vehicle without an
+   owned `vehicles` row. `BookingGuestSupportTest`'s guest-with-no-customer
+   test only passes because it borrows a vehicle from an unrelated
+   `vehicleOwner` customer fixture, not a realistic guest flow. **Phase 2's
+   guest-booking plan must resolve this** — either make `vehicle_id`
+   nullable or synthesize/attach a vehicle row for guests.
+2. **`IdempotencyRecord` needs principal-scoped lookup before Phase 3 uses
+   it.** `response_body` (`NVARCHAR(MAX) NOT NULL`) will hold full
+   serialized responses (customer name/phone, `bookingRef`, payment URLs)
+   for 24h, keyed only by a client-supplied `Idempotency-Key` header; the
+   repository currently exposes only inherited key-only `findById`. Without
+   principal scoping, one caller could replay another caller's key and read
+   cached PII. Not a live vulnerability today (no Phase 1 code performs
+   this lookup) — but **Phase 3's idempotency check must scope by
+   requesting principal, not raw key**.
+3. **The test suite lost hermeticity, undocumented.** Before this branch,
+   `mvn -f Back-end/pom.xml test` was 13 pure Mockito unit tests with no
+   external dependency. 11 of the 13 new tests are `@DataJpaTest` against a
+   live SQL Server `autowash_pro_test`, requiring that database (fully
+   migrated) plus `DB_PASSWORD` in the process environment — intentional,
+   owner-confirmed (no Testcontainers), but this prerequisite currently
+   lives only in the plan document, not in any committed README/AGENTS.md
+   note. **Recommend documenting the test-DB prerequisite** before another
+   contributor hits an unexplained red build on a fresh checkout.
+
+**5 Minor findings**, all confirmed non-blocking: uneven constraint-test
+coverage (`UX_payments_provider_txn` — the exact filtered index Task 1's
+`SET QUOTED_IDENTIFIER ON` fix targeted — has no test proving it actually
+enforces uniqueness; `CK_bays_type`, `UX_bays_branch_code`,
+`CK_slot_reservations_status`, `CK_payments_status` likewise untested;
+reasonable for a repository-layer phase, natural first tests for whichever
+phase starts writing those rows); `slot_reservations.branch_id` duplicates
+`bays.branch_id` with no DB-level guarantee they agree (Phase 3's
+allocation logic must self-enforce this); `IdempotencyRecord`'s
+`customerId`/`guestPhone` are raw fields rather than `@ManyToOne` (the
+plan's one intentional, DDL-driven exception to the object-reference
+convention — not a defect); `application-test.properties` lives under
+`src/main/resources` rather than `src/test/resources`, so it ships inside
+the production jar (no secret leak — the password is the `${DB_PASSWORD}`
+env placeholder — but conventionally belongs under test resources); Phase 1
+is not literally 100% inert — `BaySeeder` is a genuine runtime write
+side-effect on every app boot, within Task 11's explicit scope.
+
+Full review dispatch context, the diff reviewed, and the complete report
+text are preserved in `.superpowers/sdd/progress.md`.
+
 ## Important incident and safeguards
 
 One commit attempt accidentally included the unrelated pre-existing staged
