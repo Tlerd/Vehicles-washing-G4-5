@@ -14,17 +14,11 @@
       "review": "Review",
       "confirm": "Confirm"
     },
-<<<<<<< Updated upstream
-    "success": {
-      "title": "Booking confirmed!",
-      "description": "Your slot has been held. The payOS deposit payment step will be enabled once the back-end integration is complete.",
-=======
     "submitting": "Submitting...",
     "success": {
       "title": "Booking confirmed!",
       "ref": "Booking reference: {{ref}}",
       "description": "Scan the VietQR code above or pay at the counter when you arrive.",
->>>>>>> Stashed changes
       "home": "Go home",
       "again": "Book another"
     }
@@ -35,22 +29,15 @@
     "openHours": "Open {{open}}–{{close}}"
   },
   "service": {
-<<<<<<< Updated upstream
-=======
     "description": "Choose one or more services.",
->>>>>>> Stashed changes
     "loadError": "Couldn't load the service catalog.",
     "selectedSummary": "{{count}} services selected — estimated <bold>from {{amount}}</bold>. Add more services?"
   },
   "dateTime": {
     "branchRequired": "Please choose a branch first.",
     "loadError": "Couldn't load available slots.",
-<<<<<<< Updated upstream
-    "slotInfo": "Each cell is a 15-minute slot.",
-=======
     "slotInfo": "Each cell is a 30-minute slot.",
     "noSlots": "No available slots for this day.",
->>>>>>> Stashed changes
     "requiredSlots": "Your order needs {{count}} consecutive slots",
     "legend": {
       "free": "Available",
@@ -64,22 +51,6 @@
     "unavailable": "Unavailable"
   },
   "vehicle": {
-<<<<<<< Updated upstream
-    "sizeLabel": "Vehicle size",
-    "sizeNote": "Size-based pricing is recalculated in the Review step.",
-    "plateLabel": "License plate",
-    "platePlaceholder": "51K-123.45",
-    "modelLabel": "Vehicle model",
-    "modelPlaceholder": "Toyota Vios",
-    "contactTitle": "Contact information",
-    "nameLabel": "Full name",
-    "namePlaceholder": "Nguyen Van A",
-    "phoneLabel": "Phone number",
-    "phonePlaceholder": "0912345678",
-    "emailLabel": "Email",
-    "emailPlaceholder": "email@example.com",
-    "contactNote": "You can book as a guest, but you won't earn points or use vouchers."
-=======
     "savedTitle": "Saved vehicles",
     "useOtherVehicle": "Use another vehicle (manual entry)",
     "sizeLabel": "Vehicle size",
@@ -89,37 +60,16 @@
     "plateLabel": "License plate",
     "platePlaceholder": "51K-123.45",
     "contactTitle": "Confirmed via your account"
->>>>>>> Stashed changes
   },
   "review": {
     "servicesTitle": "Services",
     "comboBadge": "Combo",
     "total": "Total",
-<<<<<<< Updated upstream
-    "deposit": "Deposit (payOS)",
-=======
->>>>>>> Stashed changes
     "appointmentTitle": "Appointment",
     "branch": "Branch",
     "day": "Day",
     "time": "Time",
     "vehicleSize": "Vehicle size",
-<<<<<<< Updated upstream
-    "plate": "License plate",
-    "model": "Vehicle model",
-    "contactTitle": "Contact",
-    "name": "Full name",
-    "phone": "Phone",
-    "email": "Email"
-  },
-  "confirm": {
-    "paymentTitle": "Deposit payment",
-    "paymentSubtitle": "payOS payment gateway (VietQR)",
-    "totalLabel": "Order total",
-    "depositLabel": "Deposit",
-    "remainingLabel": "Remaining (pay at counter)",
-    "note": "Your slot is held for up to 15 minutes during payment. The live payOS connection will be enabled during back-end integration."
-=======
     "vehicle": "Vehicle",
     "contactTitle": "Contact",
     "name": "Full name",
@@ -131,7 +81,6 @@
     "totalLabel": "Order total",
     "submitError": "Couldn't create the booking, please try again.",
     "note": "Your booking stays pending confirmation until you pay at the counter or via VietQR."
->>>>>>> Stashed changes
   },
   "categoryGrid": {
     "comboGroupTitle": "Combo packages",

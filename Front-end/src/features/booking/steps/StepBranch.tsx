@@ -1,11 +1,7 @@
 import { MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, ErrorState, Skeleton } from '@/components/ui';
-<<<<<<< Updated upstream
-import { useBranches } from '@/lib/mock/api';
-=======
 import { useBranches } from '@/lib/api/bookings';
->>>>>>> Stashed changes
 import { useBookingStore } from '../store';
 
 export function StepBranch() {

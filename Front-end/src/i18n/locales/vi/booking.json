@@ -14,17 +14,11 @@
       "review": "Xem lại",
       "confirm": "Xác nhận"
     },
-<<<<<<< Updated upstream
-    "success": {
-      "title": "Đã ghi nhận lịch hẹn!",
-      "description": "Slot của bạn đã được giữ. Bước thanh toán cọc qua payOS sẽ được kích hoạt khi tích hợp back-end hoàn tất.",
-=======
     "submitting": "Đang gửi...",
     "success": {
       "title": "Đặt lịch thành công!",
       "ref": "Mã đặt lịch: {{ref}}",
       "description": "Quét mã VietQR bên trên hoặc thanh toán tại quầy khi đến chi nhánh.",
->>>>>>> Stashed changes
       "home": "Về trang chủ",
       "again": "Đặt lịch khác"
     }
@@ -35,22 +29,15 @@
     "openHours": "Mở cửa {{open}}–{{close}}"
   },
   "service": {
-<<<<<<< Updated upstream
-=======
     "description": "Chọn một hoặc nhiều dịch vụ.",
->>>>>>> Stashed changes
     "loadError": "Không tải được danh mục dịch vụ.",
     "selectedSummary": "Đã chọn {{count}} dịch vụ — tạm tính <bold>từ {{amount}}</bold>. Chọn thêm dịch vụ khác?"
   },
   "dateTime": {
     "branchRequired": "Vui lòng chọn chi nhánh trước.",
     "loadError": "Không tải được lịch trống.",
-<<<<<<< Updated upstream
-    "slotInfo": "Mỗi ô là 1 slot 15 phút.",
-=======
     "slotInfo": "Mỗi ô là 1 khung giờ 30 phút.",
     "noSlots": "Không còn khung giờ trống cho ngày này.",
->>>>>>> Stashed changes
     "requiredSlots": "Đơn của bạn cần {{count}} slot liên tiếp",
     "legend": {
       "free": "Còn chỗ",
@@ -64,22 +51,6 @@
     "unavailable": "Không khả dụng"
   },
   "vehicle": {
-<<<<<<< Updated upstream
-    "sizeLabel": "Kích cỡ xe",
-    "sizeNote": "Giá dịch vụ theo kích cỡ được tính lại ở bước Xem lại.",
-    "plateLabel": "Biển số xe",
-    "platePlaceholder": "51K-123.45",
-    "modelLabel": "Dòng xe",
-    "modelPlaceholder": "Toyota Vios",
-    "contactTitle": "Thông tin liên hệ",
-    "nameLabel": "Họ tên",
-    "namePlaceholder": "Nguyễn Văn A",
-    "phoneLabel": "Số điện thoại",
-    "phonePlaceholder": "0912345678",
-    "emailLabel": "Email",
-    "emailPlaceholder": "email@example.com",
-    "contactNote": "Đặt với tư cách khách vãng lai được, nhưng sẽ không tích điểm hoặc dùng voucher."
-=======
     "savedTitle": "Xe đã lưu",
     "useOtherVehicle": "Dùng xe khác (nhập tay)",
     "sizeLabel": "Kích cỡ xe",
@@ -89,37 +60,16 @@
     "plateLabel": "Biển số xe",
     "platePlaceholder": "51K-123.45",
     "contactTitle": "Xác nhận bằng tài khoản"
->>>>>>> Stashed changes
   },
   "review": {
     "servicesTitle": "Dịch vụ",
     "comboBadge": "Combo",
     "total": "Tổng cộng",
-<<<<<<< Updated upstream
-    "deposit": "Cọc giữ chỗ (payOS)",
-=======
->>>>>>> Stashed changes
     "appointmentTitle": "Lịch hẹn",
     "branch": "Chi nhánh",
     "day": "Ngày",
     "time": "Giờ",
     "vehicleSize": "Kích cỡ xe",
-<<<<<<< Updated upstream
-    "plate": "Biển số",
-    "model": "Dòng xe",
-    "contactTitle": "Liên hệ",
-    "name": "Họ tên",
-    "phone": "Điện thoại",
-    "email": "Email"
-  },
-  "confirm": {
-    "paymentTitle": "Thanh toán cọc giữ chỗ",
-    "paymentSubtitle": "Cổng thanh toán payOS (VietQR)",
-    "totalLabel": "Tổng đơn",
-    "depositLabel": "Cọc trả trước",
-    "remainingLabel": "Còn lại (trả tại quầy)",
-    "note": "Slot được giữ tối đa 15 phút trong lúc thanh toán. Kết nối payOS thật sẽ được bật ở giai đoạn tích hợp back-end."
-=======
     "vehicle": "Xe",
     "contactTitle": "Liên hệ",
     "name": "Họ tên",
@@ -131,7 +81,6 @@
     "totalLabel": "Tổng đơn",
     "submitError": "Không thể đặt lịch, vui lòng thử lại.",
     "note": "Lịch hẹn sẽ ở trạng thái chờ xác nhận cho đến khi bạn thanh toán tại quầy hoặc quét mã VietQR."
->>>>>>> Stashed changes
   },
   "categoryGrid": {
     "comboGroupTitle": "Gói combo",
