@@ -4,6 +4,7 @@ import com.autowashpro.exception.custom.BadRequestException;
 import com.autowashpro.exception.custom.ConflictException;
 import com.autowashpro.exception.custom.ForbiddenException;
 import com.autowashpro.exception.custom.ResourceNotFoundException;
+import com.autowashpro.exception.custom.TooManyRequestsException;
 import com.autowashpro.exception.custom.UnauthorizedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +50,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<Map<String, Object>> handleForbidden(ForbiddenException ex) {
         return buildAuthStyleError(HttpStatus.FORBIDDEN, ex.getMessage());
+    }
+
+    @ExceptionHandler(TooManyRequestsException.class)
+    public ResponseEntity<Map<String, Object>> handleTooManyRequests(TooManyRequestsException ex) {
+        return buildAuthStyleError(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
