@@ -25,7 +25,6 @@ public class CustomerRequest {
     @Size(max = 100, message = "Email không được vượt quá 100 ký tự")
     private String email;
 
-    private String passwordHash;
     private String tier;
     private Integer accumulatedPoints;
     private BigDecimal totalSpent;

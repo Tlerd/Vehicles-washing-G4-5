@@ -1,5 +1,0 @@
-import type { CustomerTier } from '../../types';
-export interface Campaign {id?:string;title:string;description:string;discount:string;validUntil:string;bgGradient:string;icon:string;targetTier:CustomerTier|'ALL';kmMultiplier:number;isActive:boolean;createdAt?:string;}
-export function generateCampaignDraft({goal,targetTier,discountPercent,validUntil}:{goal:string;targetTier:CustomerTier|'ALL';discountPercent:number;validUntil:string}):Campaign{return {title:`${targetTier} AutoWash Boost`,description:`${discountPercent}% reward campaign to ${goal.charAt(0).toLowerCase()+goal.slice(1)}`,discount:`${discountPercent}% BONUS`,validUntil,bgGradient:'linear-gradient(135deg, #0b7f86, #18344f)',icon:'sparkles',targetTier,kmMultiplier:1+discountPercent/100,isActive:false};}
-export const publishCampaign=<T extends Campaign>(campaign:T):T=>({...campaign,isActive:true});
-export function getActivePromotionsForTier(items:Campaign[],tier:CustomerTier,date:string){return items.filter(p=>p.isActive&&p.validUntil>=date&&(p.targetTier==='ALL'||p.targetTier===tier));}

@@ -1,0 +1,99 @@
+{
+  "wizard": {
+    "homeAriaLabel": "Go to homepage",
+    "stepCounter": "Step {{current}}/{{total}}",
+    "back": "Back",
+    "continue": "Continue",
+    "confirmBooking": "Confirm booking",
+    "cartTotalLabel": "Total:",
+    "steps": {
+      "branch": "Branch",
+      "service": "Services",
+      "dateTime": "Date & time",
+      "vehicle": "Vehicle",
+      "review": "Review",
+      "confirm": "Confirm"
+    },
+    "success": {
+      "title": "Booking confirmed!",
+      "description": "Your slot has been held. The payOS deposit payment step will be enabled once the back-end integration is complete.",
+      "home": "Go home",
+      "again": "Book another"
+    }
+  },
+  "branch": {
+    "description": "Choose the branch closest to you.",
+    "loadError": "Couldn't load the list of branches.",
+    "openHours": "Open {{open}}–{{close}}"
+  },
+  "service": {
+    "loadError": "Couldn't load the service catalog.",
+    "selectedSummary": "{{count}} services selected — estimated <bold>from {{amount}}</bold>. Add more services?"
+  },
+  "dateTime": {
+    "branchRequired": "Please choose a branch first.",
+    "loadError": "Couldn't load available slots.",
+    "slotInfo": "Each cell is a 15-minute slot.",
+    "requiredSlots": "Your order needs {{count}} consecutive slots",
+    "legend": {
+      "free": "Available",
+      "held": "On hold",
+      "full": "Full"
+    }
+  },
+  "weekGrid": {
+    "hourColumn": "Time",
+    "remainingSlots": "{{count}} spots left",
+    "unavailable": "Unavailable"
+  },
+  "vehicle": {
+    "sizeLabel": "Vehicle size",
+    "sizeNote": "Size-based pricing is recalculated in the Review step.",
+    "plateLabel": "License plate",
+    "platePlaceholder": "51K-123.45",
+    "modelLabel": "Vehicle model",
+    "modelPlaceholder": "Toyota Vios",
+    "contactTitle": "Contact information",
+    "nameLabel": "Full name",
+    "namePlaceholder": "Nguyen Van A",
+    "phoneLabel": "Phone number",
+    "phonePlaceholder": "0912345678",
+    "emailLabel": "Email",
+    "emailPlaceholder": "email@example.com",
+    "contactNote": "You can book as a guest, but you won't earn points or use vouchers."
+  },
+  "review": {
+    "servicesTitle": "Services",
+    "comboBadge": "Combo",
+    "total": "Total",
+    "deposit": "Deposit (payOS)",
+    "appointmentTitle": "Appointment",
+    "branch": "Branch",
+    "day": "Day",
+    "time": "Time",
+    "vehicleSize": "Vehicle size",
+    "plate": "License plate",
+    "model": "Vehicle model",
+    "contactTitle": "Contact",
+    "name": "Full name",
+    "phone": "Phone",
+    "email": "Email"
+  },
+  "confirm": {
+    "paymentTitle": "Deposit payment",
+    "paymentSubtitle": "payOS payment gateway (VietQR)",
+    "totalLabel": "Order total",
+    "depositLabel": "Deposit",
+    "remainingLabel": "Remaining (pay at counter)",
+    "note": "Your slot is held for up to 15 minutes during payment. The live payOS connection will be enabled during back-end integration."
+  },
+  "categoryGrid": {
+    "comboGroupTitle": "Combo packages",
+    "singleGroupTitle": "Individual services"
+  },
+  "picker": {
+    "closeAriaLabel": "Close",
+    "doneButton": "Done",
+    "fromPrefix": "from"
+  }
+}

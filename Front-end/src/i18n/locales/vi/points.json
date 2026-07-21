@@ -1,0 +1,18 @@
+{
+  "title": "Điểm thưởng",
+  "tier": {
+    "currentLabel": "Hạng hiện tại",
+    "pointsBadge": "{{points}} điểm",
+    "progressToNext": "Cần thêm {{remaining}} điểm để lên hạng {{next}}",
+    "maxTier": "Hạng cao nhất",
+    "loadError": "Không thể tải thông tin điểm thưởng. Vui lòng thử lại."
+  },
+  "history": {
+    "title": "Lịch sử điểm",
+    "loadError": "Không thể tải lịch sử điểm. Vui lòng thử lại.",
+    "empty": {
+      "title": "Chưa có lịch sử điểm",
+      "description": "Điểm thưởng của bạn sẽ xuất hiện tại đây sau khi hoàn thành đơn rửa xe."
+    }
+  }
+}

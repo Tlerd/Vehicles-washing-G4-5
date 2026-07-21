@@ -1,0 +1,42 @@
+{
+  "title": "Xe của tôi",
+  "description": "Quản lý danh sách xe để đặt lịch nhanh hơn ở những lần sau.",
+  "addButton": "Thêm xe",
+  "loadError": "Không tải được danh sách xe.",
+  "empty": {
+    "title": "Chưa có xe nào",
+    "description": "Thêm xe của bạn để lần đặt lịch tiếp theo được điền sẵn thông tin."
+  },
+  "sizes": {
+    "HATCHBACK": "Hatchback",
+    "SEDAN": "Sedan",
+    "SUV": "SUV/Crossover",
+    "PICKUP": "Bán tải"
+  },
+  "card": {
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "deleteConfirm": "Xóa xe này?",
+    "deleteError": "Không xóa được xe. Vui lòng thử lại.",
+    "cancelAriaLabel": "Hủy xóa",
+    "confirmDeleteAriaLabel": "Xác nhận xóa",
+    "defaultBadge": "Mặc định"
+  },
+  "form": {
+    "addTitle": "Thêm xe mới",
+    "editTitle": "Sửa thông tin xe",
+    "closeAriaLabel": "Đóng",
+    "brandLabel": "Hãng xe",
+    "brandRequired": "Vui lòng chọn hãng xe.",
+    "plateLabel": "Biển số xe",
+    "platePlaceholder": "51K-123.45",
+    "plateRequired": "Vui lòng nhập biển số xe.",
+    "sizeLabel": "Loại xe",
+    "notesLabel": "Ghi chú (không bắt buộc)",
+    "notesPlaceholder": "VD: Vios đời 2022, màu bạc",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "saving": "Đang lưu…",
+    "saveError": "Không lưu được. Vui lòng thử lại."
+  }
+}

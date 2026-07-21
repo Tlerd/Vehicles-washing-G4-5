@@ -7,6 +7,7 @@ import { isFirebaseConfigured, sendOtp, confirmOtp, signInWithGoogle } from '@/l
 import { toE164 } from '@/lib/phone';
 import { cn } from '@/lib/utils';
 import { useAuth } from '../AuthContext';
+import { roleHomePath } from '../roleNavigation';
 import { login as loginRequest, register as registerRequest } from '@/lib/api/auth';
 import { ApiError } from '@/lib/api/client';
 
@@ -30,8 +31,7 @@ export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, setSession } = useAuth();
-  const navState = location.state as { from?: { pathname: string }; mode?: Mode } | null;
-  const redirectTo = navState?.from?.pathname ?? '/app';
+  const navState = location.state as { mode?: Mode } | null;
 
   const [mode, setMode] = useState<Mode>(navState?.mode ?? 'login');
   const [error, setError] = useState<string | null>(null);
@@ -62,8 +62,8 @@ export function LoginPage() {
     setError(null);
     setBusy(true);
     try {
-      await login(loginPhone, loginPassword);
-      navigate(redirectTo, { replace: true });
+      const customer = await login(loginPhone, loginPassword);
+      navigate(roleHomePath(customer.role), { replace: true });
     } catch (err) {
       setError(friendlyError(err));
     } finally {
@@ -147,7 +147,7 @@ export function LoginPage() {
       // Register doesn't return a session token itself — log in right after.
       const result = await loginRequest(regPhone, password);
       setSession(result.token, result.customer);
-      navigate(redirectTo, { replace: true });
+      navigate(roleHomePath(result.customer.role), { replace: true });
     } catch (err) {
       setError(friendlyError(err));
     } finally {
@@ -357,7 +357,7 @@ export function LoginPage() {
         )}
 
         <button
-          onClick={() => navigate('/booking')}
+          onClick={() => navigate('/guest/booking')}
           className="mt-6 w-full text-center text-sm text-primary hover:underline"
         >
           Đặt lịch không cần tài khoản

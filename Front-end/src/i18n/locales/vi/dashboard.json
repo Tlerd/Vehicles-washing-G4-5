@@ -1,0 +1,40 @@
+{
+  "greeting": "Xin chào, {{name}}!",
+  "subtitle": "Quản lý xe, lịch hẹn và ưu đãi của bạn tại một nơi.",
+  "tier": {
+    "title": "Hạng thành viên",
+    "pointsLabel": "điểm",
+    "toNextTier": "Còn {{points}} điểm để lên hạng {{tier}}",
+    "maxTierReached": "Bạn đã đạt hạng cao nhất!"
+  },
+  "upcoming": {
+    "title": "Lịch hẹn sắp tới",
+    "viewDetail": "Xem chi tiết",
+    "dateTime": "{{date}} · {{time}}",
+    "empty": {
+      "title": "Chưa có lịch hẹn nào",
+      "description": "Đặt lịch rửa xe ngay để giữ xe luôn sạch bóng."
+    }
+  },
+  "cta": {
+    "newBooking": "Đặt lịch mới"
+  },
+  "quickLinks": {
+    "title": "Truy cập nhanh",
+    "garage": { "title": "Xe của tôi", "description": "Quản lý danh sách xe" },
+    "points": { "title": "Điểm thưởng", "description": "Xem lịch sử tích điểm" },
+    "vouchers": { "title": "Voucher", "description": "Đổi điểm lấy ưu đãi" },
+    "history": { "title": "Lịch sử", "description": "Xem các lượt rửa xe trước" }
+  },
+  "status": {
+    "CONFIRMED": "Đã xác nhận",
+    "CHECKED_IN": "Đã check-in",
+    "COMPLETED": "Hoàn thành",
+    "NO_SHOW": "Không đến",
+    "CHANGE_REQUESTED": "Yêu cầu đổi lịch"
+  },
+  "errors": {
+    "profile": "Không thể tải thông tin khách hàng. Vui lòng thử lại.",
+    "bookings": "Không thể tải lịch sử đặt lịch. Vui lòng thử lại."
+  }
+}

@@ -1,0 +1,71 @@
+/* LAYER 2 · SEMANTIC — maps palette (Layer 1) into Tailwind theme tokens.
+   Components reference ONLY these (bg-primary, text-text-primary, ...). */
+@theme {
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --color-background: var(--p-bg);
+  --color-surface: var(--p-surface);
+  --color-surface-soft: var(--p-surface-soft);
+  --color-primary: var(--p-brand-500);
+  --color-primary-dark: var(--p-brand-600);
+  --color-primary-light: var(--p-brand-50);
+  --color-text-primary: var(--p-neutral-900);
+  --color-text-secondary: var(--p-neutral-600);
+  --color-text-muted: var(--p-neutral-500);
+  --color-border: var(--p-border);
+  --color-success: var(--p-green-500);
+  --color-warning: var(--p-amber-500);
+  --color-danger: var(--p-red-500);
+
+  --color-slot-free: var(--p-slot-free);
+  --color-slot-held: var(--p-slot-held);
+  --color-slot-full: var(--p-slot-full);
+  --color-slot-picked: var(--p-slot-picked);
+}
+
+@layer utilities {
+  .primary-gradient {
+    background: linear-gradient(
+      135deg,
+      var(--p-brand-gradient-from) 0%,
+      var(--p-brand-gradient-to) 100%
+    );
+  }
+  .shadow-primary-btn {
+    box-shadow: 0 10px 25px rgba(14, 165, 233, 0.22);
+  }
+}
+
+@layer base {
+  body {
+    font-family: var(--font-body);
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 100px;
+  }
+}
+
+@keyframes float-bubble {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+@keyframes soft-pulse {
+  0%, 100% { opacity: 0.45; transform: scale(1); }
+  50% { opacity: 0.75; transform: scale(1.08); }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-float-bubble { animation: float-bubble 5s ease-in-out infinite; }
+.animate-soft-pulse { animation: soft-pulse 3s ease-in-out infinite; }
+.animate-fade-up { animation: fade-up 0.7s ease-out forwards; }

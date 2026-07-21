@@ -1,0 +1,16 @@
+/* LAYER 3 · DENSITY — one component set, two contexts (D-24).
+   comfortable = customer flow · compact = admin / counter / week grid. */
+[data-density="comfortable"] {
+  --d-radius-card: 16px;
+  --d-radius-btn: 12px;
+  --d-row-h: 48px;
+  --d-pad-card: 20px;
+  --d-font: 16px;
+}
+[data-density="compact"] {
+  --d-radius-card: 6px;
+  --d-radius-btn: 6px;
+  --d-row-h: 36px;
+  --d-pad-card: 12px;
+  --d-font: 14px;
+}

@@ -1,0 +1,99 @@
+{
+  "wizard": {
+    "homeAriaLabel": "Về trang chủ",
+    "stepCounter": "Bước {{current}}/{{total}}",
+    "back": "Quay lại",
+    "continue": "Tiếp tục",
+    "confirmBooking": "Xác nhận đặt lịch",
+    "cartTotalLabel": "Tổng:",
+    "steps": {
+      "branch": "Chi nhánh",
+      "service": "Dịch vụ",
+      "dateTime": "Ngày giờ",
+      "vehicle": "Chọn xe",
+      "review": "Xem lại",
+      "confirm": "Xác nhận"
+    },
+    "success": {
+      "title": "Đã ghi nhận lịch hẹn!",
+      "description": "Slot của bạn đã được giữ. Bước thanh toán cọc qua payOS sẽ được kích hoạt khi tích hợp back-end hoàn tất.",
+      "home": "Về trang chủ",
+      "again": "Đặt lịch khác"
+    }
+  },
+  "branch": {
+    "description": "Chọn chi nhánh gần bạn nhất.",
+    "loadError": "Không tải được danh sách chi nhánh.",
+    "openHours": "Mở cửa {{open}}–{{close}}"
+  },
+  "service": {
+    "loadError": "Không tải được danh mục dịch vụ.",
+    "selectedSummary": "Đã chọn {{count}} dịch vụ — tạm tính <bold>từ {{amount}}</bold>. Chọn thêm dịch vụ khác?"
+  },
+  "dateTime": {
+    "branchRequired": "Vui lòng chọn chi nhánh trước.",
+    "loadError": "Không tải được lịch trống.",
+    "slotInfo": "Mỗi ô là 1 slot 15 phút.",
+    "requiredSlots": "Đơn của bạn cần {{count}} slot liên tiếp",
+    "legend": {
+      "free": "Còn chỗ",
+      "held": "Đang giữ",
+      "full": "Hết chỗ"
+    }
+  },
+  "weekGrid": {
+    "hourColumn": "Giờ",
+    "remainingSlots": "Còn {{count}} chỗ",
+    "unavailable": "Không khả dụng"
+  },
+  "vehicle": {
+    "sizeLabel": "Kích cỡ xe",
+    "sizeNote": "Giá dịch vụ theo kích cỡ được tính lại ở bước Xem lại.",
+    "plateLabel": "Biển số xe",
+    "platePlaceholder": "51K-123.45",
+    "modelLabel": "Dòng xe",
+    "modelPlaceholder": "Toyota Vios",
+    "contactTitle": "Thông tin liên hệ",
+    "nameLabel": "Họ tên",
+    "namePlaceholder": "Nguyễn Văn A",
+    "phoneLabel": "Số điện thoại",
+    "phonePlaceholder": "0912345678",
+    "emailLabel": "Email",
+    "emailPlaceholder": "email@example.com",
+    "contactNote": "Đặt với tư cách khách vãng lai được, nhưng sẽ không tích điểm hoặc dùng voucher."
+  },
+  "review": {
+    "servicesTitle": "Dịch vụ",
+    "comboBadge": "Combo",
+    "total": "Tổng cộng",
+    "deposit": "Cọc giữ chỗ (payOS)",
+    "appointmentTitle": "Lịch hẹn",
+    "branch": "Chi nhánh",
+    "day": "Ngày",
+    "time": "Giờ",
+    "vehicleSize": "Kích cỡ xe",
+    "plate": "Biển số",
+    "model": "Dòng xe",
+    "contactTitle": "Liên hệ",
+    "name": "Họ tên",
+    "phone": "Điện thoại",
+    "email": "Email"
+  },
+  "confirm": {
+    "paymentTitle": "Thanh toán cọc giữ chỗ",
+    "paymentSubtitle": "Cổng thanh toán payOS (VietQR)",
+    "totalLabel": "Tổng đơn",
+    "depositLabel": "Cọc trả trước",
+    "remainingLabel": "Còn lại (trả tại quầy)",
+    "note": "Slot được giữ tối đa 15 phút trong lúc thanh toán. Kết nối payOS thật sẽ được bật ở giai đoạn tích hợp back-end."
+  },
+  "categoryGrid": {
+    "comboGroupTitle": "Gói combo",
+    "singleGroupTitle": "Dịch vụ đơn"
+  },
+  "picker": {
+    "closeAriaLabel": "Đóng",
+    "doneButton": "Xong",
+    "fromPrefix": "từ"
+  }
+}
