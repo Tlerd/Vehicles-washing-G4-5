@@ -61,6 +61,25 @@
   fix, sitting in the same file; separated into its own accurately-labeled
   commit rather than silently absorbed into Task 2's.
 
+  A final whole-branch review (opus, full 13-commit Phase 2 diff) returned
+  **Ready to merge** — no Critical findings. It traced the full composed
+  call chain end-to-end (`issueProof` → `consumeProofForLookup`/
+  `consumeProofForPhone` → `authorize()`) and confirmed every one of the
+  plan's "Frozen decision" sections holds in the actual diff, not just on
+  paper. It raised 1 Important finding, binding on whichever phase adds a
+  real consumption endpoint (not a Phase 2 defect — unreachable today with
+  no controller in place): `RateLimiter` never evicts entries, and
+  `consumeProofForPhone`/`consumeProofForLookup` key on
+  attacker-suppliable proof tokens — once a real HTTP endpoint exists, a
+  flood of distinct garbage tokens grows the in-memory rate-limiter map
+  without bound (unbounded-memory DoS). The controller phase must add
+  stale-window eviction or a bounded cache before exposing consumption
+  externally. 5 Minor notes recorded, including a recommendation to switch
+  `consumeProofForLookup`/`consumeProofForPhone` to
+  `Propagation.REQUIRES_NEW` as belt-and-suspenders once a controller
+  exists, so the single-use burn stays durable regardless of future caller
+  transaction context (today's non-`@Transactional` `authorize()` design is
+  correct, but entirely contingent on that invariant never being violated).
   Full findings, the complete investigation/review trail, and per-task
   evidence are recorded in `.superpowers/sdd/progress.md` and
   `docs/ai-logs/m1/2026-07-22-fr004v2-phase2-guest-verification.md`.

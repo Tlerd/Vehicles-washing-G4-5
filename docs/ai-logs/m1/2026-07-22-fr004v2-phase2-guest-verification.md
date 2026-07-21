@@ -261,12 +261,79 @@ New from Phase 2:
   for an even larger fraction of the suite (`@SpringBootTest` tests in
   addition to `@DataJpaTest` ones).
 
+## Final whole-branch review
+
+After all 9 application-code tasks and Task 10 were done, a final
+whole-branch review was dispatched on the most capable available model
+(opus), covering the complete Phase 2 diff as one unit (13 commits,
+`475619d..5386f26` — the range starting right after Phase 1's own final
+review commit). Its job was different from the per-task reviews: verify
+the two security-fix outcomes (Task 6's `issueProof` reordering, Task 9's
+non-transactional `authorize()`) hold not just individually but as a
+*composed system* end-to-end, check the `@Transactional` layering across
+repository + service + the deliberately-non-transactional primitive is
+consistent, and confirm every one of the plan's "Frozen decision" sections
+is actually honored in the diff, not just designed correctly on paper.
+
+**Verdict: Ready to merge.** No Critical findings. The reviewer traced the
+full call chain `issueProof` → `consumeProofForLookup`/`consumeProofForPhone`
+→ `authorize()` and confirmed it delivers every Global Constraint promise
+(never trusts a client-claimed phone — the lookup path derives phone from
+the stored proof row, never caller input; opaque/single-use/replay-resistant
+— proven concurrently and durably-across-exceptions; no enumeration — all
+six consumption failures collapse to one message, and the 404-vs-403
+booking distinction is only reachable after a proof burn). Confirmed the
+`@Transactional` layering (repository-level + service-level `REQUIRED`,
+both nesting harmlessly; `authorize()` correctly non-transactional) is
+consistent, not conflicting. Confirmed the 3-key rate-limiter set
+(`"issue|"+verifiedPhone+"|"+purpose`, `"consume|"+proofToken`,
+`"lookup|"+proofToken`) has no bypass or cross-flow budget theft. Confirmed
+test-isolation between `@DataJpaTest` (auto-rollback) and the two
+`@SpringBootTest` tests (manual UUID-scoped cleanup) cannot pollute shared
+state across a full `mvn test` run. Confirmed the 59/59 (26+33) evidence is
+internally consistent with the diff.
+
+**1 Important finding** — explicitly *not* a Phase 2 defect; binding design
+input for whichever later phase adds a real consumption endpoint:
+
+1. **`RateLimiter` never evicts entries, and the consumption-side limiters
+   are keyed on attacker-suppliable proof tokens.**
+   `consumeProofForPhone`/`consumeProofForLookup` key on
+   `"consume|"+proofToken` / `"lookup|"+proofToken` — any non-blank token
+   reaches `rateLimiter.tryConsume` *before* the DB check. Not reachable
+   today (no controller exists to accept external tokens), but once a real
+   HTTP endpoint is wired, a flood of distinct garbage tokens would grow
+   the in-memory map without bound — an unbounded-memory DoS. **The
+   controller phase must add stale-window eviction or a bounded cache
+   before exposing proof consumption externally.**
+
+**5 Minor findings**, all recorded, none blocking: (1) `consumeProofForLookup`'s
+replay-safety is correct today but entirely contingent on the "never wrap
+`authorize()` in an outer `@Transactional`" invariant holding forever —
+recommend `Propagation.REQUIRES_NEW` on `consumeProofForLookup`/
+`consumeProofForPhone` as belt-and-suspenders once a controller exists, so
+the burn stays durable regardless of future caller transaction context;
+(2) a test-count bookkeeping nuance (34 `@Test` methods added in-diff vs
+"33 new" in the evidence above) fully explained by the FR-003 incident's
+`handleForbidden` test landing inside the review range — not an integrity
+problem; (3) `PhoneNormalizer`'s distinct format-error messages on the
+caller's own phone input (restated from Task 7's own Minor finding); (4)
+`application-test.properties` remains under `src/main/resources` rather
+than `src/test/resources` (a Phase 1 finding, now extended with the Hikari
+pool-size line); (5) `mvn test` now boots the full Spring context via
+`@SpringBootTest`, running Phase 1's `BaySeeder`/`SystemAccountSeeder`
+against `autowash_pro_test` (idempotent and harmless, but widens the
+suite's live-DB coupling further, extending Phase 1's already-flagged
+non-hermeticity).
+
 ## Evidence status
 
-This log records Phase 2 as fully implemented, committed, and reviewed,
-with live SQL Server evidence and a clean full-suite run. **Do not claim
-the Backend + Swagger gate has passed** — Phase 2 added no HTTP endpoint at
-all. Guest booking creation (which must resolve the `vehicle_id` gap
-above), the real proof-issuance and booking-lookup controllers, VNPAY,
-slot/bay allocation, RBAC, and Swagger completion all remain outstanding,
-each requiring its own plan before implementation starts.
+This log records Phase 2 as fully implemented, committed, reviewed, and
+having passed its final whole-branch review, with live SQL Server evidence
+and a clean full-suite run. **Do not claim the Backend + Swagger gate has
+passed** — Phase 2 added no HTTP endpoint at all. Guest booking creation
+(which must resolve the `vehicle_id` gap above), the real proof-issuance
+and booking-lookup controllers (which must also resolve the RateLimiter
+unbounded-growth finding above), VNPAY, slot/bay allocation, RBAC, and
+Swagger completion all remain outstanding, each requiring its own plan
+before implementation starts.
