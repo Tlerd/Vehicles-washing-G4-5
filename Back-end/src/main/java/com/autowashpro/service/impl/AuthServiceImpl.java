@@ -14,10 +14,10 @@ import com.autowashpro.exception.custom.UnauthorizedException;
 import com.autowashpro.repository.CustomerRepository;
 import com.autowashpro.repository.VoucherRepository;
 import com.autowashpro.service.AuthService;
+import com.autowashpro.service.FirebaseTokenVerifier;
+import com.autowashpro.service.VerifiedFirebaseIdentity;
 import com.autowashpro.utils.PhoneNormalizer;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.FirebaseToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,16 +34,19 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final VoucherRepository voucherRepository;
+    private final FirebaseTokenVerifier firebaseTokenVerifier;
 
     public AuthServiceImpl(
             CustomerRepository customerRepository,
             PasswordEncoder passwordEncoder,
             JwtTokenProvider jwtTokenProvider,
-            VoucherRepository voucherRepository) {
+            VoucherRepository voucherRepository,
+            FirebaseTokenVerifier firebaseTokenVerifier) {
         this.customerRepository = customerRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
         this.voucherRepository = voucherRepository;
+        this.firebaseTokenVerifier = firebaseTokenVerifier;
     }
 
     @Override
@@ -52,31 +55,41 @@ public class AuthServiceImpl implements AuthService {
         String phone = PhoneNormalizer.toE164(request.getPhone());
 
         if (customerRepository.existsByPhone(phone)) {
-            throw new ConflictException("Phone number already registered.");
+            throw new ConflictException("Số điện thoại đã được đăng ký.");
         }
 
+        VerifiedFirebaseIdentity identity;
         try {
-            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(request.getFirebaseToken());
-            String verifiedPhone = (String) decodedToken.getClaims().get("phone_number");
-
-            if (verifiedPhone == null) {
-                throw new BadRequestException("Mã xác minh của Firebase không chứa số điện thoại.");
-            }
-
-            String requestPhone = PhoneNormalizer.toE164(phone);
-            String firebaseVerifiedPhone = PhoneNormalizer.toE164(verifiedPhone);
-
-            if (!requestPhone.equals(firebaseVerifiedPhone)) {
-                throw new BadRequestException("Số điện thoại đăng ký không trùng khớp với số điện thoại xác minh trên Firebase.");
-            }
+            identity = firebaseTokenVerifier.verify(request.getFirebaseToken());
         } catch (FirebaseAuthException e) {
             throw new BadRequestException("Mã xác thực Firebase đã hết hạn hoặc không hợp lệ: " + e.getMessage());
+        }
+
+        String email = request.getEmail();
+
+        if (identity.phoneNumber() != null) {
+            String firebaseVerifiedPhone = PhoneNormalizer.toE164(identity.phoneNumber());
+
+            if (!phone.equals(firebaseVerifiedPhone)) {
+                throw new BadRequestException("Số điện thoại đăng ký không trùng khớp với số điện thoại xác minh trên Firebase.");
+            }
+        } else if (identity.email() != null) {
+            if (email != null && !email.isBlank() && !email.trim().equalsIgnoreCase(identity.email())) {
+                throw new BadRequestException("Email đăng ký không trùng khớp với email xác minh trên Google.");
+            }
+            email = identity.email();
+        } else {
+            throw new BadRequestException("Mã xác minh của Firebase không chứa số điện thoại hoặc email.");
+        }
+
+        if (email != null && !email.isBlank() && customerRepository.existsByEmail(email)) {
+            throw new ConflictException("Email đã được đăng ký.");
         }
 
         Customer customer = new Customer();
         customer.setFullName(request.getName());
         customer.setPhone(phone);
-        customer.setEmail(request.getEmail());
+        customer.setEmail(email);
         customer.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         customer.setTier("Member");
         customer.setRole("CUSTOMER");

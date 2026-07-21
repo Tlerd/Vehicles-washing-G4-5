@@ -1,0 +1,2856 @@
+{
+  "version": "2.9.4",
+  "kind": "domain",
+  "project": {
+    "name": "AutoWash Pro",
+    "root": ".",
+    "languages": [
+      "html",
+      "java",
+      "javascript",
+      "json",
+      "markdown",
+      "properties",
+      "sql",
+      "txt",
+      "typescript",
+      "unknown",
+      "xml"
+    ],
+    "frameworks": [
+      "React",
+      "React Router",
+      "Vite",
+      "TypeScript",
+      "Tailwind CSS",
+      "Axios",
+      "Firebase",
+      "Spring Boot",
+      "Spring Web",
+      "Spring Data JPA",
+      "Spring Security",
+      "Hibernate",
+      "JUnit",
+      "Lombok",
+      "MapStruct",
+      "SpringDoc OpenAPI"
+    ],
+    "fileCount": 195
+  },
+  "nodes": [
+    {
+      "id": "domain:identity-and-access",
+      "type": "domain",
+      "name": "Identity and Access",
+      "summary": "Owns customer self-registration via Firebase phone OTP, password login issuing a JWT, and the role model (CUSTOMER, STAFF, ADMIN) that decides which of the three portals a signed-in user reaches. Real enforcement is server-side in SecurityConfig and JwtAuthenticationFilter; the frontend role routing is presentation only. Built-in admin and staff accounts are created at startup by SystemAccountSeeder.",
+      "tags": [
+        "auth",
+        "jwt",
+        "otp",
+        "rbac",
+        "security-sensitive"
+      ],
+      "complexity": "complex",
+      "domainMeta": {
+        "entities": [
+          "Customer",
+          "Role (CUSTOMER/STAFF/ADMIN)",
+          "JWT token"
+        ],
+        "businessRules": [
+          "Phone numbers are normalized before lookup and duplicate phones are rejected at registration",
+          "Registration requires a Firebase OTP token that matches the submitted phone",
+          "Passwords are stored hashed, never in plaintext",
+          "Role determines the landing portal: ADMIN to /admin, STAFF to /counter, CUSTOMER to /app",
+          "Frontend route guards are cosmetic; the JWT filter is the enforcing boundary"
+        ],
+        "crossDomainInteractions": [
+          "Supplies the authenticated caller id that Booking, Loyalty and Vehicle flows scope their data to",
+          "Gates the admin reporting surface to ADMIN and the counter queue to STAFF"
+        ]
+      }
+    },
+    {
+      "id": "flow:customer-registration",
+      "type": "flow",
+      "name": "Customer Registration with Phone OTP",
+      "summary": "A prospective customer registers by phone: the frontend sends a Firebase SMS OTP, the user enters the six-digit code, and the resulting Firebase ID token is posted to the Spring backend, which verifies the token matches the phone before persisting the customer.",
+      "tags": [
+        "auth",
+        "otp",
+        "firebase",
+        "trust-boundary"
+      ],
+      "complexity": "complex",
+      "domainMeta": {
+        "entryPoint": "POST /api/auth/register",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "step:customer-registration:fill-registration-form",
+      "type": "step",
+      "name": "Fill and validate registration form",
+      "summary": "RegisterForm validates name, phone, email and password against field patterns before submission.",
+      "tags": [
+        "validation",
+        "ui"
+      ],
+      "complexity": "simple",
+      "filePath": "Front-end/src/features/customer/components/RegisterForm.tsx",
+      "lineRange": [
+        16,
+        179
+      ]
+    },
+    {
+      "id": "step:customer-registration:send-firebase-otp",
+      "type": "step",
+      "name": "Send Firebase SMS OTP",
+      "summary": "useCustomerRegister normalizes the phone to E.164, triggers a Firebase SMS OTP and stashes the pending registration.",
+      "tags": [
+        "otp",
+        "firebase"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/features/customer/hooks/use-auth.ts",
+      "lineRange": [
+        7,
+        41
+      ]
+    },
+    {
+      "id": "step:customer-registration:verify-otp-code",
+      "type": "step",
+      "name": "Verify OTP code",
+      "summary": "VerifyOtpForm manages the six digit inputs, resend countdown and reCAPTCHA lifecycle, then confirms the code.",
+      "tags": [
+        "otp",
+        "ui"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/features/customer/components/VerifyOtpForm.tsx",
+      "lineRange": [
+        19,
+        190
+      ]
+    },
+    {
+      "id": "step:customer-registration:exchange-id-token",
+      "type": "step",
+      "name": "Exchange OTP result for backend registration",
+      "summary": "useVerifyCustomerOtp confirms against the Firebase confirmationResult, obtains an ID token and calls AuthContext register.",
+      "tags": [
+        "otp",
+        "firebase"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/features/customer/hooks/use-auth.ts",
+      "lineRange": [
+        68,
+        108
+      ]
+    },
+    {
+      "id": "step:customer-registration:register-endpoint",
+      "type": "step",
+      "name": "Accept registration request",
+      "summary": "AuthController register handles the endpoint and returns HTTP 201 with the created customer id.",
+      "tags": [
+        "api",
+        "controller"
+      ],
+      "complexity": "simple",
+      "filePath": "Back-end/src/main/java/com/autowashpro/controller/AuthController.java",
+      "lineRange": [
+        29,
+        34
+      ]
+    },
+    {
+      "id": "step:customer-registration:persist-customer",
+      "type": "step",
+      "name": "Verify OTP token and persist customer",
+      "summary": "AuthServiceImpl register normalizes the phone, rejects duplicates, verifies the Firebase OTP token matches the phone, and persists the customer with a hashed password.",
+      "tags": [
+        "security-sensitive",
+        "trust-boundary",
+        "persistence"
+      ],
+      "complexity": "complex",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/impl/AuthServiceImpl.java",
+      "lineRange": [
+        49,
+        94
+      ]
+    },
+    {
+      "id": "flow:password-login",
+      "type": "flow",
+      "name": "Password Login and Session Establishment",
+      "summary": "An existing user signs in with phone and password; the backend verifies the hash and issues a JWT, which the frontend persists and attaches to every subsequent request through the shared Axios instance.",
+      "tags": [
+        "auth",
+        "jwt",
+        "session",
+        "trust-boundary"
+      ],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "POST /api/auth/login",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "step:password-login:submit-credentials",
+      "type": "step",
+      "name": "Submit credentials from login page",
+      "summary": "LoginPage orchestrates role selection and password login, then navigates to the destination route for the role.",
+      "tags": [
+        "ui",
+        "auth"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/features/customer/pages/LoginPage.tsx",
+      "lineRange": [
+        17,
+        360
+      ]
+    },
+    {
+      "id": "step:password-login:login-endpoint",
+      "type": "step",
+      "name": "Handle login endpoint",
+      "summary": "AuthController login returns the JWT token and customer profile on success.",
+      "tags": [
+        "api",
+        "controller"
+      ],
+      "complexity": "simple",
+      "filePath": "Back-end/src/main/java/com/autowashpro/controller/AuthController.java",
+      "lineRange": [
+        36,
+        41
+      ]
+    },
+    {
+      "id": "step:password-login:verify-password",
+      "type": "step",
+      "name": "Verify password and issue JWT",
+      "summary": "AuthServiceImpl login looks up the customer by normalized phone, verifies the password hash and returns a freshly issued JWT with the profile.",
+      "tags": [
+        "security-sensitive",
+        "jwt"
+      ],
+      "complexity": "moderate",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/impl/AuthServiceImpl.java",
+      "lineRange": [
+        96,
+        123
+      ]
+    },
+    {
+      "id": "step:password-login:normalize-user",
+      "type": "step",
+      "name": "Normalize login response to User shape",
+      "summary": "mapLoginCustomer coerces id and loyalty-point fields into the frontend User shape.",
+      "tags": [
+        "mapping"
+      ],
+      "complexity": "simple",
+      "filePath": "Front-end/src/services/customer/auth.service.ts",
+      "lineRange": [
+        40,
+        50
+      ]
+    },
+    {
+      "id": "step:password-login:persist-session",
+      "type": "step",
+      "name": "Persist session and expose auth state",
+      "summary": "AuthProvider owns auth state, exposes login/register/logout/refreshProfile and persists the session to localStorage.",
+      "tags": [
+        "state",
+        "session"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/context/AuthContext.tsx",
+      "lineRange": [
+        39,
+        127
+      ]
+    },
+    {
+      "id": "step:password-login:attach-bearer-token",
+      "type": "step",
+      "name": "Attach bearer token to outbound calls",
+      "summary": "The shared Axios client injects the bearer token on request and clears local auth state on a 401 response.",
+      "tags": [
+        "http",
+        "security-sensitive"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/config/axios.ts"
+    },
+    {
+      "id": "flow:authorize-request",
+      "type": "flow",
+      "name": "Authorize an Incoming API Request",
+      "summary": "Every guarded backend call passes through the security filter chain: JwtAuthenticationFilter extracts and validates the bearer token before the controller runs. This is the only real authorization boundary in the system.",
+      "tags": [
+        "security-sensitive",
+        "jwt",
+        "trust-boundary",
+        "rbac"
+      ],
+      "complexity": "complex",
+      "domainMeta": {
+        "entryPoint": "Servlet filter chain on every /api request",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "step:authorize-request:route-guard",
+      "type": "step",
+      "name": "Apply frontend route guard",
+      "summary": "ProtectedRoute gates children behind authentication and an optional allowedRoles list. Presentation only, not enforcement.",
+      "tags": [
+        "ui",
+        "rbac"
+      ],
+      "complexity": "simple",
+      "filePath": "Front-end/src/routes/ProtectedRoute.tsx",
+      "lineRange": [
+        11,
+        23
+      ]
+    },
+    {
+      "id": "step:authorize-request:resolve-portal",
+      "type": "step",
+      "name": "Resolve destination portal for role",
+      "summary": "getDestinationForRole translates a role into its post-login route: /admin, /counter, /app, or /login.",
+      "tags": [
+        "rbac",
+        "routing"
+      ],
+      "complexity": "simple",
+      "filePath": "Front-end/src/features/auth/roleAccess.ts",
+      "lineRange": [
+        70,
+        75
+      ]
+    },
+    {
+      "id": "step:authorize-request:filter-chain",
+      "type": "step",
+      "name": "Declare public and guarded endpoints",
+      "summary": "securityFilterChain declares which endpoints are public and installs the JWT authentication filter.",
+      "tags": [
+        "security-sensitive",
+        "config"
+      ],
+      "complexity": "moderate",
+      "filePath": "Back-end/src/main/java/com/autowashpro/config/SecurityConfig.java",
+      "lineRange": [
+        29,
+        52
+      ]
+    },
+    {
+      "id": "step:authorize-request:validate-token",
+      "type": "step",
+      "name": "Validate bearer token per request",
+      "summary": "JwtAuthenticationFilter runs per request, extracts the bearer token and validates it through JwtTokenProvider.",
+      "tags": [
+        "security-sensitive",
+        "jwt"
+      ],
+      "complexity": "moderate",
+      "filePath": "Back-end/src/main/java/com/autowashpro/config/JwtAuthenticationFilter.java"
+    },
+    {
+      "id": "step:authorize-request:seed-system-accounts",
+      "type": "step",
+      "name": "Seed built-in admin and staff accounts",
+      "summary": "SystemAccountSeeder creates the built-in admin and staff accounts at application startup. Security-sensitive: it carries seeded credentials in source.",
+      "tags": [
+        "security-sensitive",
+        "bootstrap"
+      ],
+      "complexity": "moderate",
+      "filePath": "Back-end/src/main/java/com/autowashpro/config/SystemAccountSeeder.java"
+    },
+    {
+      "id": "domain:booking-lifecycle",
+      "type": "domain",
+      "name": "Booking Lifecycle",
+      "summary": "The central journey of the product: a customer assembles a booking through a six-step wizard (branch, car type, services, date/time, payment, confirmation), the backend validates and persists it, and staff advance it through the PENDING to CONFIRMED to CHECKED_IN to COMPLETED status machine. Completion triggers loyalty accrual.",
+      "tags": [
+        "booking",
+        "core-domain",
+        "workflow",
+        "state-machine"
+      ],
+      "complexity": "complex",
+      "domainMeta": {
+        "entities": [
+          "Booking",
+          "BookingService (join entity with composite BookingServiceId)",
+          "Branch",
+          "Vehicle",
+          "Customer"
+        ],
+        "businessRules": [
+          "A customer may not hold a second active booking",
+          "The branch and every selected service must be ACTIVE at creation time",
+          "One booking can include several wash services via the booking_services join table",
+          "Status transitions must follow the allowed lifecycle order PENDING to CONFIRMED to CHECKED_IN to COMPLETED",
+          "Available slots are derived from summed service durations against branch opening hours, excluding overlaps",
+          "A booking can only be credited with loyalty points once"
+        ],
+        "crossDomainInteractions": [
+          "Requires the authenticated customer id from Identity and Access",
+          "Reads the service and branch catalogue and the computed price from Service Catalog and Pricing",
+          "Resolves or creates a Vehicle through Customer and Vehicle Management",
+          "Writes PointHistory into Loyalty and Rewards on completion",
+          "Feeds the revenue series and booking log in Admin Operations"
+        ]
+      }
+    },
+    {
+      "id": "flow:create-booking",
+      "type": "flow",
+      "name": "Create a Booking (Customer Wizard)",
+      "summary": "The live end-to-end booking path, backend-backed throughout. AppRouter imports BookingWizardPage; each wizard step writes into CustomerBookingContext, and confirmation posts to the Spring BookingController which persists through BookingManagementService. Note: Front-end/src/pages/booking/** holds a near-duplicate older wizard that AppRouter does not import and that this flow deliberately does not describe.",
+      "tags": [
+        "booking",
+        "core-domain",
+        "wizard",
+        "backend-backed"
+      ],
+      "complexity": "complex",
+      "domainMeta": {
+        "entryPoint": "POST /api/bookings",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "step:create-booking:open-wizard",
+      "type": "step",
+      "name": "Open the booking wizard",
+      "summary": "BookingWizardPage renders the stepper and dispatches to the current step component while wiring next/back navigation.",
+      "tags": [
+        "ui",
+        "wizard"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/features/customer/pages/BookingWizardPage.tsx",
+      "lineRange": [
+        28,
+        107
+      ]
+    },
+    {
+      "id": "step:create-booking:select-branch",
+      "type": "step",
+      "name": "Select a branch",
+      "summary": "StepBranch loads branches and writes the chosen branch into the booking draft.",
+      "tags": [
+        "ui",
+        "branch"
+      ],
+      "complexity": "simple",
+      "filePath": "Front-end/src/features/customer/components/StepBranch.tsx",
+      "lineRange": [
+        7,
+        78
+      ]
+    },
+    {
+      "id": "step:create-booking:select-vehicle",
+      "type": "step",
+      "name": "Select vehicle and car type",
+      "summary": "StepCarType lists saved vehicles, supports adding a new one, and records the selected vehicle and car size.",
+      "tags": [
+        "ui",
+        "vehicle"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/features/customer/components/StepCarType.tsx",
+      "lineRange": [
+        12,
+        190
+      ]
+    },
+    {
+      "id": "step:create-booking:select-services",
+      "type": "step",
+      "name": "Select wash services",
+      "summary": "StepServices renders the grouped service catalogue with combo and single-service cards and recomputes the estimated price on change.",
+      "tags": [
+        "ui",
+        "catalog",
+        "pricing"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/features/customer/components/StepServices.tsx",
+      "lineRange": [
+        11,
+        274
+      ]
+    },
+    {
+      "id": "step:create-booking:pick-slot",
+      "type": "step",
+      "name": "Pick date and time slot",
+      "summary": "StepDateTime renders upcoming days and the available time slots fetched for the selected branch and services.",
+      "tags": [
+        "ui",
+        "scheduling"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/features/customer/components/StepDateTime.tsx",
+      "lineRange": [
+        7,
+        122
+      ]
+    },
+    {
+      "id": "step:create-booking:validate-draft",
+      "type": "step",
+      "name": "Validate draft and guard step progression",
+      "summary": "useBookingWizard combines booking context state with price estimation, draft validation and a per-step canProceed guard.",
+      "tags": [
+        "validation",
+        "hook"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/features/customer/hooks/useBookingWizard.ts",
+      "lineRange": [
+        5,
+        34
+      ]
+    },
+    {
+      "id": "step:create-booking:submit-booking",
+      "type": "step",
+      "name": "Confirm and submit the booking",
+      "summary": "StepConfirmation summarises the draft with pricing and voucher selection, then creates the booking via the booking service.",
+      "tags": [
+        "ui",
+        "submission"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/features/customer/components/StepConfirmation.tsx",
+      "lineRange": [
+        26,
+        246
+      ]
+    },
+    {
+      "id": "step:create-booking:persist-booking",
+      "type": "step",
+      "name": "Validate business rules and persist",
+      "summary": "BookingManagementService create loads the customer, rejects a second active booking, resolves the vehicle, verifies the branch and services are ACTIVE, and persists the booking.",
+      "tags": [
+        "business-rules",
+        "persistence",
+        "core-domain"
+      ],
+      "complexity": "complex",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/BookingManagementService.java",
+      "lineRange": [
+        32,
+        60
+      ]
+    },
+    {
+      "id": "flow:check-slot-availability",
+      "type": "flow",
+      "name": "Check Slot Availability",
+      "summary": "Before a customer can pick a time, the backend computes bookable slots for the chosen branch and date by summing the selected service durations, walking the branch opening hours and excluding slots that overlap existing bookings.",
+      "tags": [
+        "booking",
+        "scheduling",
+        "backend-backed"
+      ],
+      "complexity": "complex",
+      "domainMeta": {
+        "entryPoint": "GET /api/bookings/availability",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "step:check-slot-availability:request-slots",
+      "type": "step",
+      "name": "Request slots for branch and date",
+      "summary": "The customer booking service wraps the availability endpoint alongside booking creation, history and upcoming-day generation.",
+      "tags": [
+        "http",
+        "service"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/services/customer/booking.service.ts"
+    },
+    {
+      "id": "step:check-slot-availability:compute-slots",
+      "type": "step",
+      "name": "Compute bookable time slots",
+      "summary": "BookingController availability sums selected service durations, walks branch opening hours and excludes slots that overlap existing bookings.",
+      "tags": [
+        "scheduling",
+        "business-rules"
+      ],
+      "complexity": "complex",
+      "filePath": "Back-end/src/main/java/com/autowashpro/controller/BookingController.java",
+      "lineRange": [
+        25,
+        38
+      ]
+    },
+    {
+      "id": "step:check-slot-availability:render-slots",
+      "type": "step",
+      "name": "Render available slots",
+      "summary": "StepDateTime renders the upcoming days and returned time slots for selection.",
+      "tags": [
+        "ui"
+      ],
+      "complexity": "simple",
+      "filePath": "Front-end/src/features/customer/components/StepDateTime.tsx",
+      "lineRange": [
+        7,
+        122
+      ]
+    },
+    {
+      "id": "flow:present-payment-qr",
+      "type": "flow",
+      "name": "Present VietQR Payment Details",
+      "summary": "Payment is display-only bank transfer: the backend builds a VietQR URL when mapping the booking to its response DTO, and the wizard renders the transfer details for the customer to confirm. There is no payment entity, no payments table and no settlement or reconciliation logic anywhere in the codebase.",
+      "tags": [
+        "payment",
+        "vietqr",
+        "display-only",
+        "security-sensitive"
+      ],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "Rendered inside the booking wizard after creation",
+        "entryType": "manual"
+      }
+    },
+    {
+      "id": "step:present-payment-qr:build-qr-url",
+      "type": "step",
+      "name": "Build VietQR payment URL",
+      "summary": "BookingManagementService toResponse maps the Booking entity to the flattened BookingResponse, denormalizing customer, vehicle and service fields and building the VietQR payment URL.",
+      "tags": [
+        "payment",
+        "mapping"
+      ],
+      "complexity": "moderate",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/BookingManagementService.java",
+      "lineRange": [
+        116,
+        129
+      ]
+    },
+    {
+      "id": "step:present-payment-qr:parse-qr-details",
+      "type": "step",
+      "name": "Parse backend QR payload",
+      "summary": "parseBackendQrDetails parses the backend VietQR payload into structured bank, account and amount details for display.",
+      "tags": [
+        "payment",
+        "parsing"
+      ],
+      "complexity": "simple",
+      "filePath": "Front-end/src/features/customer/components/StepPayment.tsx",
+      "lineRange": [
+        22,
+        39
+      ]
+    },
+    {
+      "id": "step:present-payment-qr:confirm-payment",
+      "type": "step",
+      "name": "Render transfer panel and confirm",
+      "summary": "StepPayment renders the VietQR payment panel with transfer details and drives payment confirmation for the created booking. Confirmation is a UI acknowledgement, not a verified settlement.",
+      "tags": [
+        "payment",
+        "ui"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/features/customer/components/StepPayment.tsx",
+      "lineRange": [
+        41,
+        237
+      ]
+    },
+    {
+      "id": "flow:counter-status-transition",
+      "type": "flow",
+      "name": "Advance Booking Through the Counter Queue",
+      "summary": "Staff at the washing counter load the day booking queue for a branch, search it by reference, name, phone or plate, and advance each booking through the lifecycle. The COMPLETED transition routes through the completion side effects that award loyalty points.",
+      "tags": [
+        "booking",
+        "staff",
+        "state-machine",
+        "backend-backed"
+      ],
+      "complexity": "complex",
+      "domainMeta": {
+        "entryPoint": "Counter portal at /counter (STAFF role)",
+        "entryType": "manual"
+      }
+    },
+    {
+      "id": "step:counter-status-transition:load-queue",
+      "type": "step",
+      "name": "Load the day booking queue",
+      "summary": "WashingCounterPage lists the day booking queue by branch and date with search and revenue totals.",
+      "tags": [
+        "staff",
+        "ui"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/pages/washing-counter/WashingCounterPage.tsx"
+    },
+    {
+      "id": "step:counter-status-transition:filter-queue",
+      "type": "step",
+      "name": "Filter the queue",
+      "summary": "WashingPortal loads the booking queue for a date, filters by reference, name, phone or plate, and advances bookings.",
+      "tags": [
+        "staff",
+        "search"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/features/operations/OperationsPortal.tsx",
+      "lineRange": [
+        6,
+        40
+      ]
+    },
+    {
+      "id": "step:counter-status-transition:request-transition",
+      "type": "step",
+      "name": "Request a status change",
+      "summary": "The platform service issues the customer and admin API calls and maps raw backend payloads into frontend shapes.",
+      "tags": [
+        "http",
+        "service"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/services/platform.service.ts"
+    },
+    {
+      "id": "step:counter-status-transition:apply-transition",
+      "type": "step",
+      "name": "Enforce the lifecycle state machine",
+      "summary": "BookingManagementService transition applies the requested status change, enforcing the allowed lifecycle order and routing COMPLETED transitions through the completion side effects.",
+      "tags": [
+        "state-machine",
+        "business-rules"
+      ],
+      "complexity": "complex",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/BookingManagementService.java",
+      "lineRange": [
+        89,
+        98
+      ]
+    },
+    {
+      "id": "step:counter-status-transition:complete-booking",
+      "type": "step",
+      "name": "Finalize booking and award points",
+      "summary": "BookingManagementService complete finalizes the booking by awarding loyalty points through PointHistory, guarded so the same booking cannot be credited twice.",
+      "tags": [
+        "loyalty",
+        "business-rules",
+        "idempotency"
+      ],
+      "complexity": "moderate",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/BookingManagementService.java",
+      "lineRange": [
+        100,
+        114
+      ]
+    },
+    {
+      "id": "domain:service-catalog-and-pricing",
+      "type": "domain",
+      "name": "Service Catalog and Pricing",
+      "summary": "Defines what can be bought and what it costs: the wash service catalogue, the branch network that offers it, and the car-size multiplier model that turns a base service price into a final quote. Pricing is computed on the client from the fetched catalogue, with a static fallback catalogue in constants.ts when the API is unavailable.",
+      "tags": [
+        "catalog",
+        "pricing",
+        "branches"
+      ],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entities": [
+          "Service",
+          "Branch",
+          "car size multiplier",
+          "service duration"
+        ],
+        "businessRules": [
+          "Only ACTIVE services and branches may be selected for a booking",
+          "Final price is the base service price adjusted by a car-size multiplier",
+          "Each service carries a duration that drives slot availability computation",
+          "Prices are formatted and presented in VND"
+        ],
+        "crossDomainInteractions": [
+          "Supplies selectable services and branches plus the price estimate to the Booking Lifecycle wizard",
+          "Service durations feed the slot availability computation",
+          "Completed booking totals become the revenue series in Admin Operations"
+        ]
+      }
+    },
+    {
+      "id": "flow:load-catalog",
+      "type": "flow",
+      "name": "Load Service and Branch Catalogue",
+      "summary": "The wizard fetches the service and branch catalogues from the backend, normalises the responses and caches them in module scope for the rest of the session.",
+      "tags": [
+        "catalog",
+        "backend-backed",
+        "caching"
+      ],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "GET service and branch catalogue endpoints",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "step:load-catalog:fetch-catalog",
+      "type": "step",
+      "name": "Fetch and cache catalogues",
+      "summary": "The catalog service fetches the service and branch catalogues, normalises backend responses and caches them in module scope.",
+      "tags": [
+        "http",
+        "caching"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/services/customer/catalog.service.ts"
+    },
+    {
+      "id": "step:load-catalog:fallback-constants",
+      "type": "step",
+      "name": "Fall back to static catalogue",
+      "summary": "constants.ts holds the static domain catalogue of loyalty tiers, car-size multipliers, car types, services, branches and slot bounds used as a fallback.",
+      "tags": [
+        "fallback",
+        "config"
+      ],
+      "complexity": "simple",
+      "filePath": "Front-end/src/config/constants.ts"
+    },
+    {
+      "id": "step:load-catalog:render-catalog",
+      "type": "step",
+      "name": "Render grouped service cards",
+      "summary": "StepServices renders the grouped service catalogue with combo and single-service cards.",
+      "tags": [
+        "ui"
+      ],
+      "complexity": "simple",
+      "filePath": "Front-end/src/features/customer/components/StepServices.tsx",
+      "lineRange": [
+        11,
+        274
+      ]
+    },
+    {
+      "id": "flow:calculate-price",
+      "type": "flow",
+      "name": "Calculate Booking Price",
+      "summary": "Given the selected services and car size, the price service computes the base and size-adjusted price from the live or fallback catalogue, and a memoising hook exposes it to the wizard.",
+      "tags": [
+        "pricing",
+        "client-side"
+      ],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "Recomputed on every wizard selection change",
+        "entryType": "manual"
+      }
+    },
+    {
+      "id": "step:calculate-price:compute-price",
+      "type": "step",
+      "name": "Compute base and adjusted price",
+      "summary": "The price service computes base and car-size-adjusted prices from the live or fallback service catalogue, plus VND currency formatting.",
+      "tags": [
+        "pricing",
+        "business-rules"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/services/customer/price.service.ts"
+    },
+    {
+      "id": "step:calculate-price:memoise-price",
+      "type": "step",
+      "name": "Memoise the price calculation",
+      "summary": "usePriceCalculation memoises base price, car multiplier, final price and formatted price derived from the price service.",
+      "tags": [
+        "pricing",
+        "hook"
+      ],
+      "complexity": "simple",
+      "filePath": "Front-end/src/features/customer/hooks/usePriceCalculation.ts",
+      "lineRange": [
+        5,
+        17
+      ]
+    },
+    {
+      "id": "step:calculate-price:format-currency",
+      "type": "step",
+      "name": "Format the price for display",
+      "summary": "Shared formatters render the computed amount as VND currency for the wizard and summary screens.",
+      "tags": [
+        "formatting"
+      ],
+      "complexity": "simple",
+      "filePath": "Front-end/src/utils/formatters.ts"
+    },
+    {
+      "id": "domain:customer-and-vehicle-management",
+      "type": "domain",
+      "name": "Customer and Vehicle Management",
+      "summary": "Maintains the customer record that is the hub of the domain model and the vehicles each customer owns. Vehicle operations are strictly ownership-scoped, enforce license plate normalisation and uniqueness, and maintain the invariant that a customer has at most one default vehicle.",
+      "tags": [
+        "customer",
+        "vehicle",
+        "crud",
+        "ownership"
+      ],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entities": [
+          "Customer",
+          "Vehicle",
+          "license plate",
+          "default vehicle flag",
+          "car size"
+        ],
+        "businessRules": [
+          "License plates are normalized and duplicates are rejected",
+          "A vehicle may only be read or mutated by its owning customer",
+          "At most one vehicle per customer carries the default flag; setting a new default clears the previous one",
+          "Deleting the default vehicle reassigns the default flag",
+          "Customer is the hub entity with the highest fan-in in the backend domain model"
+        ],
+        "crossDomainInteractions": [
+          "Vehicles are resolved or created inline during Booking Lifecycle booking creation",
+          "Customer accumulates the points balance and tier owned by Loyalty and Rewards",
+          "Customer records are searched and partially edited from Admin Operations"
+        ]
+      }
+    },
+    {
+      "id": "flow:manage-vehicles",
+      "type": "flow",
+      "name": "Manage Customer Vehicles",
+      "summary": "The customer lists, adds, edits and deletes their vehicles and chooses a default. Every operation is ownership-scoped server-side and reconciles the single-default invariant.",
+      "tags": [
+        "vehicle",
+        "crud",
+        "backend-backed",
+        "ownership"
+      ],
+      "complexity": "complex",
+      "domainMeta": {
+        "entryPoint": "/api/vehicles (GET, POST, PUT, DELETE, PATCH default)",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "step:manage-vehicles:render-vehicle-list",
+      "type": "step",
+      "name": "Render vehicle management UI",
+      "summary": "VehicleList wires list rendering, add/edit modal forms, delete confirmation and default-vehicle selection.",
+      "tags": [
+        "ui",
+        "crud"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/features/customer/components/VehicleList.tsx",
+      "lineRange": [
+        11,
+        295
+      ]
+    },
+    {
+      "id": "step:manage-vehicles:call-vehicle-api",
+      "type": "step",
+      "name": "Call the vehicle CRUD endpoints",
+      "summary": "The vehicle service wraps the vehicle CRUD endpoints including setting a customer default vehicle.",
+      "tags": [
+        "http",
+        "service"
+      ],
+      "complexity": "simple",
+      "filePath": "Front-end/src/services/customer/vehicle.service.ts"
+    },
+    {
+      "id": "step:manage-vehicles:vehicle-endpoints",
+      "type": "step",
+      "name": "Expose ownership-scoped endpoints",
+      "summary": "VehicleController lists, creates, updates, deletes and sets the default vehicle for the requesting customer.",
+      "tags": [
+        "api",
+        "controller"
+      ],
+      "complexity": "moderate",
+      "filePath": "Back-end/src/main/java/com/autowashpro/controller/VehicleController.java",
+      "lineRange": [
+        14,
+        90
+      ]
+    },
+    {
+      "id": "step:manage-vehicles:validate-plate",
+      "type": "step",
+      "name": "Validate and normalize license plate",
+      "summary": "validateLicensePlate checks plate format and length constraints, rejecting malformed values.",
+      "tags": [
+        "validation",
+        "business-rules"
+      ],
+      "complexity": "simple",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/impl/VehicleServiceImpl.java",
+      "lineRange": [
+        292,
+        302
+      ]
+    },
+    {
+      "id": "step:manage-vehicles:create-vehicle",
+      "type": "step",
+      "name": "Persist a new vehicle",
+      "summary": "createVehicle validates the request, normalizes the plate, rejects duplicates and persists honoring default-flag rules.",
+      "tags": [
+        "persistence",
+        "business-rules"
+      ],
+      "complexity": "moderate",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/impl/VehicleServiceImpl.java",
+      "lineRange": [
+        39,
+        89
+      ]
+    },
+    {
+      "id": "step:manage-vehicles:guard-ownership",
+      "type": "step",
+      "name": "Guard vehicle ownership",
+      "summary": "findOwnedVehicle fetches a vehicle scoped to its owner, throwing when it is missing or belongs to another customer.",
+      "tags": [
+        "security-sensitive",
+        "ownership",
+        "trust-boundary"
+      ],
+      "complexity": "moderate",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/impl/VehicleServiceImpl.java",
+      "lineRange": [
+        223,
+        237
+      ]
+    },
+    {
+      "id": "step:manage-vehicles:set-default",
+      "type": "step",
+      "name": "Reconcile the default vehicle",
+      "summary": "setDefaultVehicle clears any existing default and marks the target owned vehicle as the customer default.",
+      "tags": [
+        "business-rules",
+        "invariant"
+      ],
+      "complexity": "moderate",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/impl/VehicleServiceImpl.java",
+      "lineRange": [
+        207,
+        221
+      ]
+    },
+    {
+      "id": "flow:resolve-booking-vehicle",
+      "type": "flow",
+      "name": "Resolve or Create Vehicle During Booking",
+      "summary": "When a booking is created the service either attaches an existing owned vehicle by id or creates one on the fly from the inline plate, brand and size fields on the request.",
+      "tags": [
+        "vehicle",
+        "booking",
+        "backend-backed"
+      ],
+      "complexity": "simple",
+      "domainMeta": {
+        "entryPoint": "Invoked inside booking creation",
+        "entryType": "event"
+      }
+    },
+    {
+      "id": "step:resolve-booking-vehicle:resolve-vehicle",
+      "type": "step",
+      "name": "Attach existing or create inline vehicle",
+      "summary": "resolveVehicle returns the customer existing vehicle when an id is supplied, otherwise creates one from the inline plate, brand and size fields.",
+      "tags": [
+        "business-rules",
+        "vehicle"
+      ],
+      "complexity": "moderate",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/BookingManagementService.java",
+      "lineRange": [
+        62,
+        74
+      ]
+    },
+    {
+      "id": "step:resolve-booking-vehicle:persist-vehicle-row",
+      "type": "step",
+      "name": "Persist against the vehicles table",
+      "summary": "The vehicles table is the physical store the Vehicle entity maps onto.",
+      "tags": [
+        "schema",
+        "persistence"
+      ],
+      "complexity": "simple",
+      "filePath": "Back-end/database/AutoWashPro.sql",
+      "lineRange": [
+        154,
+        169
+      ]
+    },
+    {
+      "id": "flow:maintain-customer-record",
+      "type": "flow",
+      "name": "Maintain Customer Record",
+      "summary": "Standard customer CRUD exposed by CustomerController and CustomerServiceImpl, backing the profile and administrative views of a customer.",
+      "tags": [
+        "customer",
+        "crud",
+        "backend-backed"
+      ],
+      "complexity": "simple",
+      "domainMeta": {
+        "entryPoint": "/api/customers (GET, POST, PUT, DELETE)",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "step:maintain-customer-record:customer-endpoints",
+      "type": "step",
+      "name": "Expose customer CRUD endpoints",
+      "summary": "CustomerController exposes list, get-by-id, create, update and delete endpoints for customers.",
+      "tags": [
+        "api",
+        "controller"
+      ],
+      "complexity": "moderate",
+      "filePath": "Back-end/src/main/java/com/autowashpro/controller/CustomerController.java",
+      "lineRange": [
+        15,
+        65
+      ]
+    },
+    {
+      "id": "step:maintain-customer-record:create-customer",
+      "type": "step",
+      "name": "Create a customer",
+      "summary": "createCustomer maps the request to a Customer entity, persists it and returns the response projection.",
+      "tags": [
+        "persistence"
+      ],
+      "complexity": "simple",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/impl/CustomerServiceImpl.java",
+      "lineRange": [
+        43,
+        51
+      ]
+    },
+    {
+      "id": "step:maintain-customer-record:update-customer",
+      "type": "step",
+      "name": "Update a customer",
+      "summary": "updateCustomer loads an existing customer, applies mutable fields from the request, saves and returns the updated projection.",
+      "tags": [
+        "persistence"
+      ],
+      "complexity": "simple",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/impl/CustomerServiceImpl.java",
+      "lineRange": [
+        53,
+        71
+      ]
+    },
+    {
+      "id": "step:maintain-customer-record:render-profile",
+      "type": "step",
+      "name": "Render the customer profile",
+      "summary": "ProfileCard renders the customer profile summary card in the dashboard.",
+      "tags": [
+        "ui"
+      ],
+      "complexity": "simple",
+      "filePath": "Front-end/src/features/customer/components/ProfileCard.tsx",
+      "lineRange": [
+        10,
+        24
+      ]
+    },
+    {
+      "id": "domain:loyalty-and-rewards",
+      "type": "domain",
+      "name": "Loyalty and Rewards",
+      "summary": "A points-and-tier programme layered on completed washes. Points are earned when a booking completes, recorded as PointHistory rows that double as the audit trail, spent to redeem vouchers, expired after twelve months by a sweep, and periodically rolled up into a Member/Silver/Gold/Platinum tier by a monthly scheduled job.",
+      "tags": [
+        "loyalty",
+        "points",
+        "vouchers",
+        "tiers",
+        "security-sensitive"
+      ],
+      "complexity": "complex",
+      "domainMeta": {
+        "entities": [
+          "PointHistory",
+          "Voucher",
+          "loyalty tier (Member/Silver/Gold/Platinum)",
+          "point multiplier",
+          "Customer points balance"
+        ],
+        "businessRules": [
+          "Points are awarded only on booking completion and a booking cannot be credited twice",
+          "Redemption is rejected when the customer point balance is below the voucher point cost",
+          "EARN point-history rows older than twelve months are expired by a sweep, skipping rows already marked expired",
+          "Tier is recomputed monthly from wash count and total spend over the trailing 365 days",
+          "Tier carries a point multiplier and wash/spend qualification thresholds",
+          "Loyalty endpoints ignore any customer id in the path or body and act on the authenticated caller instead"
+        ],
+        "crossDomainInteractions": [
+          "Consumes completed bookings from Booking Lifecycle as the earning trigger",
+          "Scopes every read and write to the caller supplied by Identity and Access",
+          "Exposes the full point history to Admin Operations as the audit trail",
+          "Tier targeting drives promotional campaigns in Admin Operations"
+        ]
+      }
+    },
+    {
+      "id": "flow:earn-points",
+      "type": "flow",
+      "name": "Earn Points on Booking Completion",
+      "summary": "Completing a wash writes a PointHistory EARN row against the customer, guarded so the same booking cannot be credited twice.",
+      "tags": [
+        "loyalty",
+        "points",
+        "backend-backed",
+        "idempotency"
+      ],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "Triggered by a COMPLETED booking transition",
+        "entryType": "event"
+      }
+    },
+    {
+      "id": "step:earn-points:transition-to-completed",
+      "type": "step",
+      "name": "Transition booking to COMPLETED",
+      "summary": "transition enforces the allowed lifecycle order and routes COMPLETED transitions through the completion side effects.",
+      "tags": [
+        "state-machine"
+      ],
+      "complexity": "moderate",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/BookingManagementService.java",
+      "lineRange": [
+        89,
+        98
+      ]
+    },
+    {
+      "id": "step:earn-points:award-points",
+      "type": "step",
+      "name": "Write the PointHistory earn row",
+      "summary": "complete finalizes the booking by awarding loyalty points through PointHistory, guarded against double crediting.",
+      "tags": [
+        "loyalty",
+        "idempotency"
+      ],
+      "complexity": "moderate",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/BookingManagementService.java",
+      "lineRange": [
+        100,
+        114
+      ]
+    },
+    {
+      "id": "step:earn-points:persist-point-row",
+      "type": "step",
+      "name": "Persist to point_history",
+      "summary": "The point_history table stores every point delta with its activity type and description.",
+      "tags": [
+        "schema",
+        "persistence"
+      ],
+      "complexity": "simple",
+      "filePath": "Back-end/database/AutoWashPro.sql",
+      "lineRange": [
+        94,
+        107
+      ]
+    },
+    {
+      "id": "step:earn-points:show-points",
+      "type": "step",
+      "name": "Display point history to the customer",
+      "summary": "PointsHistory renders the point transaction list with type icons and relative timestamps.",
+      "tags": [
+        "ui"
+      ],
+      "complexity": "simple",
+      "filePath": "Front-end/src/features/customer/components/PointsHistory.tsx",
+      "lineRange": [
+        30,
+        57
+      ]
+    },
+    {
+      "id": "flow:redeem-voucher",
+      "type": "flow",
+      "name": "Redeem Points for a Voucher",
+      "summary": "The customer spends accumulated points on one of three voucher types. The controller overwrites any customerId in the request body with the authenticated caller id before delegating, so redemption cannot be performed on another account.",
+      "tags": [
+        "loyalty",
+        "vouchers",
+        "backend-backed",
+        "trust-boundary",
+        "security-sensitive"
+      ],
+      "complexity": "complex",
+      "domainMeta": {
+        "entryPoint": "POST /api/vouchers/redeem",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "step:redeem-voucher:browse-voucher-shop",
+      "type": "step",
+      "name": "Browse the voucher catalogue",
+      "summary": "VoucherShop shows the three-item voucher catalog against the point balance, redeems through the platform service and lists owned vouchers.",
+      "tags": [
+        "ui",
+        "vouchers"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/features/customer/components/VoucherShop.tsx",
+      "lineRange": [
+        93,
+        244
+      ]
+    },
+    {
+      "id": "step:redeem-voucher:redeem-endpoint",
+      "type": "step",
+      "name": "Force caller identity on redemption",
+      "summary": "LoyaltyController redeem forcibly overwrites the request body customerId with the authenticated caller id before delegating to LoyaltyService.",
+      "tags": [
+        "security-sensitive",
+        "trust-boundary"
+      ],
+      "complexity": "moderate",
+      "filePath": "Back-end/src/main/java/com/autowashpro/controller/LoyaltyController.java",
+      "lineRange": [
+        16,
+        16
+      ]
+    },
+    {
+      "id": "step:redeem-voucher:debit-and-issue",
+      "type": "step",
+      "name": "Debit points and issue the voucher",
+      "summary": "LoyaltyService redeem loads the customer, rejects insufficient balances, debits the point cost and issues the voucher.",
+      "tags": [
+        "loyalty",
+        "business-rules"
+      ],
+      "complexity": "moderate",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/LoyaltyService.java",
+      "lineRange": [
+        20,
+        28
+      ]
+    },
+    {
+      "id": "step:redeem-voucher:list-vouchers",
+      "type": "step",
+      "name": "List the caller owned vouchers",
+      "summary": "LoyaltyService vouchers returns a customer vouchers ordered by expiry date descending.",
+      "tags": [
+        "vouchers",
+        "read"
+      ],
+      "complexity": "simple",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/LoyaltyService.java",
+      "lineRange": [
+        29,
+        29
+      ]
+    },
+    {
+      "id": "step:redeem-voucher:persist-voucher",
+      "type": "step",
+      "name": "Persist to the vouchers table",
+      "summary": "The vouchers table stores issued vouchers with their point cost and expiry.",
+      "tags": [
+        "schema",
+        "persistence"
+      ],
+      "complexity": "simple",
+      "filePath": "Back-end/database/AutoWashPro.sql",
+      "lineRange": [
+        175,
+        189
+      ]
+    },
+    {
+      "id": "flow:expire-points",
+      "type": "flow",
+      "name": "Expire Aged Points",
+      "summary": "A maintenance sweep debits EARN point-history rows older than twelve months, skipping rows already marked expired via a marker in the EXPIRE description, and reports how many transactions were expired.",
+      "tags": [
+        "loyalty",
+        "points",
+        "maintenance",
+        "backend-backed"
+      ],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "POST /api/maintenance/expire-points",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "step:expire-points:trigger-expiry",
+      "type": "step",
+      "name": "Trigger the expiration sweep",
+      "summary": "LoyaltyController expire triggers the twelve-month point expiration sweep and reports how many transactions were expired.",
+      "tags": [
+        "api",
+        "maintenance"
+      ],
+      "complexity": "simple",
+      "filePath": "Back-end/src/main/java/com/autowashpro/controller/LoyaltyController.java",
+      "lineRange": [
+        19,
+        19
+      ]
+    },
+    {
+      "id": "step:expire-points:run-sweep",
+      "type": "step",
+      "name": "Debit aged earn rows",
+      "summary": "expireOldPoints finds EARN rows older than twelve months, skips ones already expired via a marker in the EXPIRE description, then debits the remainder.",
+      "tags": [
+        "loyalty",
+        "business-rules",
+        "batch"
+      ],
+      "complexity": "complex",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/LoyaltyService.java",
+      "lineRange": [
+        32,
+        43
+      ]
+    },
+    {
+      "id": "flow:review-tiers",
+      "type": "flow",
+      "name": "Monthly Loyalty Tier Review",
+      "summary": "A scheduled monthly job recomputes each customer wash count, total spend and loyalty tier from completed bookings in the trailing 365 days. The admin tier panel is read-only reference because no tier-management API exists.",
+      "tags": [
+        "loyalty",
+        "tiers",
+        "scheduled",
+        "backend-backed"
+      ],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "Monthly scheduled job (LoyaltyMaintenanceScheduler)",
+        "entryType": "cron"
+      }
+    },
+    {
+      "id": "step:review-tiers:recompute-tiers",
+      "type": "step",
+      "name": "Recompute wash count, spend and tier",
+      "summary": "reviewTiersMonthly recomputes each customer wash count, total spend and loyalty tier from completed bookings in the trailing 365 days.",
+      "tags": [
+        "loyalty",
+        "scheduled",
+        "business-rules"
+      ],
+      "complexity": "complex",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/LoyaltyMaintenanceScheduler.java",
+      "lineRange": [
+        25,
+        36
+      ]
+    },
+    {
+      "id": "step:review-tiers:show-tier-progress",
+      "type": "step",
+      "name": "Show tier progress to the customer",
+      "summary": "LoyaltyTierSection computes next-tier requirements and progress percentage from current tier, washes and spend against the Member/Silver/Gold/Platinum thresholds.",
+      "tags": [
+        "ui",
+        "tiers"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/features/customer/components/LoyaltyTierSection.tsx",
+      "lineRange": [
+        21,
+        169
+      ]
+    },
+    {
+      "id": "step:review-tiers:tier-reference-panel",
+      "type": "step",
+      "name": "Show read-only tier reference to admin",
+      "summary": "TierManagementPanel renders the four loyalty tiers with multipliers and qualification thresholds. Read-only: no tier-management API exists so nothing is editable.",
+      "tags": [
+        "admin",
+        "read-only"
+      ],
+      "complexity": "simple",
+      "filePath": "Front-end/src/features/admin/pages/TierManagementPanel.tsx",
+      "lineRange": [
+        41,
+        95
+      ]
+    },
+    {
+      "id": "domain:admin-operations",
+      "type": "domain",
+      "name": "Admin Operations and Reporting",
+      "summary": "The ADMIN back office: a searchable customer registry, a paginated booking log, revenue aggregation over completed bookings, a loyalty point audit trail, and promotional campaign management backed by the Promotion entity. Aggregation is done in application code over loaded collections rather than in the database.",
+      "tags": [
+        "admin",
+        "reporting",
+        "promotions",
+        "audit",
+        "security-sensitive"
+      ],
+      "complexity": "complex",
+      "domainMeta": {
+        "entities": [
+          "Promotion",
+          "revenue series",
+          "booking log page",
+          "point audit row",
+          "AdminCustomer record"
+        ],
+        "businessRules": [
+          "Revenue is aggregated only over COMPLETED bookings, grouped by year, month or day",
+          "A campaign with an end date before its start date is rejected",
+          "Campaigns are soft-deleted by setting status INACTIVE rather than removing the row",
+          "Campaign listing returns every Promotion including soft-deleted INACTIVE ones",
+          "Admin customer update is a partial update of name and email with regex email validation",
+          "The customer registry search matches full name, phone, or any of the customer vehicle license plates"
+        ],
+        "crossDomainInteractions": [
+          "Reads completed bookings from Booking Lifecycle to build the revenue series and booking log",
+          "Reads PointHistory from Loyalty and Rewards as the audit trail",
+          "Targets campaigns at loyalty tiers owned by Loyalty and Rewards",
+          "Requires the ADMIN role established by Identity and Access"
+        ]
+      }
+    },
+    {
+      "id": "flow:revenue-reporting",
+      "type": "flow",
+      "name": "Revenue Reporting",
+      "summary": "The admin selects a period and the backend aggregates revenue over COMPLETED bookings grouped by year, month or day; the frontend defensively parses the payload and renders the series alongside the point audit trail.",
+      "tags": [
+        "admin",
+        "reporting",
+        "revenue",
+        "backend-backed"
+      ],
+      "complexity": "complex",
+      "domainMeta": {
+        "entryPoint": "GET admin revenue endpoint (ADMIN role)",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "step:revenue-reporting:open-revenue-panel",
+      "type": "step",
+      "name": "Open the revenue and audit panel",
+      "summary": "RevenueAuditPanel loads revenue for the selected period and the filtered points audit trail, resolving customer names for display.",
+      "tags": [
+        "admin",
+        "ui"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/features/admin/pages/RevenueAuditPanel.tsx",
+      "lineRange": [
+        28,
+        173
+      ]
+    },
+    {
+      "id": "step:revenue-reporting:aggregate-revenue",
+      "type": "step",
+      "name": "Aggregate revenue over completed bookings",
+      "summary": "AdminService revenue aggregates revenue over COMPLETED bookings, grouping totals by year, month or day depending on the period argument.",
+      "tags": [
+        "reporting",
+        "aggregation"
+      ],
+      "complexity": "complex",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/AdminService.java",
+      "lineRange": [
+        23,
+        23
+      ]
+    },
+    {
+      "id": "step:revenue-reporting:parse-revenue",
+      "type": "step",
+      "name": "Defensively parse the revenue payload",
+      "summary": "parseAdminRevenue normalises a revenue payload into total revenue, completed bookings and a period-keyed series map.",
+      "tags": [
+        "parsing",
+        "defensive"
+      ],
+      "complexity": "simple",
+      "filePath": "Front-end/src/features/admin/adminApi.ts",
+      "lineRange": [
+        153,
+        174
+      ]
+    },
+    {
+      "id": "step:revenue-reporting:summarise-client-side",
+      "type": "step",
+      "name": "Summarise revenue by period and branch",
+      "summary": "getRevenueSummary aggregates completed bookings for a day, month or year and branch into revenue, wash count and average ticket.",
+      "tags": [
+        "reporting",
+        "client-side"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/features/admin/revenueAudit.ts",
+      "lineRange": [
+        2,
+        4
+      ]
+    },
+    {
+      "id": "flow:audit-loyalty-points",
+      "type": "flow",
+      "name": "Audit the Loyalty Point Trail",
+      "summary": "The admin reviews the full loyalty point history as an audit trail, newest first, exposing customer id, point delta, activity type, description and timestamp.",
+      "tags": [
+        "admin",
+        "audit",
+        "loyalty",
+        "backend-backed",
+        "security-sensitive"
+      ],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "GET admin audit endpoint (ADMIN role)",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "step:audit-loyalty-points:load-audit",
+      "type": "step",
+      "name": "Return the full point history",
+      "summary": "AdminService audit returns the full loyalty point history as an audit trail sorted newest first.",
+      "tags": [
+        "audit",
+        "reporting"
+      ],
+      "complexity": "moderate",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/AdminService.java",
+      "lineRange": [
+        24,
+        24
+      ]
+    },
+    {
+      "id": "step:audit-loyalty-points:parse-audit",
+      "type": "step",
+      "name": "Parse the audit payload",
+      "summary": "parseAdminAudit converts an unknown points-audit payload into typed audit records with customer id, points delta, type and timestamp.",
+      "tags": [
+        "parsing",
+        "defensive"
+      ],
+      "complexity": "simple",
+      "filePath": "Front-end/src/features/admin/adminApi.ts",
+      "lineRange": [
+        176,
+        187
+      ]
+    },
+    {
+      "id": "step:audit-loyalty-points:filter-audit-rows",
+      "type": "step",
+      "name": "Filter and order audit rows",
+      "summary": "getPointAuditRows filters loyalty point transactions by type and orders them newest first.",
+      "tags": [
+        "audit",
+        "client-side"
+      ],
+      "complexity": "simple",
+      "filePath": "Front-end/src/features/admin/revenueAudit.ts",
+      "lineRange": [
+        5,
+        5
+      ]
+    },
+    {
+      "id": "flow:booking-log-review",
+      "type": "flow",
+      "name": "Review the Booking Log",
+      "summary": "The admin browses a paginated booking log built by loading all bookings, filtering by optional status and date, sorting newest-created first and slicing the requested page. Additional filtering, sorting and infinite-scroll paging happen client-side.",
+      "tags": [
+        "admin",
+        "reporting",
+        "booking",
+        "backend-backed"
+      ],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "GET admin bookings endpoint (ADMIN role)",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "step:booking-log-review:build-log-page",
+      "type": "step",
+      "name": "Build the paginated booking log",
+      "summary": "AdminService bookingLog loads all bookings, filters by optional status and date, sorts newest-created first and slices the requested page.",
+      "tags": [
+        "reporting",
+        "pagination"
+      ],
+      "complexity": "complex",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/AdminService.java",
+      "lineRange": [
+        22,
+        22
+      ]
+    },
+    {
+      "id": "step:booking-log-review:project-booking-row",
+      "type": "step",
+      "name": "Project the admin booking row",
+      "summary": "bookingMap converts a Booking entity into an ordered map of admin-facing fields including id, booking reference, customer name and license plate.",
+      "tags": [
+        "mapping"
+      ],
+      "complexity": "simple",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/AdminService.java",
+      "lineRange": [
+        27,
+        27
+      ]
+    },
+    {
+      "id": "step:booking-log-review:parse-booking-page",
+      "type": "step",
+      "name": "Parse the paginated payload",
+      "summary": "parseAdminBookingPage parses a paginated admin bookings payload into typed records plus page, size, totalItems and last-page metadata.",
+      "tags": [
+        "parsing",
+        "defensive"
+      ],
+      "complexity": "simple",
+      "filePath": "Front-end/src/features/admin/adminApi.ts",
+      "lineRange": [
+        130,
+        151
+      ]
+    },
+    {
+      "id": "step:booking-log-review:page-client-side",
+      "type": "step",
+      "name": "Filter, sort and page client-side",
+      "summary": "getBookingPage filters bookings by date and status, sorts by time or creation and slices out the requested page.",
+      "tags": [
+        "pagination",
+        "client-side"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/features/admin/bookingLog.ts",
+      "lineRange": [
+        3,
+        6
+      ]
+    },
+    {
+      "id": "flow:customer-registry",
+      "type": "flow",
+      "name": "Search and Edit the Customer Registry",
+      "summary": "The admin searches CUSTOMER-role accounts by name, phone or vehicle plate and applies a partial update of name and email. Editing another user record crosses a trust boundary and is gated on the ADMIN role.",
+      "tags": [
+        "admin",
+        "customer",
+        "backend-backed",
+        "trust-boundary",
+        "security-sensitive"
+      ],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "GET/PUT admin customers endpoints (ADMIN role)",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "step:customer-registry:search-customers",
+      "type": "step",
+      "name": "Search customer accounts",
+      "summary": "AdminService customers returns all CUSTOMER-role accounts, optionally filtered by a free-text query matched against full name, phone or any vehicle license plate.",
+      "tags": [
+        "search",
+        "admin"
+      ],
+      "complexity": "moderate",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/AdminService.java",
+      "lineRange": [
+        17,
+        20
+      ]
+    },
+    {
+      "id": "step:customer-registry:update-customer-admin",
+      "type": "step",
+      "name": "Apply a partial customer update",
+      "summary": "AdminService updateCustomer applies a partial update of name and email from a raw string map, validating email format with a regex.",
+      "tags": [
+        "security-sensitive",
+        "validation",
+        "trust-boundary"
+      ],
+      "complexity": "moderate",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/AdminService.java",
+      "lineRange": [
+        21,
+        21
+      ]
+    },
+    {
+      "id": "step:customer-registry:filter-registry",
+      "type": "step",
+      "name": "Filter and sort the registry",
+      "summary": "getFilteredCustomers filters customers by tier and a search term matching name, phone or vehicle plate, then sorts by the chosen key.",
+      "tags": [
+        "search",
+        "client-side"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/features/admin/customerRegistry.ts",
+      "lineRange": [
+        4,
+        7
+      ]
+    },
+    {
+      "id": "step:customer-registry:drive-registry-console",
+      "type": "step",
+      "name": "Drive the admin console",
+      "summary": "AdminCustomerRegistryPage loads customers, paginated bookings, revenue and audit data and applies search, filter and paging.",
+      "tags": [
+        "admin",
+        "ui"
+      ],
+      "complexity": "complex",
+      "filePath": "Front-end/src/features/admin/pages/AdminCustomerRegistryPage.tsx",
+      "lineRange": [
+        88,
+        557
+      ]
+    },
+    {
+      "id": "flow:campaign-management",
+      "type": "flow",
+      "name": "Create and Retire Promotional Campaigns",
+      "summary": "The admin drafts a promotional campaign from a goal and target tier, publishes it as a Promotion, and retires it by soft-delete to INACTIVE. The backend generates a marketing tagline from the campaign goal.",
+      "tags": [
+        "admin",
+        "promotions",
+        "campaigns",
+        "backend-backed"
+      ],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "POST/GET/DELETE admin campaign endpoints (ADMIN role)",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "step:campaign-management:draft-campaign",
+      "type": "step",
+      "name": "Generate a campaign draft",
+      "summary": "generateCampaignDraft builds an inactive campaign draft with title, copy, gradient and point multiplier derived from goal and tier.",
+      "tags": [
+        "campaigns",
+        "client-side"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/features/admin/campaignBuilder.ts",
+      "lineRange": [
+        3,
+        3
+      ]
+    },
+    {
+      "id": "step:campaign-management:campaign-panel",
+      "type": "step",
+      "name": "Manage the campaign form",
+      "summary": "CampaignBuilderPanel manages draft form state, requests a generated draft, publishes the promotion and lists existing campaigns.",
+      "tags": [
+        "admin",
+        "ui"
+      ],
+      "complexity": "moderate",
+      "filePath": "Front-end/src/features/admin/pages/CampaignBuilderPanel.tsx",
+      "lineRange": [
+        39,
+        250
+      ]
+    },
+    {
+      "id": "step:campaign-management:create-campaign",
+      "type": "step",
+      "name": "Persist the promotion",
+      "summary": "AdminService campaign creates and persists a new Promotion from a CampaignRequest, rejecting an end date before the start date and generating the description tagline.",
+      "tags": [
+        "persistence",
+        "business-rules"
+      ],
+      "complexity": "moderate",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/AdminService.java",
+      "lineRange": [
+        25,
+        25
+      ]
+    },
+    {
+      "id": "step:campaign-management:generate-tagline",
+      "type": "step",
+      "name": "Generate the marketing tagline",
+      "summary": "generateTagline normalizes whitespace in a campaign goal and capitalizes it into the marketing tagline used as the promotion description.",
+      "tags": [
+        "campaigns"
+      ],
+      "complexity": "simple",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/AdminService.java",
+      "lineRange": [
+        26,
+        26
+      ]
+    },
+    {
+      "id": "step:campaign-management:soft-delete-campaign",
+      "type": "step",
+      "name": "Soft-delete a campaign",
+      "summary": "deleteCampaign loads the Promotion and persists its status as INACTIVE rather than removing the row.",
+      "tags": [
+        "business-rules",
+        "soft-delete"
+      ],
+      "complexity": "simple",
+      "filePath": "Back-end/src/main/java/com/autowashpro/service/AdminService.java",
+      "lineRange": [
+        26,
+        26
+      ]
+    },
+    {
+      "id": "step:campaign-management:show-promotions",
+      "type": "step",
+      "name": "Show active promotions to customers",
+      "summary": "PromotionDisplay renders the active promotion list in the customer portal.",
+      "tags": [
+        "ui",
+        "promotions"
+      ],
+      "complexity": "simple",
+      "filePath": "Front-end/src/features/customer/components/PromotionDisplay.tsx",
+      "lineRange": [
+        4,
+        21
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "domain:identity-and-access",
+      "target": "flow:customer-registration",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "flow:customer-registration",
+      "target": "step:customer-registration:fill-registration-form",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.17
+    },
+    {
+      "source": "flow:customer-registration",
+      "target": "step:customer-registration:send-firebase-otp",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.33
+    },
+    {
+      "source": "flow:customer-registration",
+      "target": "step:customer-registration:verify-otp-code",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "flow:customer-registration",
+      "target": "step:customer-registration:exchange-id-token",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.67
+    },
+    {
+      "source": "flow:customer-registration",
+      "target": "step:customer-registration:register-endpoint",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.83
+    },
+    {
+      "source": "flow:customer-registration",
+      "target": "step:customer-registration:persist-customer",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "domain:identity-and-access",
+      "target": "flow:password-login",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "flow:password-login",
+      "target": "step:password-login:submit-credentials",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.17
+    },
+    {
+      "source": "flow:password-login",
+      "target": "step:password-login:login-endpoint",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.33
+    },
+    {
+      "source": "flow:password-login",
+      "target": "step:password-login:verify-password",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "flow:password-login",
+      "target": "step:password-login:normalize-user",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.67
+    },
+    {
+      "source": "flow:password-login",
+      "target": "step:password-login:persist-session",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.83
+    },
+    {
+      "source": "flow:password-login",
+      "target": "step:password-login:attach-bearer-token",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "domain:identity-and-access",
+      "target": "flow:authorize-request",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "flow:authorize-request",
+      "target": "step:authorize-request:route-guard",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.2
+    },
+    {
+      "source": "flow:authorize-request",
+      "target": "step:authorize-request:resolve-portal",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.4
+    },
+    {
+      "source": "flow:authorize-request",
+      "target": "step:authorize-request:filter-chain",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "flow:authorize-request",
+      "target": "step:authorize-request:validate-token",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "flow:authorize-request",
+      "target": "step:authorize-request:seed-system-accounts",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "domain:booking-lifecycle",
+      "target": "flow:create-booking",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "flow:create-booking",
+      "target": "step:create-booking:open-wizard",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.13
+    },
+    {
+      "source": "flow:create-booking",
+      "target": "step:create-booking:select-branch",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.25
+    },
+    {
+      "source": "flow:create-booking",
+      "target": "step:create-booking:select-vehicle",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.38
+    },
+    {
+      "source": "flow:create-booking",
+      "target": "step:create-booking:select-services",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "flow:create-booking",
+      "target": "step:create-booking:pick-slot",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.63
+    },
+    {
+      "source": "flow:create-booking",
+      "target": "step:create-booking:validate-draft",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.75
+    },
+    {
+      "source": "flow:create-booking",
+      "target": "step:create-booking:submit-booking",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.88
+    },
+    {
+      "source": "flow:create-booking",
+      "target": "step:create-booking:persist-booking",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "domain:booking-lifecycle",
+      "target": "flow:check-slot-availability",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "flow:check-slot-availability",
+      "target": "step:check-slot-availability:request-slots",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.33
+    },
+    {
+      "source": "flow:check-slot-availability",
+      "target": "step:check-slot-availability:compute-slots",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.67
+    },
+    {
+      "source": "flow:check-slot-availability",
+      "target": "step:check-slot-availability:render-slots",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "domain:booking-lifecycle",
+      "target": "flow:present-payment-qr",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "flow:present-payment-qr",
+      "target": "step:present-payment-qr:build-qr-url",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.33
+    },
+    {
+      "source": "flow:present-payment-qr",
+      "target": "step:present-payment-qr:parse-qr-details",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.67
+    },
+    {
+      "source": "flow:present-payment-qr",
+      "target": "step:present-payment-qr:confirm-payment",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "domain:booking-lifecycle",
+      "target": "flow:counter-status-transition",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "flow:counter-status-transition",
+      "target": "step:counter-status-transition:load-queue",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.2
+    },
+    {
+      "source": "flow:counter-status-transition",
+      "target": "step:counter-status-transition:filter-queue",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.4
+    },
+    {
+      "source": "flow:counter-status-transition",
+      "target": "step:counter-status-transition:request-transition",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "flow:counter-status-transition",
+      "target": "step:counter-status-transition:apply-transition",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "flow:counter-status-transition",
+      "target": "step:counter-status-transition:complete-booking",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "domain:service-catalog-and-pricing",
+      "target": "flow:load-catalog",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "flow:load-catalog",
+      "target": "step:load-catalog:fetch-catalog",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.33
+    },
+    {
+      "source": "flow:load-catalog",
+      "target": "step:load-catalog:fallback-constants",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.67
+    },
+    {
+      "source": "flow:load-catalog",
+      "target": "step:load-catalog:render-catalog",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "domain:service-catalog-and-pricing",
+      "target": "flow:calculate-price",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "flow:calculate-price",
+      "target": "step:calculate-price:compute-price",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.33
+    },
+    {
+      "source": "flow:calculate-price",
+      "target": "step:calculate-price:memoise-price",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.67
+    },
+    {
+      "source": "flow:calculate-price",
+      "target": "step:calculate-price:format-currency",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "domain:customer-and-vehicle-management",
+      "target": "flow:manage-vehicles",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "flow:manage-vehicles",
+      "target": "step:manage-vehicles:render-vehicle-list",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.14
+    },
+    {
+      "source": "flow:manage-vehicles",
+      "target": "step:manage-vehicles:call-vehicle-api",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.29
+    },
+    {
+      "source": "flow:manage-vehicles",
+      "target": "step:manage-vehicles:vehicle-endpoints",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.43
+    },
+    {
+      "source": "flow:manage-vehicles",
+      "target": "step:manage-vehicles:validate-plate",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.57
+    },
+    {
+      "source": "flow:manage-vehicles",
+      "target": "step:manage-vehicles:create-vehicle",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.71
+    },
+    {
+      "source": "flow:manage-vehicles",
+      "target": "step:manage-vehicles:guard-ownership",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.86
+    },
+    {
+      "source": "flow:manage-vehicles",
+      "target": "step:manage-vehicles:set-default",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "domain:customer-and-vehicle-management",
+      "target": "flow:resolve-booking-vehicle",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "flow:resolve-booking-vehicle",
+      "target": "step:resolve-booking-vehicle:resolve-vehicle",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "flow:resolve-booking-vehicle",
+      "target": "step:resolve-booking-vehicle:persist-vehicle-row",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "domain:customer-and-vehicle-management",
+      "target": "flow:maintain-customer-record",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "flow:maintain-customer-record",
+      "target": "step:maintain-customer-record:customer-endpoints",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.25
+    },
+    {
+      "source": "flow:maintain-customer-record",
+      "target": "step:maintain-customer-record:create-customer",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "flow:maintain-customer-record",
+      "target": "step:maintain-customer-record:update-customer",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.75
+    },
+    {
+      "source": "flow:maintain-customer-record",
+      "target": "step:maintain-customer-record:render-profile",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "domain:loyalty-and-rewards",
+      "target": "flow:earn-points",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "flow:earn-points",
+      "target": "step:earn-points:transition-to-completed",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.25
+    },
+    {
+      "source": "flow:earn-points",
+      "target": "step:earn-points:award-points",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "flow:earn-points",
+      "target": "step:earn-points:persist-point-row",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.75
+    },
+    {
+      "source": "flow:earn-points",
+      "target": "step:earn-points:show-points",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "domain:loyalty-and-rewards",
+      "target": "flow:redeem-voucher",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "flow:redeem-voucher",
+      "target": "step:redeem-voucher:browse-voucher-shop",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.2
+    },
+    {
+      "source": "flow:redeem-voucher",
+      "target": "step:redeem-voucher:redeem-endpoint",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.4
+    },
+    {
+      "source": "flow:redeem-voucher",
+      "target": "step:redeem-voucher:debit-and-issue",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "flow:redeem-voucher",
+      "target": "step:redeem-voucher:list-vouchers",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "flow:redeem-voucher",
+      "target": "step:redeem-voucher:persist-voucher",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "domain:loyalty-and-rewards",
+      "target": "flow:expire-points",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "flow:expire-points",
+      "target": "step:expire-points:trigger-expiry",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "flow:expire-points",
+      "target": "step:expire-points:run-sweep",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "domain:loyalty-and-rewards",
+      "target": "flow:review-tiers",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "flow:review-tiers",
+      "target": "step:review-tiers:recompute-tiers",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.33
+    },
+    {
+      "source": "flow:review-tiers",
+      "target": "step:review-tiers:show-tier-progress",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.67
+    },
+    {
+      "source": "flow:review-tiers",
+      "target": "step:review-tiers:tier-reference-panel",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "domain:admin-operations",
+      "target": "flow:revenue-reporting",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "flow:revenue-reporting",
+      "target": "step:revenue-reporting:open-revenue-panel",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.25
+    },
+    {
+      "source": "flow:revenue-reporting",
+      "target": "step:revenue-reporting:aggregate-revenue",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "flow:revenue-reporting",
+      "target": "step:revenue-reporting:parse-revenue",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.75
+    },
+    {
+      "source": "flow:revenue-reporting",
+      "target": "step:revenue-reporting:summarise-client-side",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "domain:admin-operations",
+      "target": "flow:audit-loyalty-points",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "flow:audit-loyalty-points",
+      "target": "step:audit-loyalty-points:load-audit",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.33
+    },
+    {
+      "source": "flow:audit-loyalty-points",
+      "target": "step:audit-loyalty-points:parse-audit",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.67
+    },
+    {
+      "source": "flow:audit-loyalty-points",
+      "target": "step:audit-loyalty-points:filter-audit-rows",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "domain:admin-operations",
+      "target": "flow:booking-log-review",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "flow:booking-log-review",
+      "target": "step:booking-log-review:build-log-page",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.25
+    },
+    {
+      "source": "flow:booking-log-review",
+      "target": "step:booking-log-review:project-booking-row",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "flow:booking-log-review",
+      "target": "step:booking-log-review:parse-booking-page",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.75
+    },
+    {
+      "source": "flow:booking-log-review",
+      "target": "step:booking-log-review:page-client-side",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "domain:admin-operations",
+      "target": "flow:customer-registry",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "flow:customer-registry",
+      "target": "step:customer-registry:search-customers",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.25
+    },
+    {
+      "source": "flow:customer-registry",
+      "target": "step:customer-registry:update-customer-admin",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "flow:customer-registry",
+      "target": "step:customer-registry:filter-registry",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.75
+    },
+    {
+      "source": "flow:customer-registry",
+      "target": "step:customer-registry:drive-registry-console",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "domain:admin-operations",
+      "target": "flow:campaign-management",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "flow:campaign-management",
+      "target": "step:campaign-management:draft-campaign",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.17
+    },
+    {
+      "source": "flow:campaign-management",
+      "target": "step:campaign-management:campaign-panel",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.33
+    },
+    {
+      "source": "flow:campaign-management",
+      "target": "step:campaign-management:create-campaign",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "flow:campaign-management",
+      "target": "step:campaign-management:generate-tagline",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.67
+    },
+    {
+      "source": "flow:campaign-management",
+      "target": "step:campaign-management:soft-delete-campaign",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.83
+    },
+    {
+      "source": "flow:campaign-management",
+      "target": "step:campaign-management:show-promotions",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "domain:identity-and-access",
+      "target": "domain:booking-lifecycle",
+      "type": "cross_domain",
+      "direction": "forward",
+      "description": "Supplies the authenticated customer id that scopes booking creation and history, and gates the STAFF counter queue.",
+      "weight": 0.8
+    },
+    {
+      "source": "domain:identity-and-access",
+      "target": "domain:admin-operations",
+      "type": "cross_domain",
+      "direction": "forward",
+      "description": "Gates every admin reporting and campaign endpoint behind the ADMIN role.",
+      "weight": 0.7
+    },
+    {
+      "source": "domain:identity-and-access",
+      "target": "domain:loyalty-and-rewards",
+      "type": "cross_domain",
+      "direction": "forward",
+      "description": "Loyalty endpoints act on the authenticated caller, discarding any customer id supplied in the path or body.",
+      "weight": 0.7
+    },
+    {
+      "source": "domain:booking-lifecycle",
+      "target": "domain:service-catalog-and-pricing",
+      "type": "cross_domain",
+      "direction": "forward",
+      "description": "The wizard selects ACTIVE services and branches and derives the booking price and slot duration from the catalogue.",
+      "weight": 0.9
+    },
+    {
+      "source": "domain:booking-lifecycle",
+      "target": "domain:customer-and-vehicle-management",
+      "type": "cross_domain",
+      "direction": "forward",
+      "description": "Booking creation resolves an existing owned vehicle or creates one inline from the request.",
+      "weight": 0.8
+    },
+    {
+      "source": "domain:booking-lifecycle",
+      "target": "domain:loyalty-and-rewards",
+      "type": "cross_domain",
+      "direction": "forward",
+      "description": "A COMPLETED booking transition writes a PointHistory earn row, guarded against double crediting.",
+      "weight": 0.9
+    },
+    {
+      "source": "domain:booking-lifecycle",
+      "target": "domain:admin-operations",
+      "type": "cross_domain",
+      "direction": "forward",
+      "description": "Completed bookings are the source of the revenue series and the paginated admin booking log.",
+      "weight": 0.7
+    },
+    {
+      "source": "domain:loyalty-and-rewards",
+      "target": "domain:admin-operations",
+      "type": "cross_domain",
+      "direction": "forward",
+      "description": "The full point history is exposed to admins as the loyalty audit trail, and campaigns target loyalty tiers.",
+      "weight": 0.6
+    },
+    {
+      "source": "domain:customer-and-vehicle-management",
+      "target": "domain:admin-operations",
+      "type": "cross_domain",
+      "direction": "forward",
+      "description": "The admin customer registry searches customer records by name, phone and vehicle license plate.",
+      "weight": 0.6
+    },
+    {
+      "source": "domain:customer-and-vehicle-management",
+      "target": "domain:loyalty-and-rewards",
+      "type": "cross_domain",
+      "direction": "forward",
+      "description": "The Customer record carries the accumulated points balance and the tier recomputed by the monthly review.",
+      "weight": 0.6
+    }
+  ]
+}

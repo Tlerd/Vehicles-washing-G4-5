@@ -58,7 +58,6 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setFullName(request.getFullName());
         customer.setPhone(request.getPhone());
         customer.setEmail(request.getEmail());
-        customer.setPasswordHash(request.getPasswordHash());
         customer.setTier(request.getTier());
         customer.setAccumulatedPoints(request.getAccumulatedPoints());
         customer.setTotalSpent(request.getTotalSpent());

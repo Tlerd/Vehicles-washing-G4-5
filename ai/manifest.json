@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 1,
+  "rendererVersion": "role-orchestration-2026-07-21",
+  "status": "role-inventory-provisioned-pending-runtime-and-human-review",
+  "protectedPaths": [
+    "AGENTS.md",
+    "CLAUDE.md",
+    "PROGRESS.md",
+    ".claude/settings.json"
+  ],
+  "allowedDestinationPrefixes": [
+    ".claude/agents/",
+    ".claude/rules/project/",
+    ".codex/agents/",
+    ".agents/skills/",
+    "scripts/ai-harness/"
+  ],
+  "workflow": {
+    "owner": "Superpowers",
+    "delivery": "official-plugin-install-attempted-blocked-by-runtime-cache-permissions",
+    "decision": "D-001-user-authorized-2026-07-21; retry in a normal user terminal"
+  },
+  "vendors": [
+    {
+      "id": "ecc",
+      "repository": "https://github.com/affaan-m/everything-claude-code",
+      "commit": "754b8dd76ca885b764ec22f476664377aa46b6cd",
+      "source": "adopted from existing .claude assets",
+      "reviewStatus": "adopted-local-pending-human-review"
+    }
+  ],
+  "agents": [
+    {
+      "id": "planner",
+      "source": "ai/catalog/agents/planner.md",
+      "outputs": [
+        ".claude/agents/planner.md",
+        ".codex/agents/planner.toml"
+      ]
+    },
+    {
+      "id": "code-reviewer",
+      "source": "ai/catalog/agents/code-reviewer.md",
+      "outputs": [
+        ".claude/agents/code-reviewer.md",
+        ".codex/agents/code-reviewer.toml"
+      ]
+    },
+    {
+      "id": "architect",
+      "source": "ai/catalog/agents/architect.md",
+      "outputs": [".claude/agents/architect.md", ".codex/agents/architect.toml"]
+    },
+    {
+      "id": "tdd-guide",
+      "source": "ai/catalog/agents/tdd-guide.md",
+      "outputs": [".claude/agents/tdd-guide.md", ".codex/agents/tdd-guide.toml"]
+    },
+    {
+      "id": "security-reviewer",
+      "source": "ai/catalog/agents/security-reviewer.md",
+      "outputs": [".claude/agents/security-reviewer.md", ".codex/agents/security-reviewer.toml"]
+    },
+    {
+      "id": "build-error-resolver",
+      "source": "ai/catalog/agents/build-error-resolver.md",
+      "outputs": [".claude/agents/build-error-resolver.md", ".codex/agents/build-error-resolver.toml"]
+    },
+    {
+      "id": "e2e-runner",
+      "source": "ai/catalog/agents/e2e-runner.md",
+      "outputs": [".claude/agents/e2e-runner.md", ".codex/agents/e2e-runner.toml"]
+    },
+    {
+      "id": "refactor-cleaner",
+      "source": "ai/catalog/agents/refactor-cleaner.md",
+      "outputs": [".claude/agents/refactor-cleaner.md", ".codex/agents/refactor-cleaner.toml"]
+    },
+    {
+      "id": "doc-updater",
+      "source": "ai/catalog/agents/doc-updater.md",
+      "outputs": [".claude/agents/doc-updater.md", ".codex/agents/doc-updater.toml"]
+    },
+    {
+      "id": "rust-reviewer",
+      "source": "ai/catalog/agents/rust-reviewer.md",
+      "outputs": [".claude/agents/rust-reviewer.md", ".codex/agents/rust-reviewer.toml"]
+    },
+    {
+      "id": "harmonyos-app-resolver",
+      "source": "ai/catalog/agents/harmonyos-app-resolver.md",
+      "outputs": [".claude/agents/harmonyos-app-resolver.md", ".codex/agents/harmonyos-app-resolver.toml"]
+    },
+    {
+      "id": "frontend-lead",
+      "source": "ai/catalog/agents/frontend-lead.md",
+      "outputs": [".claude/agents/frontend-lead.md", ".codex/agents/frontend-lead.toml"]
+    },
+    {
+      "id": "frontend-ui-specialist",
+      "source": "ai/catalog/agents/frontend-ui-specialist.md",
+      "outputs": [".claude/agents/frontend-ui-specialist.md", ".codex/agents/frontend-ui-specialist.toml"]
+    },
+    {
+      "id": "frontend-state-specialist",
+      "source": "ai/catalog/agents/frontend-state-specialist.md",
+      "outputs": [".claude/agents/frontend-state-specialist.md", ".codex/agents/frontend-state-specialist.toml"]
+    },
+    {
+      "id": "frontend-quality-specialist",
+      "source": "ai/catalog/agents/frontend-quality-specialist.md",
+      "outputs": [".claude/agents/frontend-quality-specialist.md", ".codex/agents/frontend-quality-specialist.toml"]
+    },
+    {
+      "id": "backend-lead",
+      "source": "ai/catalog/agents/backend-lead.md",
+      "outputs": [".claude/agents/backend-lead.md", ".codex/agents/backend-lead.toml"]
+    },
+    {
+      "id": "backend-api-specialist",
+      "source": "ai/catalog/agents/backend-api-specialist.md",
+      "outputs": [".claude/agents/backend-api-specialist.md", ".codex/agents/backend-api-specialist.toml"]
+    },
+    {
+      "id": "backend-data-specialist",
+      "source": "ai/catalog/agents/backend-data-specialist.md",
+      "outputs": [".claude/agents/backend-data-specialist.md", ".codex/agents/backend-data-specialist.toml"]
+    },
+    {
+      "id": "backend-security-specialist",
+      "source": "ai/catalog/agents/backend-security-specialist.md",
+      "outputs": [".claude/agents/backend-security-specialist.md", ".codex/agents/backend-security-specialist.toml"]
+    },
+    {
+      "id": "testing-lead",
+      "source": "ai/catalog/agents/testing-lead.md",
+      "outputs": [".claude/agents/testing-lead.md", ".codex/agents/testing-lead.toml"]
+    },
+    {
+      "id": "unit-test-specialist",
+      "source": "ai/catalog/agents/unit-test-specialist.md",
+      "outputs": [".claude/agents/unit-test-specialist.md", ".codex/agents/unit-test-specialist.toml"]
+    },
+    {
+      "id": "integration-test-specialist",
+      "source": "ai/catalog/agents/integration-test-specialist.md",
+      "outputs": [".claude/agents/integration-test-specialist.md", ".codex/agents/integration-test-specialist.toml"]
+    }
+  ],
+  "skills": [
+    {
+      "id": "api-design",
+      "source": "ai/vendor/ecc/skills/api-design",
+      "codexOutput": ".agents/skills/api-design",
+      "claudeOutput": "preserved-existing:.claude/skills/api-design"
+    },
+    {
+      "id": "e2e-testing",
+      "source": "ai/vendor/ecc/skills/e2e-testing",
+      "codexOutput": ".agents/skills/e2e-testing",
+      "claudeOutput": "preserved-existing:.claude/skills/e2e-testing"
+    },
+    {
+      "id": "frontend-patterns",
+      "source": "ai/vendor/ecc/skills/frontend-patterns",
+      "codexOutput": ".agents/skills/frontend-patterns",
+      "claudeOutput": "preserved-existing:.claude/skills/frontend-patterns"
+    },
+    {
+      "id": "jpa-patterns",
+      "source": "ai/vendor/ecc/skills/jpa-patterns",
+      "codexOutput": ".agents/skills/jpa-patterns",
+      "claudeOutput": "preserved-existing:.claude/skills/jpa-patterns"
+    },
+    {
+      "id": "security-review",
+      "source": "ai/vendor/ecc/skills/security-review",
+      "codexOutput": ".agents/skills/security-review",
+      "claudeOutput": "preserved-existing:.claude/skills/security-review"
+    }
+  ]
+}

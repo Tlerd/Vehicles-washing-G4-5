@@ -1,0 +1,56 @@
+{
+  "detail": {
+    "backToHistory": "Quay lại lịch sử",
+    "bookingId": "Đơn #{{id}}",
+    "loadError": "Không thể tải thông tin đơn đặt lịch. Vui lòng thử lại.",
+    "notFound": {
+      "title": "Không tìm thấy đơn đặt lịch",
+      "description": "Đơn đặt lịch này có thể đã bị xoá hoặc đường dẫn không còn đúng.",
+      "action": "Về lịch sử đặt lịch"
+    },
+    "summary": {
+      "schedule": "Thời gian",
+      "total": "Tổng tiền"
+    },
+    "status": {
+      "CONFIRMED": "Đã xác nhận",
+      "CHECKED_IN": "Đã check-in",
+      "COMPLETED": "Hoàn thành",
+      "NO_SHOW": "Không đến",
+      "CHANGE_REQUESTED": "Yêu cầu đổi lịch"
+    },
+    "checkIn": {
+      "explanation": "Check-in để báo cho chi nhánh biết bạn đã đến. Nhân viên sẽ bắt đầu rửa xe ngay sau khi bạn check-in.",
+      "action": "Check-in",
+      "pending": "Đang check-in…",
+      "error": "Check-in không thành công. Vui lòng thử lại."
+    },
+    "complete": {
+      "explanation": "Chỉ xác nhận khi xe đã rửa xong. Điểm thưởng sẽ được cộng ngay lập tức và không thể hoàn tác, vì vậy hãy kiểm tra kỹ trước khi xác nhận.",
+      "action": "Xác nhận hoàn thành",
+      "pending": "Đang xác nhận…",
+      "error": "Xác nhận hoàn thành không thành công. Vui lòng thử lại.",
+      "successBanner": "Đơn đã hoàn thành! Điểm thưởng đã được cộng vào tài khoản của bạn."
+    },
+    "feedback": {
+      "title": "Đánh giá dịch vụ",
+      "description": "Hãy cho chúng tôi biết trải nghiệm của bạn về lần rửa xe này.",
+      "ratingLabel": "Chọn số sao",
+      "starAria": "Đánh giá {{count}} trên 5 sao",
+      "commentLabel": "Nhận xét (không bắt buộc)",
+      "commentPlaceholder": "Chia sẻ cảm nhận của bạn về dịch vụ...",
+      "submit": "Gửi đánh giá",
+      "pending": "Đang gửi…",
+      "error": "Gửi đánh giá không thành công. Vui lòng thử lại.",
+      "validation": "Vui lòng chọn ít nhất 1 sao trước khi gửi.",
+      "submitted": {
+        "title": "Đánh giá của bạn",
+        "noComment": "Không có nhận xét."
+      }
+    },
+    "readOnly": {
+      "NO_SHOW": "Đơn này được ghi nhận là không đến. Vui lòng liên hệ chi nhánh nếu bạn cho rằng đây là nhầm lẫn.",
+      "CHANGE_REQUESTED": "Yêu cầu đổi lịch của bạn đang được xử lý. Chi nhánh sẽ liên hệ để xác nhận lịch mới."
+    }
+  }
+}

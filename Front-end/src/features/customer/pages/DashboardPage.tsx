@@ -1,343 +1,212 @@
-import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
-  AlertCircle,
-  ArrowRight,
+  Award,
+  Car,
   CalendarClock,
-  CarFront,
-  Clock3,
-  Gift,
-  LoaderCircle,
-  RefreshCw,
-  ShieldCheck,
-  Sparkles,
+  CalendarPlus,
+  Clock,
+  MapPin,
   Star,
-  WalletCards,
+  Ticket,
 } from 'lucide-react';
-import { useAuth } from '../../../context/AuthContext';
-import { bookingService } from '../../../services/customer/booking.service';
-import { vehicleService } from '../../../services/customer/vehicle.service';
-import { platformService } from '../../../services/platform.service';
-import { Booking, PointsTransaction, Vehicle } from '../../../types';
-import { BookingHistory } from '../components/BookingHistory';
-import { PromotionDisplay } from '../components/PromotionDisplay';
-import { PointsHistory } from '../components/PointsHistory';
-import { QuickStats } from '../components/QuickStats';
-import { AIAssistantInput } from '../components/AIAssistantInput';
-import styles from '../styles/DashboardPage.module.css';
+import { Badge, Button, Card, EmptyState, ErrorState, Skeleton } from '@/components/ui';
+import { nextTier, tierForPoints } from '@/lib/mock/customer';
+import { useBookingHistory, useCurrentCustomer } from '@/lib/mock/customerApi';
+import { BOOKING_STATUS_TONE } from '@/lib/bookingStatusTone';
+import { formatBookingDayKey } from '@/lib/datetime';
+import type { BookingRecord, BookingStatus } from '@/types';
 
-interface DashboardPageProps {
-  onNavigate: (page: string) => void;
+const UPCOMING_STATUSES: BookingStatus[] = ['CONFIRMED', 'CHECKED_IN'];
+
+const QUICK_LINKS = [
+  { to: '/app/garage', icon: Car, key: 'garage' as const },
+  { to: '/app/points', icon: Star, key: 'points' as const },
+  { to: '/app/vouchers', icon: Ticket, key: 'vouchers' as const },
+  { to: '/app/history', icon: CalendarClock, key: 'history' as const },
+];
+
+/** Earliest CONFIRMED/CHECKED_IN booking by dayKey+time, not array order. */
+function earliestUpcoming(bookings: BookingRecord[]): BookingRecord | undefined {
+  return [...bookings]
+    .filter((b) => UPCOMING_STATUSES.includes(b.status))
+    .sort((a, b) => (a.dayKey === b.dayKey ? (a.time < b.time ? -1 : 1) : a.dayKey < b.dayKey ? -1 : 1))[0];
 }
 
-export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
-  const { currentUser } = useAuth();
-  const customerId = currentUser?.id || '';
-
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [transactions, setTransactions] = useState<PointsTransaction[]>([]);
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [reloadKey, setReloadKey] = useState(0);
-
-  useEffect(() => {
-    let isCurrentRequest = true;
-
-    if (!customerId) {
-      setBookings([]);
-      setTransactions([]);
-      setVehicles([]);
-      setError('');
-      setIsLoading(false);
-      return () => {
-        isCurrentRequest = false;
-      };
-    }
-
-    const loadDashboard = async () => {
-      setIsLoading(true);
-      setError('');
-      setBookings([]);
-      setTransactions([]);
-      setVehicles([]);
-
-      const [bookingsResult, pointsResult, vehiclesResult] = await Promise.allSettled([
-        bookingService.getBookings(customerId),
-        platformService.points(customerId),
-        vehicleService.getVehicles(customerId),
-      ]);
-
-      if (!isCurrentRequest) return;
-
-      const failedResources: string[] = [];
-
-      if (bookingsResult.status === 'fulfilled') {
-        setBookings(bookingsResult.value);
-      } else {
-        failedResources.push('bookings');
-      }
-
-      if (pointsResult.status === 'fulfilled') {
-        setTransactions(pointsResult.value);
-      } else {
-        failedResources.push('points activity');
-      }
-
-      if (vehiclesResult.status === 'fulfilled') {
-        setVehicles(vehiclesResult.value);
-      } else {
-        failedResources.push('saved vehicles');
-      }
-
-      if (failedResources.length > 0) {
-        setError(`We couldn't load ${failedResources.join(', ')}. Please try again.`);
-      }
-
-      setIsLoading(false);
-    };
-
-    void loadDashboard();
-
-    return () => {
-      isCurrentRequest = false;
-    };
-  }, [customerId, reloadKey]);
-
-  const totalBookings = bookings.length;
-  const completedBookings = bookings.filter((booking) => booking.status === 'COMPLETED').length;
-  const upcomingBooking = bookings.find((booking) =>
-    ['PENDING', 'CONFIRMED', 'CHECKED_IN'].includes(booking.status),
-  );
-  const completionRate = totalBookings > 0 ? Math.round((completedBookings / totalBookings) * 100) : 0;
-  const currentPoints = currentUser?.accumulatedPoints || 0;
-  const totalSpent = currentUser?.totalSpend || 0;
-  const pointsEarned = transactions
-    .filter((transaction) => transaction.points > 0)
-    .reduce((sum, transaction) => sum + transaction.points, 0);
-
-  const quickLinks = [
-    {
-      title: 'Book a wash',
-      description: 'Start a guided booking with clear steps and available time slots.',
-      icon: CalendarClock,
-      action: () => onNavigate('booking'),
-    },
-    {
-      title: 'Manage vehicles',
-      description: 'Update saved vehicles so future bookings take less time.',
-      icon: CarFront,
-      action: () => onNavigate('vehicles'),
-    },
-    {
-      title: 'Redeem rewards',
-      description: 'Turn points into vouchers and premium car-care offers.',
-      icon: Gift,
-      action: () => onNavigate('points'),
-    },
-  ];
-
-  const heroHighlights = [
-    { icon: ShieldCheck, text: `${completionRate}% booking completion rate` },
-    { icon: Star, text: `${currentPoints.toLocaleString('vi-VN')} points ready to redeem` },
-    { icon: CarFront, text: `${vehicles.length} vehicles saved in your profile` },
-  ];
-
+function DashboardSkeleton() {
   return (
-    <div className={styles.dashboard}>
-      {isLoading && (
-        <div className={styles.stateNotice} role="status" aria-live="polite">
-          <LoaderCircle size={18} className={styles.spinner} />
-          <span>Loading your latest dashboard data...</span>
-        </div>
-      )}
-
-      {error && (
-        <div className={`${styles.stateNotice} ${styles.errorNotice}`} role="alert">
-          <AlertCircle size={18} />
-          <span>{error}</span>
-          <button type="button" className={styles.retryButton} onClick={() => setReloadKey((key) => key + 1)}>
-            <RefreshCw size={14} />
-            Try again
-          </button>
-        </div>
-      )}
-
-      <section className={styles.hero}>
-        <div className={styles.heroContent}>
-          <span className={styles.eyebrow}>Customer dashboard</span>
-          <h2>Welcome back, {currentUser?.name || 'Guest'}</h2>
-          <p>
-            Track upcoming appointments, member benefits, and recent activity in one cleaner workspace focused
-            on the next action you need.
-          </p>
-
-          <div className={styles.heroActions}>
-            <button type="button" className={styles.primaryAction} onClick={() => onNavigate('booking')}>
-              Book a wash
-              <ArrowRight size={16} />
-            </button>
-            <button type="button" className={styles.secondaryAction} onClick={() => onNavigate('points')}>
-              View rewards
-            </button>
-          </div>
-
-          <div className={styles.heroHighlights}>
-            {heroHighlights.map((item) => {
-              const Icon = item.icon;
-
-              return (
-                <div key={item.text} className={styles.heroHighlight}>
-                  <Icon size={16} />
-                  <span>{item.text}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <aside className={styles.heroCard}>
-          <span className={styles.heroCardLabel}>Today&apos;s focus</span>
-          {isLoading ? (
-            <div className={styles.heroEmpty} role="status">
-              <LoaderCircle size={22} className={styles.spinner} />
-              <strong>Loading appointments</strong>
-              <span>We are getting your latest booking, vehicle, and rewards details.</span>
-            </div>
-          ) : upcomingBooking ? (
-            <>
-              <div className={styles.heroCardTop}>
-                <div>
-                  <h3>{upcomingBooking.bookingRef || 'Upcoming appointment'}</h3>
-                  <p>Branch {upcomingBooking.branchId}</p>
-                </div>
-                <span className={styles.heroStatus}>{upcomingBooking.status}</span>
-              </div>
-
-              <div className={styles.heroCardMeta}>
-                <div>
-                  <Clock3 size={16} />
-                  <span>
-                    {upcomingBooking.date} at {upcomingBooking.time}
-                  </span>
-                </div>
-                <div>
-                  <WalletCards size={16} />
-                  <span>{upcomingBooking.totalPrice.toLocaleString('vi-VN')} VND</span>
-                </div>
-              </div>
-
-              <div className={styles.focusGrid}>
-                <div className={styles.focusItem}>
-                  <span>Rewards</span>
-                  <strong>{currentPoints.toLocaleString('vi-VN')} pts</strong>
-                </div>
-                <div className={styles.focusItem}>
-                  <span>Current tier</span>
-                  <strong>{currentUser?.tier || 'Member'}</strong>
-                </div>
-              </div>
-
-              <button type="button" className={styles.cardButton} onClick={() => onNavigate('history')}>
-                View booking history
-              </button>
-            </>
-          ) : (
-            <div className={styles.heroEmpty}>
-              <Sparkles size={20} />
-              <strong>No appointments yet</strong>
-              <span>Start a new car-care booking and save your preferred time in just a few steps.</span>
-              <button type="button" className={styles.cardButton} onClick={() => onNavigate('booking')}>
-                Create first booking
-              </button>
-            </div>
-          )}
-        </aside>
-      </section>
-
-      <QuickStats
-        points={currentPoints}
-        totalBookings={totalBookings}
-        completedWashes={completedBookings}
-        totalSpent={totalSpent}
-      />
-
-      <AIAssistantInput />
-
-      <section className={styles.quickLinksGrid}>
-        {quickLinks.map((item) => {
-          const Icon = item.icon;
-
-          return (
-            <button key={item.title} type="button" className={styles.quickLinkCard} onClick={item.action}>
-              <span className={styles.quickLinkIcon}>
-                <Icon size={18} />
-              </span>
-              <div className={styles.quickLinkContent}>
-                <strong>{item.title}</strong>
-                <span>{item.description}</span>
-              </div>
-              <ArrowRight size={16} />
-            </button>
-          );
-        })}
-      </section>
-
-      <div className={styles.mainGrid}>
-        <section className={`${styles.panel} ${styles.panelWide}`}>
-          <div className={styles.panelHeader}>
-            <div>
-              <h3 className={styles.panelTitle}>Recent bookings</h3>
-              <p className={styles.panelSubtitle}>Review recent appointments and check service progress.</p>
-            </div>
-            <button type="button" className={styles.panelAction} onClick={() => onNavigate('history')}>
-              View all
-            </button>
-          </div>
-          <div className={styles.panelBody}>
-            <BookingHistory bookings={bookings.slice(0, 5)} />
-          </div>
-        </section>
-
-        <section className={styles.panel}>
-          <div className={styles.panelHeader}>
-            <div>
-              <h3 className={styles.panelTitle}>Promotions</h3>
-              <p className={styles.panelSubtitle}>Featured offers worth checking before the next booking.</p>
-            </div>
-          </div>
-          <div className={styles.panelBody}>
-            <PromotionDisplay />
-          </div>
-        </section>
-
-        <section className={styles.panel}>
-          <div className={styles.panelHeader}>
-            <div>
-              <h3 className={styles.panelTitle}>Points activity</h3>
-              <p className={styles.panelSubtitle}>Recent point changes, tier status, and reward redemptions.</p>
-            </div>
-            <button type="button" className={styles.panelAction} onClick={() => onNavigate('points')}>
-              Open rewards
-            </button>
-          </div>
-          <div className={styles.panelBody}>
-            <div className={styles.rewardsSummary}>
-              <div className={styles.rewardsMetric}>
-                <span>Total earned</span>
-                <strong>{pointsEarned.toLocaleString('vi-VN')} pts</strong>
-              </div>
-              <div className={styles.rewardsMetric}>
-                <span>Current tier</span>
-                <strong>{currentUser?.tier || 'Member'}</strong>
-              </div>
-            </div>
-
-            <div className={styles.pointsPreview}>
-              <PointsHistory transactions={transactions.slice(0, 5)} />
-            </div>
-          </div>
-        </section>
+    <div className="space-y-6">
+      <Skeleton className="h-9 w-64" />
+      <Skeleton className="h-28" />
+      <Skeleton className="h-36" />
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} className="h-24" />
+        ))}
       </div>
     </div>
   );
-};
+}
+
+export function DashboardPage() {
+  const { t, i18n } = useTranslation('dashboard');
+  const navigate = useNavigate();
+  const profileQuery = useCurrentCustomer();
+  const bookingsQuery = useBookingHistory();
+
+  if (profileQuery.isLoading || bookingsQuery.isLoading) {
+    return <DashboardSkeleton />;
+  }
+
+  if (profileQuery.isError || !profileQuery.data) {
+    return <ErrorState message={t('errors.profile')} onRetry={() => profileQuery.refetch()} />;
+  }
+
+  if (bookingsQuery.isError || !bookingsQuery.data) {
+    return <ErrorState message={t('errors.bookings')} onRetry={() => bookingsQuery.refetch()} />;
+  }
+
+  const profile = profileQuery.data;
+  const bookings = bookingsQuery.data;
+  const tier = tierForPoints(profile.points);
+  const upgrade = nextTier(profile.points);
+  const upcoming = earliestUpcoming(bookings);
+
+  const progressPct = upgrade
+    ? Math.min(
+        100,
+        Math.max(
+          0,
+          Math.round(
+            ((profile.points - tier.minPoints) / (upgrade.minPoints - tier.minPoints)) * 100,
+          ),
+        ),
+      )
+    : 100;
+
+  return (
+    <div className="space-y-6">
+      <header>
+        <h1 className="font-display text-2xl font-bold text-text-primary">
+          {t('greeting', { name: profile.name })}
+        </h1>
+        <p className="mt-1 text-sm text-text-secondary">{t('subtitle')}</p>
+      </header>
+
+      <Card className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3">
+          <span className="rounded-xl bg-primary-light/60 p-2.5 text-primary-dark">
+            <Award className="h-6 w-6" />
+          </span>
+          <div>
+            <div className="flex items-center gap-2">
+              <p className="text-sm text-text-secondary">{t('tier.title')}</p>
+              <Badge tone="primary">{tier.name}</Badge>
+            </div>
+            <p className="mt-0.5 text-2xl font-bold text-text-primary">
+              {profile.points}{' '}
+              <span className="text-sm font-medium text-text-muted">{t('tier.pointsLabel')}</span>
+            </p>
+          </div>
+        </div>
+        <div className="sm:w-64">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-surface-soft">
+            <div
+              className="h-full rounded-full bg-primary transition-all"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
+          <p className="mt-1.5 text-xs text-text-secondary">
+            {upgrade
+              ? t('tier.toNextTier', {
+                  points: upgrade.minPoints - profile.points,
+                  tier: upgrade.name,
+                })
+              : t('tier.maxTierReached')}
+          </p>
+        </div>
+      </Card>
+
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="font-display text-lg font-semibold text-text-primary">
+            {t('upcoming.title')}
+          </h2>
+          <Button size="sm" onClick={() => navigate('/app/booking')}>
+            <CalendarPlus className="h-4 w-4" />
+            {t('cta.newBooking')}
+          </Button>
+        </div>
+
+        {upcoming ? (
+          <Card>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <span className="rounded-xl bg-primary-light/60 p-2.5 text-primary-dark">
+                  <MapPin className="h-5 w-5" />
+                </span>
+                <div>
+                  <p className="font-semibold text-text-primary">{upcoming.branchName}</p>
+                  <p className="text-sm text-text-secondary">
+                    {upcoming.serviceNames.join(', ')}
+                  </p>
+                  <p className="mt-1 flex items-center gap-1 text-xs text-text-muted">
+                    <Clock className="h-3.5 w-3.5" />
+                    {t('upcoming.dateTime', {
+                      date: formatBookingDayKey(upcoming.dayKey, i18n.language),
+                      time: upcoming.time,
+                    })}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 sm:flex-col sm:items-end">
+                <Badge tone={BOOKING_STATUS_TONE[upcoming.status]}>{t(`status.${upcoming.status}`)}</Badge>
+                <Link
+                  to={`/app/bookings/${upcoming.id}`}
+                  className="text-sm font-medium text-primary hover:underline"
+                >
+                  {t('upcoming.viewDetail')}
+                </Link>
+              </div>
+            </div>
+          </Card>
+        ) : (
+          <EmptyState
+            icon={<CalendarClock className="h-8 w-8" />}
+            title={t('upcoming.empty.title')}
+            description={t('upcoming.empty.description')}
+            action={
+              <Button onClick={() => navigate('/app/booking')}>
+                <CalendarPlus className="h-4 w-4" />
+                {t('cta.newBooking')}
+              </Button>
+            }
+          />
+        )}
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="font-display text-lg font-semibold text-text-primary">
+          {t('quickLinks.title')}
+        </h2>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          {QUICK_LINKS.map(({ to, icon: Icon, key }) => (
+            <Link key={to} to={to} className="block">
+              <Card interactive className="h-full">
+                <span className="inline-flex rounded-xl bg-primary-light/60 p-2.5 text-primary-dark">
+                  <Icon className="h-5 w-5" />
+                </span>
+                <p className="mt-3 font-semibold text-text-primary">
+                  {t(`quickLinks.${key}.title`)}
+                </p>
+                <p className="mt-0.5 text-sm text-text-secondary">
+                  {t(`quickLinks.${key}.description`)}
+                </p>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}

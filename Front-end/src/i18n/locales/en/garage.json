@@ -1,0 +1,42 @@
+{
+  "title": "My Vehicles",
+  "description": "Manage your vehicle list so future bookings fill in faster.",
+  "addButton": "Add vehicle",
+  "loadError": "Couldn't load your vehicle list.",
+  "empty": {
+    "title": "No vehicles yet",
+    "description": "Add a vehicle so your next booking can be pre-filled automatically."
+  },
+  "sizes": {
+    "HATCHBACK": "Hatchback",
+    "SEDAN": "Sedan",
+    "SUV": "SUV/Crossover",
+    "PICKUP": "Pickup truck"
+  },
+  "card": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this vehicle?",
+    "deleteError": "Couldn't delete this vehicle. Please try again.",
+    "cancelAriaLabel": "Cancel delete",
+    "confirmDeleteAriaLabel": "Confirm delete",
+    "defaultBadge": "Default"
+  },
+  "form": {
+    "addTitle": "Add a new vehicle",
+    "editTitle": "Edit vehicle",
+    "closeAriaLabel": "Close",
+    "brandLabel": "Brand",
+    "brandRequired": "Please select a brand.",
+    "plateLabel": "License plate",
+    "platePlaceholder": "51K-123.45",
+    "plateRequired": "Please enter a license plate.",
+    "sizeLabel": "Vehicle type",
+    "notesLabel": "Notes (optional)",
+    "notesPlaceholder": "e.g. 2022 Vios, silver",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving…",
+    "saveError": "Couldn't save. Please try again."
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "app": {
+    "name": "AutoWash Pro"
+  },
+  "button": {
+    "continue": "Continue",
+    "back": "Back",
+    "close": "Close",
+    "done": "Done",
+    "confirm": "Confirm",
+    "retry": "Retry",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add"
+  },
+  "theme": {
+    "toggleToDark": "Switch to dark mode",
+    "toggleToLight": "Switch to light mode"
+  },
+  "lang": {
+    "vi": "Tiếng Việt",
+    "en": "English"
+  },
+  "state": {
+    "loading": "Loading…",
+    "error": "Something went wrong",
+    "empty": "Nothing here yet"
+  }
+}
