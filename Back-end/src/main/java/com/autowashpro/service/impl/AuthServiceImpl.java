@@ -65,6 +65,8 @@ public class AuthServiceImpl implements AuthService {
             throw new BadRequestException("Mã xác thực Firebase đã hết hạn hoặc không hợp lệ: " + e.getMessage());
         }
 
+        String email = request.getEmail();
+
         if (identity.phoneNumber() != null) {
             String requestPhone = PhoneNormalizer.toE164(phone);
             String firebaseVerifiedPhone = PhoneNormalizer.toE164(identity.phoneNumber());
@@ -72,14 +74,23 @@ public class AuthServiceImpl implements AuthService {
             if (!requestPhone.equals(firebaseVerifiedPhone)) {
                 throw new BadRequestException("Số điện thoại đăng ký không trùng khớp với số điện thoại xác minh trên Firebase.");
             }
+        } else if (identity.email() != null) {
+            if (email != null && !email.isBlank() && !email.trim().equalsIgnoreCase(identity.email())) {
+                throw new BadRequestException("Email đăng ký không trùng khớp với email xác minh trên Google.");
+            }
+            email = identity.email();
         } else {
-            throw new BadRequestException("Mã xác minh của Firebase không chứa số điện thoại.");
+            throw new BadRequestException("Mã xác minh của Firebase không chứa số điện thoại hoặc email.");
+        }
+
+        if (email != null && !email.isBlank() && customerRepository.existsByEmail(email)) {
+            throw new ConflictException("Email already registered.");
         }
 
         Customer customer = new Customer();
         customer.setFullName(request.getName());
         customer.setPhone(phone);
-        customer.setEmail(request.getEmail());
+        customer.setEmail(email);
         customer.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         customer.setTier("Member");
         customer.setRole("CUSTOMER");
