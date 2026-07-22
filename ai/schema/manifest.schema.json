@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "rendererVersion",
+    "status",
+    "protectedPaths",
+    "allowedDestinationPrefixes",
+    "workflow",
+    "vendors",
+    "agents",
+    "skills"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "rendererVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "protectedPaths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "allowedDestinationPrefixes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "workflow": {
+      "type": "object"
+    },
+    "vendors": {
+      "type": "array"
+    },
+    "agents": {
+      "type": "array"
+    },
+    "skills": {
+      "type": "array"
+    }
+  }
+}
