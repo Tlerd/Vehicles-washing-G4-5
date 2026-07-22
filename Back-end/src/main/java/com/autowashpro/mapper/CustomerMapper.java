@@ -12,6 +12,7 @@ public interface CustomerMapper {
     @Mapping(target = "customerId", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "passwordHash", ignore = true)
     Customer toEntity(CustomerRequest request);
 
     CustomerResponse toResponse(Customer customer);
