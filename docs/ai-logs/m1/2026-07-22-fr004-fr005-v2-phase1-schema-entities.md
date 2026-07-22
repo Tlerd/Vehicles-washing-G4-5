@@ -31,8 +31,12 @@ SQL Server-compatible repository test fixtures.
 
 ## Completed work
 
+<<<<<<< HEAD
 **Phase 1 is now complete.** All 12 tasks are done, committed, and
 independently reviewed:
+=======
+The following tasks are complete, committed, and independently reviewed:
+>>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 
 1. Additive/idempotent SQL Server migration for `guests`, `bays`,
    `slot_reservations`, `booking_items`, `payments`, `idempotency_records`,
@@ -50,6 +54,7 @@ independently reviewed:
 7. `Payment` entity and repository.
 8. `IdempotencyRecord` entity and repository, using a client-assigned String
    primary key and no generated ID.
+<<<<<<< HEAD
 9. `AuditLog` entity and repository (`findByEntityTypeAndEntityIdOrderByCreatedAtDesc`),
    mapped onto the `audit_logs` table from Task 1 (matches BR-025's schema
    field-for-field, independently re-verified by the reviewer against the
@@ -239,6 +244,29 @@ side-effect on every app boot, within Task 11's explicit scope.
 
 Full review dispatch context, the diff reviewed, and the complete report
 text are preserved in `.superpowers/sdd/progress.md`.
+=======
+
+Relevant commits:
+
+`1139569`, `2433aa2`, `9801311`, `e75e929`, `76f7314`, `6169a6a`,
+`26884a3`, `53bce7b`, `f258ce5`.
+
+## Current checkpoint
+
+Work is paused immediately before Task 9. The next task is:
+
+- Implement and test `AuditLog` entity and repository.
+
+Then complete:
+
+- Task 10: evolve the `Booking` entity to support exactly one customer or
+  guest, matching the migration and existing JPA conventions.
+- Task 11: add an idempotent `BaySeeder` with 2 QUICK, 1 DETAIL, and 1
+  UNIVERSAL bay for every branch.
+- Task 12: run sequential Maven tests, verify against SQL Server, perform the
+  final Phase 1 review, and record actual evidence in `PROGRESS.md` and this
+  AI-log directory.
+>>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 
 ## Important incident and safeguards
 
@@ -246,16 +274,21 @@ One commit attempt accidentally included the unrelated pre-existing staged
 pile because `git commit` was not given a pathspec. It was corrected safely
 with a soft reset before anything was pushed, and the intended task files were
 then committed separately. Future commits must explicitly scope the commit
+<<<<<<< HEAD
 pathspec; never reset or discard unrelated work. This mitigation held for the
 remainder of Phase 1 (Tasks 3–11): the controller performed every commit
 itself with an explicit pathspec, and `git show --stat` was checked after
 each to confirm only the intended files landed.
+=======
+pathspec; never reset or discard unrelated work.
+>>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 
 An implementer also found that the shared SQL Server customer fixture needed a
 unique non-null email. That was corrected because SQL Server unique-column NULL
 behavior could otherwise cause a false failure before the intended bay-slot
 constraint was reached.
 
+<<<<<<< HEAD
 A separate minor incident during Task 9: the implementer's report initially
 included the real `DB_PASSWORD` value in plaintext. The report file lives
 under `.superpowers/sdd/`, which is git-ignored (confirmed via `git
@@ -293,3 +326,11 @@ concurrency tests, OTP tests, VNPAY tests, OpenAPI contract checks, live API
 verification, and the final gate evidence remain outstanding in later
 phases (Phase 2 onward), each requiring its own plan before implementation
 starts.
+=======
+## Evidence status
+
+This log records implementation progress and reviewed commits only. Do not
+claim the Backend + Swagger gate has passed yet. Full HTTP integration tests,
+concurrency tests, OTP tests, VNPAY tests, OpenAPI contract checks, live API
+verification, and final gate evidence remain outstanding in later phases.
+>>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e

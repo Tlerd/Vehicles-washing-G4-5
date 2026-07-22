@@ -60,14 +60,20 @@ class SlotReservationRepositoryTest extends RepositoryIntegrationTest {
         Customer customerA = customerRepository.saveAndFlush(BookingTestFixtures.newCustomer("+84911333001"));
         Vehicle vehicleA = vehicleRepository.saveAndFlush(BookingTestFixtures.newVehicle(customerA, "51A-11111"));
         Booking bookingA = bookingRepository.saveAndFlush(BookingTestFixtures.newBooking(customerA, vehicleA, branch, "AWP-TESTA1"));
+<<<<<<< HEAD
         bookingA.setAssignedBay(bay);
         bookingRepository.saveAndFlush(bookingA);
+=======
+>>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 
         Customer customerB = customerRepository.saveAndFlush(BookingTestFixtures.newCustomer("+84911333002"));
         Vehicle vehicleB = vehicleRepository.saveAndFlush(BookingTestFixtures.newVehicle(customerB, "51A-22222"));
         Booking bookingB = bookingRepository.saveAndFlush(BookingTestFixtures.newBooking(customerB, vehicleB, branch, "AWP-TESTA2"));
+<<<<<<< HEAD
         bookingB.setAssignedBay(bay);
         bookingRepository.saveAndFlush(bookingB);
+=======
+>>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 
         LocalDateTime slotTime = LocalDateTime.now().plusDays(1).withHour(10).withMinute(0).withSecond(0).withNano(0);
 

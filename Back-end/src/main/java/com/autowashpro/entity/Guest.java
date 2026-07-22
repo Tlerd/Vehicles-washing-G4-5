@@ -29,9 +29,12 @@ public class Guest {
     @Column(name = "license_plate", length = 20)
     private String licensePlate;
 
+<<<<<<< HEAD
     @Column(name = "vehicle_brand", length = 100)
     private String vehicleBrand;
 
+=======
+>>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
     @Enumerated(EnumType.STRING)
     @Column(name = "vehicle_size", length = 20)
     private VehicleSize vehicleSize;

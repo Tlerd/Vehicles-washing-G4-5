@@ -30,11 +30,19 @@ function mapBranch(b: BranchApiResponse): Branch {
   };
 }
 
+<<<<<<< HEAD
 /** GET /api/v1/branches — safe ACTIVE-only branch summaries. */
 export function useBranches() {
   return useQuery({
     queryKey: ['booking-branches'],
     queryFn: async () => (await apiClient.get<BranchApiResponse[]>('/branches')).map(mapBranch),
+=======
+/** GET /api/v1/catalog/branches — real, ACTIVE-only branches. */
+export function useBranches() {
+  return useQuery({
+    queryKey: ['booking-branches'],
+    queryFn: async () => (await apiClient.get<BranchApiResponse[]>('/catalog/branches')).map(mapBranch),
+>>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
   });
 }
 
@@ -120,6 +128,10 @@ interface BookingApiResponse {
   bookingTime: string;
   totalPrice: number;
   status: string;
+<<<<<<< HEAD
+=======
+  vietQrUrl: string;
+>>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 }
 
 export interface Booking {
@@ -131,6 +143,10 @@ export interface Booking {
   bookingTime: string;
   totalPrice: number;
   status: string;
+<<<<<<< HEAD
+=======
+  vietQrUrl: string;
+>>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 }
 
 function mapBooking(b: BookingApiResponse): Booking {
@@ -143,6 +159,7 @@ function mapBooking(b: BookingApiResponse): Booking {
     bookingTime: b.bookingTime.slice(0, 5),
     totalPrice: b.totalPrice,
     status: b.status,
+<<<<<<< HEAD
   };
 }
 
@@ -157,6 +174,12 @@ export function useCustomerBookings(customerId: string | undefined) {
   });
 }
 
+=======
+    vietQrUrl: b.vietQrUrl,
+  };
+}
+
+>>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 /** POST /api/v1/bookings. `customerId` is required by the DTO's Bean
  *  Validation but always overwritten server-side from the JWT subject
  *  (BookingController.create()) — the placeholder value here is never used. */
@@ -177,9 +200,13 @@ export function useCreateBooking() {
           bookingTime: input.bookingTime,
         })
         .then(mapBooking),
+<<<<<<< HEAD
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['vehicles'] });
       qc.invalidateQueries({ queryKey: ['customer-bookings'] });
     },
+=======
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['vehicles'] }),
+>>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
   });
 }

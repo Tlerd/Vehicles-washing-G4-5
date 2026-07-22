@@ -1,10 +1,17 @@
 # Plan: FR-004 Real (Non-Mock) Booking Wizard
 
 - Date: 2026-07-21
+<<<<<<< HEAD
 - Status: **Superseded on 2026-07-21 by the owner-approved backend-first plan**
   at `docs/superpowers/specs/2026-07-21-be-first-api-swagger-plan.md`. Retained
   as historical audit evidence only; its incremental frontend-wiring sequence
   is no longer the active delivery direction.
+=======
+- Status: **Audit complete, awaiting owner decisions below. No implementation
+  in this pass** — the contract is not yet clear/settled enough to satisfy the
+  "only implement when the contract is clear and secure" precondition this
+  plan was commissioned under.
+>>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 - Related: docs/srs/FR-004-booking-wizard-navigation.md,
   docs/srs/FR-005-booking-checkout-vietqr-payment.md,
   docs/ai-logs/m1/2026-07-21-role-routing-guest-booking-audit.md,

@@ -2,6 +2,7 @@ package com.autowashpro.repository;
 
 import com.autowashpro.entity.IdempotencyRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
+<<<<<<< HEAD
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -28,4 +29,8 @@ public interface IdempotencyRecordRepository extends JpaRepository<IdempotencyRe
     int deleteExpiredBatch(
             @Param("cutoff") LocalDateTime cutoff,
             @Param("batchSize") int batchSize);
+=======
+
+public interface IdempotencyRecordRepository extends JpaRepository<IdempotencyRecord, String> {
+>>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 }

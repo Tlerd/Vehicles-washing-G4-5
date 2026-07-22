@@ -18,6 +18,7 @@
     "success": {
       "title": "Booking confirmed!",
       "ref": "Booking reference: {{ref}}",
+<<<<<<< HEAD
       "description": "Your booking request has been recorded.",
       "home": "Go home",
       "again": "Book another",
@@ -26,6 +27,11 @@
         "refresh": "Refresh",
         "refreshing": "Loading…"
       }
+=======
+      "description": "Scan the VietQR code above or pay at the counter when you arrive.",
+      "home": "Go home",
+      "again": "Book another"
+>>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
     }
   },
   "branch": {
@@ -81,11 +87,19 @@
     "phone": "Phone"
   },
   "confirm": {
+<<<<<<< HEAD
     "bookingTitle": "Confirm booking",
     "bookingSubtitle": "Review the order total before submitting your request",
     "totalLabel": "Order total",
     "submitError": "Couldn't create the booking, please try again.",
     "note": "Your request will be submitted for processing through the booking lifecycle."
+=======
+    "paymentTitle": "Payment",
+    "paymentSubtitle": "Scan the VietQR code or pay at the counter",
+    "totalLabel": "Order total",
+    "submitError": "Couldn't create the booking, please try again.",
+    "note": "Your booking stays pending confirmation until you pay at the counter or via VietQR."
+>>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
   },
   "categoryGrid": {
     "comboGroupTitle": "Combo packages",
