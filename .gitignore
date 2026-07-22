@@ -42,3 +42,5 @@ Back-end/src/main/resources/firebase-service-account.json
 CLAUDE.local.md
 .ua/intermediate/
 .ua/diff-overlay.json
+.ua/tmp/
+.ua/.trash-*/
