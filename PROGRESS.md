@@ -1,6 +1,38 @@
 # Progress — AutoWash Pro
 
 ## Current state
+- 2026-07-22 — FR-004/FR-005 booking-engine Phase 3B trusted availability is
+  **implemented, independently reviewed, migrated, verified, documented, and
+  committed** as `7543192`. The backend now exposes minimized canonical branch
+  summaries and a public 15-minute slot contract driven by active server-owned
+  services, quantities, durations, booking modes, branch policy, customer tier,
+  active compatible bays, real HOLD/BOOKED reservations, and explicitly marked
+  BR-012 legacy capacity. It returns all 44 cells for the approved 07:00-18:00
+  schedule, UTC timestamps, stable unavailability reasons, remaining compatible
+  capacity, and up to three forward alternatives. The old service-code route is
+  retained only as a deprecated adapter.
+
+  The additive Phase 3B migration was applied successfully and idempotently to
+  both `autowash_pro_test` and `autowash_pro`. It adds active-bay allocation
+  support, trusted slot-grid/expiry checks, and booking/branch referential
+  integrity; startup bay seeding is atomic under SQL Server locks. Public and
+  authenticated polling uses bounded, expiring quotas, and optional bearer
+  handling is covered by real HTTP/JWT regressions. Focused gates passed 41/41
+  and 8/8. The final command `& Back-end/run-tests.ps1 -Clean` passed
+  **184/184** against SQL Server with 0 failures, 0 errors, and 0 skipped.
+  A direct Maven attempt without process-local `DB_PASSWORD` failed before test
+  execution and is not counted as evidence.
+
+  Independent reviews found no unresolved Critical or High findings. The
+  optional-auth test gap was fixed. Lifecycle-coupled `PENDING_DEPOSIT` expiry
+  and cleanup-versus-payment concurrency are binding work for Phase 3C, where
+  v2 booking creation becomes reachable. Direct socket addresses remain the
+  safe rate-limit identity; deployments behind a proxy require trusted ingress
+  address handling rather than arbitrary forwarding headers. **The Backend +
+  Swagger gate has NOT passed**: transactional member/guest creation, atomic
+  holds/idempotency/expiry, VNPAY, lifecycle/RBAC, and remaining endpoint/OpenAPI
+  coverage are pending. Detailed evidence is in
+  `docs/ai-logs/m1/2026-07-22-fr004-fr005-booking-availability-phase3b.md`.
 - 2026-07-22 — FR-004/FR-005 booking-engine Phase 3A schema/domain foundation
   is **implemented, independently reviewed, verified, migrated, and committed**
   as `bff3ab0`. The additive SQL Server migration now supplies trusted catalog
