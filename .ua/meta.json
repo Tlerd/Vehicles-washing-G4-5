@@ -1,0 +1,90 @@
+{
+  "version": "2.9.4",
+  "kind": "code",
+  "generatedAt": "2026-07-20T05:38:56.281Z",
+  "generator": "understand-anything/2.9.4 (/understand)",
+  "project": {
+    "name": "AutoWash Pro",
+    "root": ".",
+    "languages": [
+      "html",
+      "java",
+      "javascript",
+      "json",
+      "markdown",
+      "properties",
+      "sql",
+      "txt",
+      "typescript",
+      "unknown",
+      "xml"
+    ],
+    "frameworks": [
+      "React",
+      "React Router",
+      "Vite",
+      "TypeScript",
+      "Tailwind CSS",
+      "Axios",
+      "Firebase",
+      "Spring Boot",
+      "Spring Web",
+      "Spring Data JPA",
+      "Spring Security",
+      "Hibernate",
+      "JUnit",
+      "Lombok",
+      "MapStruct",
+      "SpringDoc OpenAPI"
+    ],
+    "fileCount": 195
+  },
+  "git": {
+    "commit": "65d4a948134c3ee44e311fe024914b986c4d90d9",
+    "branch": "chore/harness-setup"
+  },
+  "counts": {
+    "nodes": 439,
+    "edges": 873,
+    "layers": 10,
+    "tourSteps": 12,
+    "filesScanned": 195,
+    "filesFiltered": 66,
+    "nodeTypes": {
+      "file": 167,
+      "function": 172,
+      "class": 63,
+      "document": 19,
+      "config": 6,
+      "table": 12
+    },
+    "edgeTypes": {
+      "contains": 244,
+      "exports": 158,
+      "imports": 287,
+      "calls": 88,
+      "implements": 3,
+      "depends_on": 26,
+      "configures": 10,
+      "documents": 17,
+      "related": 22,
+      "defines_schema": 9,
+      "migrates": 4,
+      "tested_by": 5
+    }
+  },
+  "fingerprints": {
+    "path": ".ua/fingerprints.json",
+    "fileCount": 195,
+    "baselineCommit": "65d4a948134c3ee44e311fe024914b986c4d90d9",
+    "note": "Baseline built BEFORE meta.json so future incremental runs diff correctly instead of escalating to FULL_UPDATE."
+  },
+  "validation": {
+    "mode": "inline-deterministic",
+    "script": ".ua/tmp/ua-inline-validate.cjs",
+    "result": "PASS",
+    "errors": 0,
+    "warnings": 1,
+    "note": "No --review flag was passed, so the graph-reviewer LLM pass did not run. These are mechanical checks only (ID integrity, dangling edges, layer exclusivity, tour anchoring). They make no claim about semantic quality."
+  }
+}
