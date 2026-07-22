@@ -1,6 +1,35 @@
 # Progress — AutoWash Pro
 
 ## Current state
+- 2026-07-22 — FR-004/FR-005 booking-engine Phase 3A schema/domain foundation
+  is **implemented, independently reviewed, verified, migrated, and committed**
+  as `bff3ab0`. The additive SQL Server migration now supplies trusted catalog
+  metadata, approved prices/durations for the ten existing service codes,
+  data-driven tiers, branch scheduling policy, immutable booking/pricing and
+  guest-vehicle snapshots, nullable guest vehicle ownership, safe legacy-row
+  upgrades, canonical voucher-tier linkage, legacy-financial markers, scoped
+  idempotency hashes, and trusted DB constraints for booking actor/vehicle
+  ownership, price arithmetic, bay/branch consistency, and 64-hex storage
+  keys. Both `autowash_pro_test` and `autowash_pro` accepted the migration and
+  a repeat execution; the development DB contains six explicitly marked
+  legacy financial snapshots, zero guest bookings, and zero legacy
+  idempotency rows. Server-owned loyalty fields can no longer be mass-assigned,
+  and the obsolete direct customer-creation route now requires the verified
+  registration flow.
+
+  RED evidence included missing schema/catalog fields, invalid guest rows under
+  the strengthened actor constraint, raw idempotency inserts, mutable guest
+  lookup data, and an unsafe SQL Server primary-key narrowing attempt that
+  rolled back. The final command `& Back-end/run-tests.ps1 -Clean` passed
+  **108/108** against the live SQL Server test database, with 0 failures,
+  0 errors, and 0 skipped. The independent post-fix review found no unresolved
+  Critical or High findings. Accepted binding work for Phase 3B/3C: the new
+  availability engine must conservatively include six legacy active bookings
+  until they have equivalent slot reservations. The 64-hex migration ambiguity
+  is accepted because both idempotency tables were verified empty.
+  **The Backend + Swagger gate has NOT passed**: pure pricing/duration,
+  15-minute availability, atomic creation/holds/idempotency/expiry, VNPAY,
+  lifecycle/RBAC, and full OpenAPI remain pending.
 - 2026-07-22 — Backend HTTP/security foundation for FR-004/FR-005 is
   **implemented, reviewed, committed, and locally verified**. Scoped commits:
   `861dd9d` (booking/vehicle owner-only access), `8aa636e` (customer credential
