@@ -7,6 +7,7 @@ import com.autowashpro.exception.custom.ConflictException;
 import com.autowashpro.exception.custom.ForbiddenException;
 import com.autowashpro.exception.custom.GoneException;
 import com.autowashpro.exception.custom.ResourceNotFoundException;
+import com.autowashpro.exception.custom.ServiceUnavailableException;
 import com.autowashpro.exception.custom.TooManyRequestsException;
 import com.autowashpro.exception.custom.UnauthorizedException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -78,6 +79,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleGone(
             GoneException ex, HttpServletRequest request) {
         return build(HttpStatus.GONE, "GONE", ex.getMessage(), request, List.of());
+    }
+
+    @ExceptionHandler(ServiceUnavailableException.class)
+    public ResponseEntity<ApiErrorResponse> handleServiceUnavailable(
+            ServiceUnavailableException ex, HttpServletRequest request) {
+        return build(HttpStatus.SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE",
+                ex.getMessage(), request, List.of());
     }
 
     @ExceptionHandler(TooManyRequestsException.class)

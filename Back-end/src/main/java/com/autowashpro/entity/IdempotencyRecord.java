@@ -31,6 +31,12 @@ public class IdempotencyRecord {
     @Column(name = "principal_scope_hash", nullable = false, length = 64)
     private String principalScopeHash;
 
+    @Column(name = "client_key_hash", nullable = false, length = 64)
+    private String clientKeyHash;
+
+    @Column(name = "guest_proof_hash", length = 64)
+    private String guestProofHash;
+
     @Column(name = "response_status", nullable = false)
     private Integer responseStatus;
 

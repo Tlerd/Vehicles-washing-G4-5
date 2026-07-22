@@ -1,6 +1,7 @@
 package com.autowashpro.repository;
 
 import com.autowashpro.entity.IdempotencyRecord;
+import com.autowashpro.entity.IdempotencyGuestProof;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -13,20 +14,25 @@ class IdempotencyRecordRepositoryTest extends RepositoryIntegrationTest {
     @Autowired
     private IdempotencyRecordRepository idempotencyRecordRepository;
 
+    @Autowired
+    private IdempotencyGuestProofRepository guestProofRepository;
+
     @Test
     void save_and_findById_roundTripsAllFields() {
         String rawKey = "test-key-001";
         String scopedKeyHash = "c".repeat(64);
+        LocalDateTime now = LocalDateTime.now();
         IdempotencyRecord record = new IdempotencyRecord();
         record.setScopedKeyHash(scopedKeyHash);
         record.setRequestPath("/api/v1/bookings");
         record.setCustomerId(1L);
         record.setRequestHash("a".repeat(64));
         record.setPrincipalScopeHash("b".repeat(64));
+        record.setClientKeyHash("d".repeat(64));
         record.setResponseStatus(201);
         record.setResponseBody("{\"bookingRef\":\"AWP-TESTD1\"}");
-        record.setCreatedAt(LocalDateTime.now());
-        record.setExpiresAt(LocalDateTime.now().plusHours(24));
+        record.setCreatedAt(now);
+        record.setExpiresAt(now.plusHours(24));
 
         idempotencyRecordRepository.saveAndFlush(record);
 
@@ -34,8 +40,44 @@ class IdempotencyRecordRepositoryTest extends RepositoryIntegrationTest {
         assertThat(found.getRequestPath()).isEqualTo("/api/v1/bookings");
         assertThat(found.getRequestHash()).isEqualTo("a".repeat(64));
         assertThat(found.getPrincipalScopeHash()).isEqualTo("b".repeat(64));
+        assertThat(found.getClientKeyHash()).isEqualTo("d".repeat(64));
         assertThat(found.getResponseStatus()).isEqualTo(201);
         assertThat(found.getResponseBody()).contains("AWP-TESTD1");
         assertThat(idempotencyRecordRepository.findById(rawKey)).isEmpty();
+    }
+
+    @Test
+    void save_guestRecord_roundTripsProofBindingWithoutRawProof() {
+        LocalDateTime now = LocalDateTime.now();
+        IdempotencyRecord record = new IdempotencyRecord();
+        record.setScopedKeyHash("1".repeat(64));
+        record.setRequestPath("/api/v1/bookings");
+        record.setGuestPhone("+84901112233");
+        record.setRequestHash("2".repeat(64));
+        record.setPrincipalScopeHash("3".repeat(64));
+        record.setClientKeyHash("4".repeat(64));
+        record.setGuestProofHash("5".repeat(64));
+        record.setResponseStatus(201);
+        record.setResponseBody("{\"bookingRef\":\"AWP-GUEST1\"}");
+        record.setCreatedAt(now);
+        record.setExpiresAt(now.plusHours(24));
+
+        idempotencyRecordRepository.saveAndFlush(record);
+
+        IdempotencyRecord found = idempotencyRecordRepository.findById("1".repeat(64)).orElseThrow();
+        assertThat(found.getGuestPhone()).isEqualTo("+84901112233");
+        assertThat(found.getGuestProofHash()).isEqualTo("5".repeat(64));
+        assertThat(found.getGuestProofHash()).doesNotContain("gvp_");
+
+        IdempotencyGuestProof proof = new IdempotencyGuestProof();
+        proof.setProofHash(found.getGuestProofHash());
+        proof.setRecord(found);
+        proof.setCreatedAt(now);
+        guestProofRepository.saveAndFlush(proof);
+
+        assertThat(guestProofRepository.findReplayRecord(
+                "5".repeat(64), "4".repeat(64), "/api/v1/bookings"))
+                .map(IdempotencyRecord::getScopedKeyHash)
+                .contains("1".repeat(64));
     }
 }

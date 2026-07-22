@@ -1,10 +1,14 @@
 package com.autowashpro.repository;
 
 import com.autowashpro.entity.Booking;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +29,26 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     boolean existsByCustomerCustomerIdAndStatusIn(Long customerId, List<String> statuses);
     List<Booking> findByCustomerCustomerIdAndStatusAndBookingDateGreaterThanEqual(Long customerId, String status, LocalDate fromDate);
     Optional<Booking> findByBookingRef(String bookingRef);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT b FROM Booking b WHERE b.bookingId = :bookingId")
+    Optional<Booking> findByIdForUpdate(@Param("bookingId") Long bookingId);
+
+    @Query(value = "SELECT TOP (:batchSize) * FROM dbo.bookings " +
+            "WITH (UPDLOCK, READPAST, ROWLOCK) WHERE status = 'PENDING_DEPOSIT' " +
+            "AND deposit_expires_at <= :now ORDER BY deposit_expires_at, booking_id",
+            nativeQuery = true)
+    List<Booking> findDueForExpiry(
+            @Param("now") LocalDateTime now,
+            @Param("batchSize") int batchSize);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE Booking b SET b.status = 'EXPIRED', b.depositExpiresAt = NULL " +
+            "WHERE b.bookingId = :bookingId AND b.status = 'PENDING_DEPOSIT' " +
+            "AND b.depositExpiresAt <= :now")
+    int expirePendingDeposit(
+            @Param("bookingId") Long bookingId,
+            @Param("now") LocalDateTime now);
 
     @Query("SELECT b FROM Booking b " +
             "LEFT JOIN FETCH b.customer " +

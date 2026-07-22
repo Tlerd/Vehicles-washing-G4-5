@@ -32,7 +32,7 @@ class AvailabilityRepositoryIntegrationTest extends RepositoryIntegrationTest {
     private EntityManager entityManager;
 
     @Test
-    void blockingSlotQuery_usesHalfOpenDayRangeAndExactExpiryBoundary() {
+    void blockingSlotQuery_usesHalfOpenRangeAndTreatsPhysicalHoldsAsBlockingUntilLifecycleCleanup() {
         Branch branch = branches.saveAndFlush(BookingTestFixtures.newBranch("Availability Query"));
         Bay bay = bays.saveAndFlush(newBay(branch, "Q1", "QUICK", true));
         LocalDate date = LocalDate.now().plusDays(4);
@@ -51,10 +51,12 @@ class AvailabilityRepositoryIntegrationTest extends RepositoryIntegrationTest {
 
         List<SlotReservationRepository.BlockingSlotProjection> result =
                 reservations.findBlockingSlots(
-                        branch.getBranchId(), date.atTime(9, 0), date.atTime(10, 0), now);
+                        branch.getBranchId(), date.atTime(9, 0), date.atTime(10, 0));
 
         assertThat(result).extracting(SlotReservationRepository.BlockingSlotProjection::getSlotTime)
-                .containsExactlyInAnyOrder(date.atTime(9, 0), date.atTime(9, 15));
+                .containsExactlyInAnyOrder(
+                        date.atTime(9, 0), date.atTime(9, 15),
+                        date.atTime(9, 30), date.atTime(9, 45));
     }
 
     @Test
@@ -85,6 +87,7 @@ class AvailabilityRepositoryIntegrationTest extends RepositoryIntegrationTest {
         Booking unmarked = booking(branch, date, "AWP-LEG003");
         unmarked.setStatus("CONFIRMED");
         unmarked.setLegacyFinancialSnapshot(false);
+        unmarked.setBookingMode("FLEXIBLE");
         bookings.saveAndFlush(unmarked);
         Booking pending = booking(branch, date, "AWP-LEG004");
         pending.setStatus("PENDING");
@@ -105,6 +108,8 @@ class AvailabilityRepositoryIntegrationTest extends RepositoryIntegrationTest {
         Bay bay = bays.saveAndFlush(newBay(branch, "Q1", "QUICK", true));
         LocalDate date = LocalDate.now().plusDays(6);
         Booking booking = booking(branch, date, "AWP-GRID01");
+        booking.setAssignedBay(bay);
+        bookings.saveAndFlush(booking);
 
         SlotReservation offGrid = reservation(
                 branch, bay, booking, date.atTime(9, 1), "BOOKED", null);
@@ -121,6 +126,8 @@ class AvailabilityRepositoryIntegrationTest extends RepositoryIntegrationTest {
         Bay bay = bays.saveAndFlush(newBay(branch, "Q1", "QUICK", true));
         LocalDate date = LocalDate.now().plusDays(7);
         Booking booking = booking(branch, date, "AWP-EXP001");
+        booking.setAssignedBay(bay);
+        bookings.saveAndFlush(booking);
 
         SlotReservation invalid = reservation(
                 branch, bay, booking, date.atTime(9, 0), "HOLD", null);
@@ -137,6 +144,8 @@ class AvailabilityRepositoryIntegrationTest extends RepositoryIntegrationTest {
         Bay bay = bays.saveAndFlush(newBay(branch, "Q1", "QUICK", true));
         LocalDate date = LocalDate.now().plusDays(8);
         Booking booking = booking(branch, date, "AWP-EXP002");
+        booking.setAssignedBay(bay);
+        bookings.saveAndFlush(booking);
 
         SlotReservation invalid = reservation(
                 branch, bay, booking, date.atTime(9, 0), "BOOKED",
@@ -149,21 +158,24 @@ class AvailabilityRepositoryIntegrationTest extends RepositoryIntegrationTest {
     }
 
     @Test
-    void reservationBookingBranchConstraint_rejectsCrossBranchBooking() {
+    void reservationBookingAssignmentConstraint_rejectsCrossBranchBooking() {
         Branch reservationBranch = branches.saveAndFlush(
                 BookingTestFixtures.newBranch("Reservation Branch"));
         Branch bookingBranch = branches.saveAndFlush(
                 BookingTestFixtures.newBranch("Different Booking Branch"));
         Bay bay = bays.saveAndFlush(newBay(reservationBranch, "Q1", "QUICK", true));
+        Bay bookingBay = bays.saveAndFlush(newBay(bookingBranch, "Q1", "QUICK", true));
         LocalDate date = LocalDate.now().plusDays(9);
         Booking booking = booking(bookingBranch, date, "AWP-XBR001");
+        booking.setAssignedBay(bookingBay);
+        bookings.saveAndFlush(booking);
 
         SlotReservation invalid = reservation(
                 reservationBranch, bay, booking, date.atTime(9, 0), "BOOKED", null);
 
         assertThatThrownBy(() -> reservations.saveAndFlush(invalid))
                 .isInstanceOf(DataIntegrityViolationException.class)
-                .hasMessageContaining("FK_slot_reservations_booking_branch");
+                .hasMessageContaining("FK_slot_reservations_booking_assignment");
         entityManager.clear();
     }
 
@@ -206,6 +218,10 @@ class AvailabilityRepositoryIntegrationTest extends RepositoryIntegrationTest {
             LocalDateTime slotTime,
             String status,
             LocalDateTime expiresAt) {
+        if (booking.getAssignedBay() == null) {
+            booking.setAssignedBay(bay);
+            bookings.saveAndFlush(booking);
+        }
         reservations.saveAndFlush(reservation(
                 branch, bay, booking, slotTime, status, expiresAt));
     }

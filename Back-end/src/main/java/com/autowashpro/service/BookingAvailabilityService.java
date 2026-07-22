@@ -211,7 +211,7 @@ public class BookingAvailabilityService {
         if (insideWindow && Boolean.TRUE.equals(branch.getBookingEnabled())) {
             LocalDateTime dayEnd = date.atTime(branch.getCloseTime());
             LocalDateTime nowLocal = LocalDateTime.ofInstant(clock.instant(), BUSINESS_ZONE);
-            blocking = reservations.findBlockingSlots(branchId, dayStart, dayEnd, nowLocal);
+            blocking = reservations.findBlockingSlots(branchId, dayStart, dayEnd);
             occupiedByBay = occupiedByBay(blocking);
             compatibleBayIds = compatibleBays(
                     bays.findActiveByBranchId(branchId), requiredBayTypes).stream()

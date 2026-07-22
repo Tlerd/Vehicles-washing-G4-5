@@ -2,11 +2,14 @@ package com.autowashpro.repository;
 
 import com.autowashpro.entity.Service;
 import com.autowashpro.entity.Tier;
+import com.autowashpro.entity.Bay;
+import com.autowashpro.entity.Branch;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -17,6 +20,12 @@ class BookingEngineDomainRepositoryTest extends RepositoryIntegrationTest {
 
     @Autowired
     private TierRepository tierRepository;
+
+    @Autowired
+    private BranchRepository branchRepository;
+
+    @Autowired
+    private BayRepository bayRepository;
 
     @Test
     void configuredService_roundTripsTrustedBookingMetadata() {
@@ -71,6 +80,32 @@ class BookingEngineDomainRepositoryTest extends RepositoryIntegrationTest {
             assertThat(service.getPricingUnit()).as(code + " unit")
                     .isEqualTo(snapshot.pricingUnit());
         });
+    }
+
+    @Test
+    void compatibleBayAllocation_ordersSpecializedBeforeUniversalAndExcludesInactive() {
+        Branch branch = branchRepository.saveAndFlush(
+                BookingTestFixtures.newBranch("Bay Ordering"));
+        bayRepository.saveAndFlush(bay(branch, "U1", "UNIVERSAL", true));
+        bayRepository.saveAndFlush(bay(branch, "Q2", "QUICK", true));
+        bayRepository.saveAndFlush(bay(branch, "Q1", "QUICK", true));
+        bayRepository.saveAndFlush(bay(branch, "Q0", "QUICK", false));
+        bayRepository.saveAndFlush(bay(branch, "D1", "DETAIL", true));
+
+        assertThat(bayRepository.findActiveCompatibleForAllocation(
+                branch.getBranchId(), "QUICK"))
+                .extracting(Bay::getBayCode)
+                .containsExactly("Q1", "Q2", "U1");
+    }
+
+    private Bay bay(Branch branch, String code, String type, boolean active) {
+        Bay bay = new Bay();
+        bay.setBranch(branch);
+        bay.setBayCode(code);
+        bay.setBayType(type);
+        bay.setActive(active);
+        bay.setCreatedAt(LocalDateTime.now());
+        return bay;
     }
 
     private record CatalogSnapshot(

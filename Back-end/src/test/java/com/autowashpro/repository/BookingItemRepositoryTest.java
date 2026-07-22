@@ -13,12 +13,16 @@ import com.autowashpro.repository.ServiceRepository;
 import com.autowashpro.repository.VehicleRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class BookingItemRepositoryTest extends RepositoryIntegrationTest {
 
@@ -39,6 +43,9 @@ class BookingItemRepositoryTest extends RepositoryIntegrationTest {
 
     @Autowired
     private BookingItemRepository bookingItemRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Test
     void findByBookingBookingId_returnsSnapshottedLineItem() {
@@ -74,5 +81,65 @@ class BookingItemRepositoryTest extends RepositoryIntegrationTest {
         assertThat(items.get(0).getSizeMultiplier()).isEqualByComparingTo("1.20");
         assertThat(items.get(0).getDurationMinutes()).isEqualTo(20);
         assertThat(items.get(0).getBufferMinutes()).isEqualTo(10);
+    }
+
+    @Test
+    void invalidQuantityAboveTrustedPolicy_isRejectedByDatabase() {
+        ItemFixture fixture = fixture("INVALIDQ");
+        BookingItem item = item(fixture, 21);
+
+        assertThatThrownBy(() -> bookingItemRepository.saveAndFlush(item))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("CK_booking_items_v2");
+        entityManager.clear();
+    }
+
+    @Test
+    void duplicateBookingServiceSnapshot_isRejectedByDatabase() {
+        ItemFixture fixture = fixture("DUPLICATE");
+        bookingItemRepository.saveAndFlush(item(fixture, 1));
+
+        assertThatThrownBy(() -> bookingItemRepository.saveAndFlush(item(fixture, 1)))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("UX_booking_items_booking_service");
+        entityManager.clear();
+    }
+
+    private ItemFixture fixture(String suffix) {
+        String unique = suffix + System.nanoTime();
+        Branch branch = branchRepository.saveAndFlush(
+                BookingTestFixtures.newBranch("Item " + unique));
+        Customer customer = customerRepository.saveAndFlush(
+                BookingTestFixtures.newCustomer("+849" + Math.abs(unique.hashCode())));
+        Vehicle vehicle = vehicleRepository.saveAndFlush(
+                BookingTestFixtures.newVehicle(customer, "T-" + Math.abs(unique.hashCode())));
+        Booking booking = bookingRepository.saveAndFlush(
+                BookingTestFixtures.newBooking(customer, vehicle, branch, "AWP-" + unique));
+        com.autowashpro.entity.Service service = new com.autowashpro.entity.Service();
+        service.setServiceCode(unique.substring(0, Math.min(30, unique.length())));
+        service.setServiceName("Test " + suffix);
+        service.setBasePrice(new BigDecimal("100000"));
+        service.setDurationMinutes(20);
+        service.setStatus("ACTIVE");
+        service = serviceRepository.saveAndFlush(service);
+        return new ItemFixture(booking, service);
+    }
+
+    private BookingItem item(ItemFixture fixture, int quantity) {
+        BookingItem item = new BookingItem();
+        item.setBooking(fixture.booking());
+        item.setService(fixture.service());
+        item.setQuantity(quantity);
+        item.setUnitPrice(new BigDecimal("100000"));
+        item.setSizeMultiplier(BigDecimal.ONE);
+        item.setLineTotal(new BigDecimal("100000").multiply(BigDecimal.valueOf(quantity)));
+        item.setDurationMinutes(20);
+        item.setBufferMinutes(10);
+        item.setCreatedAt(LocalDateTime.now());
+        return item;
+    }
+
+    private record ItemFixture(
+            Booking booking, com.autowashpro.entity.Service service) {
     }
 }

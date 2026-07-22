@@ -19,6 +19,14 @@ public interface BayRepository extends JpaRepository<Bay, Long> {
             "ORDER BY b.bayCode ASC, b.bayId ASC")
     List<Bay> findActiveByBranchId(@Param("branchId") Long branchId);
 
+    @Query("SELECT b FROM Bay b WHERE b.branch.branchId = :branchId AND b.active = true " +
+            "AND (b.bayType = :requiredType OR b.bayType = 'UNIVERSAL') " +
+            "ORDER BY CASE WHEN b.bayType = :requiredType THEN 0 ELSE 1 END, " +
+            "b.bayCode ASC, b.bayId ASC")
+    List<Bay> findActiveCompatibleForAllocation(
+            @Param("branchId") Long branchId,
+            @Param("requiredType") String requiredType);
+
     boolean existsByBranchBranchIdAndBayCode(Long branchId, String bayCode);
 
     @Modifying

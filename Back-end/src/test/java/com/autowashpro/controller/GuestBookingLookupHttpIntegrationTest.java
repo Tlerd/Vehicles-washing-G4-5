@@ -383,6 +383,7 @@ class GuestBookingLookupHttpIntegrationTest {
         booking.setCounterBalance(new BigDecimal("150000.00"));
         booking.setStatus("CONFIRMED");
         booking.setCreatedAt(LocalDateTime.now());
+        booking.setLegacyFinancialSnapshot(true);
         booking = bookingRepository.saveAndFlush(booking);
         bookingIds.add(booking.getBookingId());
         return booking;

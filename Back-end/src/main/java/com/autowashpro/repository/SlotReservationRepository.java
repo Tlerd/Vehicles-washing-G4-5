@@ -27,16 +27,24 @@ public interface SlotReservationRepository extends JpaRepository<SlotReservation
             WHERE r.branch.branchId = :branchId
               AND r.slotTime >= :from
               AND r.slotTime < :to
-              AND (r.status = 'BOOKED'
-                   OR (r.status = 'HOLD' AND (r.expiresAt IS NULL OR r.expiresAt > :now)))
+              AND r.status IN ('BOOKED', 'HOLD')
             """)
     List<BlockingSlotProjection> findBlockingSlots(
             @Param("branchId") Long branchId,
             @Param("from") LocalDateTime from,
-            @Param("to") LocalDateTime to,
-            @Param("now") LocalDateTime now);
+            @Param("to") LocalDateTime to);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM SlotReservation r WHERE r.status = 'HOLD' AND r.expiresAt <= :now")
     int deleteExpiredHolds(@Param("now") LocalDateTime now);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("DELETE FROM SlotReservation r WHERE r.booking.bookingId = :bookingId " +
+            "AND r.status = 'HOLD'")
+    int deleteHoldsByBookingId(@Param("bookingId") Long bookingId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE SlotReservation r SET r.status = 'BOOKED', r.expiresAt = NULL " +
+            "WHERE r.booking.bookingId = :bookingId AND r.status = 'HOLD'")
+    int confirmHoldsByBookingId(@Param("bookingId") Long bookingId);
 }

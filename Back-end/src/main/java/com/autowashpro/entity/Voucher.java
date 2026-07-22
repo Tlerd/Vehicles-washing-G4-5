@@ -50,4 +50,7 @@ public class Voucher {
     @JsonIgnore
     @JoinColumn(name = "min_tier_id")
     private Tier minimumTier;
+
+    @Column(name = "locked_booking_id")
+    private Long lockedBookingId;
 }

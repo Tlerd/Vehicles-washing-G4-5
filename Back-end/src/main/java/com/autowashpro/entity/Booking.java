@@ -39,6 +39,10 @@ public class Booking {
     @JoinColumn(name = "branch_id", nullable = false)
     private Branch branch;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assigned_bay_id")
+    private Bay assignedBay;
+
     @Column(name = "booking_date", nullable = false)
     private LocalDate bookingDate;
 

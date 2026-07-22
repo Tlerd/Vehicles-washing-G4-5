@@ -74,7 +74,7 @@ class BookingAvailabilityServiceTest {
         lenient().when(bays.findActiveByBranchId(BRANCH_ID)).thenReturn(List.of(
                 bay(1L, "Q1", "QUICK"), bay(2L, "Q2", "QUICK"),
                 bay(3L, "D1", "DETAIL"), bay(4L, "U1", "UNIVERSAL")));
-        lenient().when(reservations.findBlockingSlots(eq(BRANCH_ID), any(), any(), any()))
+        lenient().when(reservations.findBlockingSlots(eq(BRANCH_ID), any(), any()))
                 .thenReturn(List.of());
         lenient().when(bookings.findLegacyAvailabilityCandidates(
                         eq(BRANCH_ID), any(LocalDate.class), anyList()))
@@ -116,7 +116,7 @@ class BookingAvailabilityServiceTest {
     @Test
     void consecutiveCapacity_mustExistInOneCompatibleBay() {
         LocalDateTime ten = DATE.atTime(10, 0);
-        when(reservations.findBlockingSlots(eq(BRANCH_ID), any(), any(), any())).thenReturn(List.of(
+        when(reservations.findBlockingSlots(eq(BRANCH_ID), any(), any())).thenReturn(List.of(
                 blocking(1L, 101L, ten),
                 blocking(2L, 102L, ten.plusMinutes(15)),
                 blocking(4L, 103L, ten.plusMinutes(30))));
@@ -162,7 +162,7 @@ class BookingAvailabilityServiceTest {
         when(bookings.findLegacyAvailabilityCandidates(eq(BRANCH_ID), eq(DATE), anyList()))
                 .thenReturn(List.of(legacyBooking(
                         502L, "CONFIRMED", LocalTime.of(10, 0), null, 45, true)));
-        when(reservations.findBlockingSlots(eq(BRANCH_ID), any(), any(), any())).thenReturn(List.of(
+        when(reservations.findBlockingSlots(eq(BRANCH_ID), any(), any())).thenReturn(List.of(
                 blocking(1L, 502L, ten),
                 blocking(1L, 502L, ten.plusMinutes(15)),
                 blocking(1L, 502L, ten.plusMinutes(30))));
@@ -206,13 +206,13 @@ class BookingAvailabilityServiceTest {
         assertThat(result.slots()).isEmpty();
         assertThat(result.alternatives()).isEmpty();
         verify(bays, never()).findActiveByBranchId(any());
-        verify(reservations, never()).findBlockingSlots(any(), any(), any(), any());
+        verify(reservations, never()).findBlockingSlots(any(), any(), any());
     }
 
     @Test
     void unavailableRequestedStart_returnsExactlyThreeLaterCapacityValidAlternatives() {
         LocalDateTime requested = DATE.atTime(13, 15);
-        when(reservations.findBlockingSlots(eq(BRANCH_ID), any(), any(), any())).thenReturn(List.of(
+        when(reservations.findBlockingSlots(eq(BRANCH_ID), any(), any())).thenReturn(List.of(
                 blocking(1L, 201L, requested),
                 blocking(2L, 202L, requested),
                 blocking(4L, 203L, requested)));
@@ -237,7 +237,7 @@ class BookingAvailabilityServiceTest {
                 .isInstanceOf(com.autowashpro.exception.custom.BadRequestException.class);
 
         verify(branches, never()).findById(any());
-        verify(reservations, never()).findBlockingSlots(any(), any(), any(), any());
+        verify(reservations, never()).findBlockingSlots(any(), any(), any());
     }
 
     @Test
@@ -271,7 +271,7 @@ class BookingAvailabilityServiceTest {
     @Test
     void alternatives_continueOnFollowingBusinessDayNearClosing() {
         LocalDateTime requested = DATE.atTime(17, 45);
-        when(reservations.findBlockingSlots(eq(BRANCH_ID), any(), any(), any())).thenReturn(List.of(
+        when(reservations.findBlockingSlots(eq(BRANCH_ID), any(), any())).thenReturn(List.of(
                 blocking(1L, 301L, requested),
                 blocking(2L, 302L, requested),
                 blocking(4L, 303L, requested)));
@@ -301,7 +301,7 @@ class BookingAvailabilityServiceTest {
                                 selection(BayType.QUICK, 5, 10), Instant.MAX, null))
                 .isInstanceOf(com.autowashpro.exception.custom.BadRequestException.class);
 
-        verify(reservations, never()).findBlockingSlots(any(), any(), any(), any());
+        verify(reservations, never()).findBlockingSlots(any(), any(), any());
     }
 
     @Test
