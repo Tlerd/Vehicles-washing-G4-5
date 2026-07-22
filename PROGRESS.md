@@ -1,6 +1,35 @@
 # Progress — AutoWash Pro
 
 ## Current state
+- 2026-07-22 — Backend HTTP/security foundation for FR-004/FR-005 is
+  **implemented, reviewed, committed, and locally verified**. Scoped commits:
+  `861dd9d` (booking/vehicle owner-only access), `8aa636e` (customer credential
+  update hardening), and `b8e49fc` (guest proof and booking-lookup HTTP APIs).
+  The phase adds purpose-bound Firebase Phone OTP proof issuance; JWT-or-proof
+  booking lookup with principal-derived ownership and a minimized response;
+  proof digests at rest; atomic `REQUIRES_NEW` single-use consumption; bounded,
+  expiring, independently scoped throttles; bounded proof cleanup; exact public
+  route matchers; exact-origin CORS; unified MVC/Spring Security error bodies;
+  partial OpenAPI security/error contracts; and environment-only, disabled-by-
+  default privileged-account provisioning. The post-review focused command
+  `& Back-end/run-tests.ps1 -Tests
+  "BookingControllerRateLimitTest,GuestBookingLookupHttpIntegrationTest,GlobalExceptionHandlerTest"`
+  passed **18/18**. The final clean backend command
+  `& Back-end/run-tests.ps1 -Clean` passed **98/98** against the configured live
+  `autowash_pro_test` SQL Server database, with 0 failures, 0 errors, and 0
+  skipped. Independent code and adversarial security re-reviews found no
+  unresolved Critical or High findings after fixes.
+
+  Accepted residuals: guest lookup consumes a proof before returning `200`,
+  `403`, or `404`; the approved differentiated `404`/`403` contract is a bounded
+  reference-existence oracle; rate limiting is process-local; and direct
+  `getRemoteAddr()` deliberately ignores spoofable forwarding headers, so a
+  proxy deployment must use an explicitly trusted address-resolution setup.
+  Real Firebase Phone OTP, VNPAY callbacks, and browser E2E were not exercised
+  in this backend-only phase. The lecturer's original rubric was not present.
+  **The Backend + Swagger gate has NOT passed**: guest booking creation,
+  15-minute bay allocation/holds, VNPAY, lifecycle/loyalty/admin completion,
+  and complete OpenAPI documentation remain pending.
 - 2026-07-22 — FR-004/FR-005 v2 backend Phase 2 (guest identity & OTP/Firebase
   verification-proof foundation) is **complete**, committed, and reviewed
   under `docs/superpowers/plans/2026-07-22-fr004v2-phase2-guest-verification.md`.
@@ -430,10 +459,10 @@ Navigation data, not requirements. None of this satisfies a rubric item.
       wants a clean slate.
 - [x] STAFF (+84900000001) and ADMIN (+84900000002) DB passwords rotated
       2026-07-21 (fresh bcrypt hashes, verified via live login), replacing the
-      seeder's hardcoded Staff@123/Admin@123. New passwords reported to the
+      seeder's hardcoded legacy credentials (now redacted). New passwords reported to the
       owner in chat only, not written to any file. **Still open**:
       Back-end/src/main/java/com/autowashpro/config/SystemAccountSeeder.java
-      itself still hardcodes Staff@123/Admin@123 in tracked source — those
+      itself still hardcoded legacy credentials in tracked source — those
       values are permanently exposed via git history regardless of what's live
       in the DB now, and the seeder will silently stop mattering only because
       `existsByPhone` skips already-seeded rows; it should still be changed to

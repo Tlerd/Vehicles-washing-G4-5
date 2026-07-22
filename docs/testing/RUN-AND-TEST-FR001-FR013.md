@@ -5,14 +5,16 @@
 - Java JDK 17 and Maven 3.9+
 - Node.js 20+
 - SQL Server on port 1433 and SSMS
-- Database login: `sa` / `AutoWash@123456`
+- Database credentials supplied through `Back-end/.env`; use a dedicated,
+  least-privileged local test login and never commit its password.
 - Firebase web configuration in `Front-end/.env`
 - Firebase Admin service account at `Back-end/src/main/resources/firebase-service-account.json`
 
 ## Start
 
 1. Execute `Back-end/database/AutoWashPro.sql` in SSMS.
-2. In `Back-end`, run `mvn clean test` and then `mvn spring-boot:run`.
+2. From the repository root, run `Back-end/run-tests.ps1 -Clean`, then start
+   the backend through the environment-loading local run script.
 3. In `Front-end`, run `npm install`, `npm run build`, then `npm run dev`.
 4. Open `http://localhost:5173`. Swagger is at `http://localhost:8080/swagger-ui/index.html`.
 

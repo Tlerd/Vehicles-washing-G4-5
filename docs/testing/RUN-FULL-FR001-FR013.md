@@ -18,12 +18,9 @@ mvn clean spring-boot:run
 
 The first successful start creates these local test accounts when absent:
 
-| Role | Phone | Password |
-|---|---|---|
-| STAFF | `0900000001` | `Staff@123` |
-| ADMIN | `0900000002` | `Admin@123` |
-
-Change these passwords before deploying outside a local test machine.
+STAFF and ADMIN test accounts are provisioned only when the explicit
+environment-only bootstrap is enabled. Obtain local test credentials from the
+human environment owner; this repository does not publish defaults.
 
 ## 3. Start frontend
 

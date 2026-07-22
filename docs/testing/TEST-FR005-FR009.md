@@ -8,7 +8,9 @@
 4. Start frontend: `cd Front-end`, run `npm install`, then `npm run dev`.
 5. Register/login and add at least one saved vehicle before opening Booking.
 
-Default database connection: `localhost:1433`, database `autowash_pro`, user `sa`, password `AutoWash@123456`.
+Default database location: `localhost:1433`, database `autowash_pro`. Supply a
+dedicated least-privileged login through `Back-end/.env`; no password is stored
+in this document.
 
 ## 2. FR-005 — booking and VietQR
 
