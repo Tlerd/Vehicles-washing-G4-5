@@ -9,6 +9,11 @@
   No frontend tests were run by explicit demo instruction. Full backend gate,
   lifecycle expiry, guest booking, VNPAY, and Swagger completion remain
   pending; do not treat this demo pass as final FR-001…FR-013 evidence.
+- 2026-07-22 — Local demo processes started successfully: Vite is listening on
+  `http://localhost:5173` (HTTP 200) and Spring Boot is listening on
+  `http://localhost:8080` (HTTP 200 for `GET /api/v1/branches`). Process IDs
+  were 16992 (FE) and 23600 (BE) at verification time. This is live local demo
+  evidence only; no tests were run in this quick-demo pass.
 - 2026-07-22 — FR-004/FR-005 booking-engine Phase 3B trusted availability is
   **implemented, independently reviewed, migrated, verified, documented, and
   committed** as `7543192`. The backend now exposes minimized canonical branch

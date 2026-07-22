@@ -38,3 +38,14 @@ repository.
 4. The wizard reads branches/services/availability and vehicles from the API;
    confirming a booking uses the current authenticated `POST /api/v1/bookings`
    compatibility route.
+
+## Running demo evidence
+
+- Started Vite with `npm --prefix Front-end run dev -- --host 0.0.0.0`.
+- Started Spring Boot with the environment-only `.env` loader and
+  `mvn spring-boot:run`; no secret values were printed.
+- `http://localhost:5173/` returned HTTP 200.
+- `GET http://localhost:8080/api/v1/branches` returned HTTP 200 and one live
+  SQL Server branch record.
+- No tests, typecheck, production build, or browser E2E were run per the quick
+  demo instruction.
