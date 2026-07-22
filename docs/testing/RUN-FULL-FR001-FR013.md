@@ -47,5 +47,5 @@ Open `http://localhost:5173`. A browser reload keeps a valid logged-in session.
 - Service duration determines the occupied start/end interval.
 - An ACTIVE unexpired voucher may be applied and becomes LOCKED.
 - Estimated and credited points use final cash paid after the voucher.
-- VietQR is manual payment. Configure the real bank details in `application.properties` before accepting money.
+- Do not accept payment based on a customer acknowledgement. Payment verification requires the approved provider integration.
 

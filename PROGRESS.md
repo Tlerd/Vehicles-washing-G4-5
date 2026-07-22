@@ -1,19 +1,46 @@
 # Progress — AutoWash Pro
 
 ## Current state
-- 2026-07-22 — Demo-priority frontend connection pass: the existing React
-  booking wizard already calls the backend catalog, availability, vehicle,
-  authentication, and booking routes. This pass hardens the API client with a
-  localhost backend fallback when `VITE_API_BASE_URL` is absent and switches
-  branch loading to the minimized public `GET /api/v1/branches` contract.
-  No frontend tests were run by explicit demo instruction. Full backend gate,
-  lifecycle expiry, guest booking, VNPAY, and Swagger completion remain
-  pending; do not treat this demo pass as final FR-001…FR-013 evidence.
-- 2026-07-22 — Local demo processes started successfully: Vite is listening on
-  `http://localhost:5173` (HTTP 200) and Spring Boot is listening on
-  `http://localhost:8080` (HTTP 200 for `GET /api/v1/branches`). Process IDs
-  were 16992 (FE) and 23600 (BE) at verification time. This is live local demo
-  evidence only; no tests were run in this quick-demo pass.
+- 2026-07-22 — Added project-local Engram identification in
+  `.engram/config.json` for the `autowash-pro` memory namespace. The verified
+  local Engram binary and existing Codex MCP registration use an explicit
+  executable path; cloud/Git sync and exports remain unconfigured. A fresh
+  Codex or Claude Code session still needs to run `mem_current_project` before
+  MCP project detection is claimed verified; do not broadly stage `.engram/`
+  or enable Git sync without an approved sharing and sensitive-data policy. See
+  `docs/ai-logs/m1/2026-07-22-engram-local-project-configuration.md`.
+- 2026-07-22 — Connected workspace code discovery to codebase-memory MCP v0.9.0
+  after verifying the release SHA-256, and indexed this repository successfully
+  (5,817 nodes, 13,612 edges; status `ready`). The server is configured in
+  `.codex/config.toml`; a new Codex session is required for its tools to appear
+  in the conversation tool list. See
+  `docs/ai-logs/m1/2026-07-22-codebase-memory-mcp-connection.md`.
+- 2026-07-22 — Removed the customer self-confirmation/VietQR payment surface
+  because it is demo-only and cannot verify settlement. The obsolete payment
+  endpoint, service, test, generated QR response/UI, and related text were
+  deleted; payment persistence, locking, lifecycle support, and PayOS
+  scaffolding were retained for the approved implementation path. The latest
+  `.env`-loaded full backend run was 237/246 passing (1 failure, 8 errors);
+  focused backend validation and frontend typecheck/build passed. See
+  `docs/ai-logs/m1/2026-07-22-remove-demo-payment-surface.md`.
+- 2026-07-22 — Owner-authorized local credential rotation: the single STAFF
+  and single ADMIN rows were updated in one guarded SQL Server transaction,
+  keyed by their existing phone+role identities (not by role alone). Fresh
+  BCrypt hashes were generated in a local JVM; no plaintext password, hash,
+  token, or database credential was written to source or logs. Both stored
+  hashes passed BCrypt format and `matches()` verification. Existing JWTs are
+  stateless and remain valid until expiry; invalidating them would require a
+  separate JWT-secret rotation. See
+  `docs/ai-logs/m1/2026-07-22-local-staff-admin-password-rotation.md`.
+- 2026-07-22 — Local backend-startup guidance was corrected after the owner
+  ran `./Back-end/run-local.ps1` and Spring Boot failed with `Could not resolve
+  placeholder 'JWT_SECRET'`, despite the local `.env` containing that value.
+  The same-process PowerShell `.env` loader followed by `mvn spring-boot:run`
+  was verified with `GET /api/v1/branches` returning HTTP 200. `README.md` now
+  documents that verified command and explicitly says `.env` is not executable.
+  `run-local.ps1` has not been claimed fixed; its effective environment
+  propagation needs a separate investigation. See
+  `docs/ai-logs/m1/2026-07-22-local-backend-startup-env-loader.md`.
 - 2026-07-22 — FR-004/FR-005 booking-engine Phase 3B trusted availability is
   **implemented, independently reviewed, migrated, verified, documented, and
   committed** as `7543192`. The backend now exposes minimized canonical branch

@@ -28,7 +28,7 @@ The application has Customer, Washing Counter, and Admin portal buttons after lo
 | FR-002 | Login using phone and password | JWT is returned and automatically attached to protected API calls |
 | FR-003 | Add, edit, set default and delete vehicles | Changes persist in `vehicles`; the final vehicle cannot be deleted |
 | FR-004 | Move forward/backward through six booking steps | State is preserved; occupied slots come from SQL Server |
-| FR-005 | Confirm booking | `bookings` and `booking_services` are inserted; backend price and VietQR are displayed |
+| FR-005 | Confirm booking | `bookings` and `booking_services` are inserted; provider-verified payment remains pending integration |
 | FR-006 | Complete a checked-in booking | Points are credited once and recorded in `point_history` |
 | FR-007 | Complete bookings across tier thresholds | Member/Silver/Gold/Platinum changes based on spending; maintenance API expires old points |
 | FR-008 | Redeem voucher and apply it to booking | Points are deducted transactionally; voucher locks, is restored on cancellation, or used on checkout |

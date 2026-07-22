@@ -418,6 +418,24 @@ IF NOT EXISTS (
     CREATE INDEX IX_idempotency_expiry
         ON dbo.idempotency_records(expires_at, idempotency_key);
 
+IF NOT EXISTS (
+    SELECT 1 FROM sys.indexes
+    WHERE name = 'IX_bookings_expiry_claim'
+      AND object_id = OBJECT_ID('dbo.bookings')
+)
+    CREATE INDEX IX_bookings_expiry_claim
+        ON dbo.bookings(status, deposit_expires_at, booking_id)
+        INCLUDE(applied_voucher_id);
+
+IF NOT EXISTS (
+    SELECT 1 FROM sys.indexes
+    WHERE name = 'IX_slot_booking_lock'
+      AND object_id = OBJECT_ID('dbo.slot_reservations')
+)
+    CREATE INDEX IX_slot_booking_lock
+        ON dbo.slot_reservations(booking_id, slot_time, reservation_id)
+        INCLUDE(status, expires_at, bay_id, branch_id);
+
 IF OBJECT_ID('dbo.idempotency_guest_proofs', 'U') IS NULL
 BEGIN
     CREATE TABLE dbo.idempotency_guest_proofs (

@@ -1,0 +1,7 @@
+[agents]
+max_threads = 5
+max_depth = 2
+
+[mcp_servers.codebase-memory]
+command = "C:\\Users\\nguye\\.codex\\bin\\codebase-memory-mcp\\codebase-memory-mcp.exe"
+args = []

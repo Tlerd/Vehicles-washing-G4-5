@@ -66,9 +66,11 @@ public class SecurityConfig {
                         .requestMatchers(new RegexRequestMatcher(
                                 "^/api/v1/bookings/AWP-[A-Z0-9]{6,8}$", "GET")).permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/customers/me").hasAnyRole("CUSTOMER", "STAFF", "ADMIN")
                         .requestMatchers("/api/v1/customers/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/washing-counter/**").hasAnyRole("STAFF", "ADMIN")
                         .requestMatchers("/api/v1/loyalty/maintenance/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/payments/**").hasRole("CUSTOMER")
                         .requestMatchers("/api/v1/vehicles/**", "/api/v1/loyalty/**").hasRole("CUSTOMER")
                         .requestMatchers("/api/v1/bookings/**", "/api/v1/catalog/**").hasAnyRole("CUSTOMER", "STAFF", "ADMIN")
                         .anyRequest().authenticated()

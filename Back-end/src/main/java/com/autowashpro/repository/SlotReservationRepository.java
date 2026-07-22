@@ -1,9 +1,11 @@
 package com.autowashpro.repository;
 
 import com.autowashpro.entity.SlotReservation;
+import jakarta.persistence.QueryHint;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
@@ -34,9 +36,12 @@ public interface SlotReservationRepository extends JpaRepository<SlotReservation
             @Param("from") LocalDateTime from,
             @Param("to") LocalDateTime to);
 
-    @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("DELETE FROM SlotReservation r WHERE r.status = 'HOLD' AND r.expiresAt <= :now")
-    int deleteExpiredHolds(@Param("now") LocalDateTime now);
+    @Query(value = "SELECT * FROM dbo.slot_reservations " +
+            "WITH (UPDLOCK, ROWLOCK, INDEX(IX_slot_booking_lock)) " +
+            "WHERE booking_id = :bookingId ORDER BY slot_time, reservation_id",
+            nativeQuery = true)
+    @QueryHints(@QueryHint(name = "jakarta.persistence.query.timeout", value = "2000"))
+    List<SlotReservation> findByBookingIdForUpdate(@Param("bookingId") Long bookingId);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM SlotReservation r WHERE r.booking.bookingId = :bookingId " +

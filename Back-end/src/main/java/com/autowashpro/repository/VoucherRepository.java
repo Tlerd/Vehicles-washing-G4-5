@@ -1,10 +1,12 @@
 package com.autowashpro.repository;
 
 import com.autowashpro.entity.Voucher;
+import jakarta.persistence.QueryHint;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
 
 import jakarta.persistence.LockModeType;
@@ -22,6 +24,11 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
     Optional<Voucher> findOwnedForUpdate(
             @Param("voucherId") Long voucherId,
             @Param("customerId") Long customerId);
+
+    @Query(value = "SELECT * FROM dbo.vouchers WITH (UPDLOCK, ROWLOCK) " +
+            "WHERE voucher_id = :voucherId", nativeQuery = true)
+    @QueryHints(@QueryHint(name = "jakarta.persistence.query.timeout", value = "2000"))
+    Optional<Voucher> findByIdForUpdate(@Param("voucherId") Long voucherId);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE Voucher v SET v.status = 'LOCKED', v.lockedBookingId = :bookingId " +

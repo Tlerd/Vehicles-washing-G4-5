@@ -6,6 +6,7 @@ import com.autowashpro.entity.Branch;
 import com.autowashpro.entity.Customer;
 import com.autowashpro.entity.SlotReservation;
 import com.autowashpro.entity.Vehicle;
+import com.autowashpro.service.BookingLifecycleExpiryService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,7 @@ class AvailabilityRepositoryIntegrationTest extends RepositoryIntegrationTest {
     @Autowired private VehicleRepository vehicles;
     @Autowired private BookingRepository bookings;
     @Autowired private SlotReservationRepository reservations;
+    @Autowired private BookingLifecycleExpiryService expiry;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -185,14 +187,20 @@ class AvailabilityRepositoryIntegrationTest extends RepositoryIntegrationTest {
         Bay bay = bays.saveAndFlush(newBay(branch, "Q1", "QUICK", true));
         LocalDate date = LocalDate.now().plusDays(10);
         LocalDateTime now = date.atTime(8, 0);
-        saveReservation(branch, bay, booking(branch, date, "AWP-CLN001"),
-                date.atTime(9, 0), "HOLD", now);
-        saveReservation(branch, bay, booking(branch, date, "AWP-CLN002"),
-                date.atTime(9, 15), "HOLD", now.plusMinutes(1));
-        saveReservation(branch, bay, booking(branch, date, "AWP-CLN003"),
-                date.atTime(9, 30), "BOOKED", null);
+        Booking due = booking(branch, date, "AWP-CLN001");
+        due.setDepositExpiresAt(now);
+        bookings.saveAndFlush(due);
+        saveReservation(branch, bay, due, date.atTime(9, 0), "HOLD", now);
+        Booking future = booking(branch, date, "AWP-CLN002");
+        future.setDepositExpiresAt(now.plusMinutes(1));
+        bookings.saveAndFlush(future);
+        saveReservation(branch, bay, future, date.atTime(9, 15), "HOLD", now.plusMinutes(1));
+        Booking booked = booking(branch, date, "AWP-CLN003");
+        booked.setDepositExpiresAt(now);
+        bookings.saveAndFlush(booked);
+        saveReservation(branch, bay, booked, date.atTime(9, 30), "BOOKED", null);
 
-        int deleted = reservations.deleteExpiredHolds(now);
+        int deleted = expiry.expireDue(now, 100);
 
         assertThat(deleted).isEqualTo(1);
         assertThat(reservations.findByBayBayIdAndSlotTimeBetween(

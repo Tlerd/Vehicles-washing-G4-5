@@ -1,0 +1,60 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------------< com.autowashpro:backend >-----------------------
+[INFO] Building backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ backend ---
+[INFO] Copying 2 resources from src\main\resources to target\classes
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ backend ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 72 source files with javac [debug parameters release 17] to target\classes
+[WARNING] /D:/demoSWP/demomain/Vehicles-washing-G4-5/Back-end/src/main/java/com/autowashpro/mapper/CustomerMapper.java:[16,14] Unmapped target properties: "role, vehicles".
+[WARNING] /D:/demoSWP/demomain/Vehicles-washing-G4-5/Back-end/src/main/java/com/autowashpro/mapper/AuthMapper.java:[27,14] Unmapped target property: "vehicles".
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ backend ---
+[INFO] skip non existing resourceDirectory D:\demoSWP\demomain\Vehicles-washing-G4-5\Back-end\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ backend ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 8 source files with javac [debug parameters release 17] to target\test-classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /D:/demoSWP/demomain/Vehicles-washing-G4-5/Back-end/src/test/java/com/autowashpro/repository/BayRepositoryTest.java:[3,30] cannot find symbol
+  symbol:   class Bay
+  location: package com.autowashpro.entity
+[ERROR] /D:/demoSWP/demomain/Vehicles-washing-G4-5/Back-end/src/test/java/com/autowashpro/repository/BayRepositoryTest.java:[5,34] cannot find symbol
+  symbol:   class BayRepository
+  location: package com.autowashpro.repository
+[ERROR] /D:/demoSWP/demomain/Vehicles-washing-G4-5/Back-end/src/test/java/com/autowashpro/repository/BayRepositoryTest.java:[21,13] cannot find symbol
+  symbol:   class BayRepository
+  location: class com.autowashpro.repository.BayRepositoryTest
+[INFO] 3 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  6.440 s
+[INFO] Finished at: 2026-07-22T00:59:45+07:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:testCompile (default-testCompile) on project backend: Compilation failure: Compilation failure: 
+[ERROR] /D:/demoSWP/demomain/Vehicles-washing-G4-5/Back-end/src/test/java/com/autowashpro/repository/BayRepositoryTest.java:[3,30] cannot find symbol
+[ERROR]   symbol:   class Bay
+[ERROR]   location: package com.autowashpro.entity
+[ERROR] /D:/demoSWP/demomain/Vehicles-washing-G4-5/Back-end/src/test/java/com/autowashpro/repository/BayRepositoryTest.java:[5,34] cannot find symbol
+[ERROR]   symbol:   class BayRepository
+[ERROR]   location: package com.autowashpro.repository
+[ERROR] /D:/demoSWP/demomain/Vehicles-washing-G4-5/Back-end/src/test/java/com/autowashpro/repository/BayRepositoryTest.java:[21,13] cannot find symbol
+[ERROR]   symbol:   class BayRepository
+[ERROR]   location: class com.autowashpro.repository.BayRepositoryTest
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

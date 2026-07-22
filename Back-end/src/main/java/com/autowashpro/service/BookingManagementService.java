@@ -7,18 +7,12 @@ import com.autowashpro.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.beans.factory.annotation.Value;
 import java.math.*;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.*;
 import java.util.*;
 
 @Service @RequiredArgsConstructor @Transactional
 public class BookingManagementService {
-    @Value("${autowash.payment.bank-code:VCB}") private String bankCode;
-    @Value("${autowash.payment.account-number:1234567890}") private String accountNumber;
-    @Value("${autowash.payment.account-name:VINAWASH CO. LTD}") private String accountName;
     private final BookingRepository bookingRepository;
     private final CustomerRepository customerRepository;
     private final VehicleRepository vehicleRepository;
@@ -120,12 +114,10 @@ public class BookingManagementService {
         }
     }
 
-    private BookingResponse toResponse(Booking b) {
+    public BookingResponse toResponse(Booking b) {
         List<BookingService> bookingServices = bookingServiceRepository.findByBookingBookingId(b.getBookingId());
         List<Long> ids = bookingServices.stream().map(x -> x.getService().getServiceId()).toList();
         List<String> serviceNames = bookingServices.stream().map(x -> x.getService().getServiceName()).toList();
-        String info = URLEncoder.encode(b.getBookingRef(), StandardCharsets.UTF_8);
-        String qr = "https://img.vietqr.io/image/" + bankCode + "-" + accountNumber + "-compact2.png?amount=" + b.getTotalPrice().toPlainString() + "&addInfo=" + info + "&accountName=" + URLEncoder.encode(accountName, StandardCharsets.UTF_8);
         Customer customer = b.getCustomer();
         Guest guest = b.getGuest();
         Vehicle vehicle = b.getVehicle();
@@ -141,6 +133,7 @@ public class BookingManagementService {
                 .branchId(b.getBranch().getBranchId()).serviceIds(ids).serviceNames(serviceNames)
                 .bookingDate(b.getBookingDate()).bookingTime(b.getBookingTime()).endTime(b.getEndTime()).durationMinutes(b.getDurationMinutes())
                 .totalPrice(b.getTotalPrice()).status(b.getStatus()).pointsEarned(b.getPointsEarned())
-                .appliedVoucherId(b.getAppliedVoucher() == null ? null : b.getAppliedVoucher().getVoucherId()).createdAt(b.getCreatedAt()).vietQrUrl(qr).build();
+                .appliedVoucherId(b.getAppliedVoucher() == null ? null : b.getAppliedVoucher().getVoucherId()).createdAt(b.getCreatedAt())
+                .build();
     }
 }

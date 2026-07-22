@@ -1,0 +1,99 @@
+{
+  "wizard": {
+    "homeAriaLabel": "Go to homepage",
+    "stepCounter": "Step {{current}}/{{total}}",
+    "back": "Back",
+    "continue": "Continue",
+    "confirmBooking": "Confirm booking",
+    "cartTotalLabel": "Total:",
+    "steps": {
+      "branch": "Branch",
+      "service": "Services",
+      "dateTime": "Date & time",
+      "vehicle": "Vehicle",
+      "review": "Review",
+      "confirm": "Confirm"
+    },
+    "submitting": "Submitting...",
+    "success": {
+      "title": "Booking confirmed!",
+      "ref": "Booking reference: {{ref}}",
+      "description": "Your booking request has been recorded.",
+      "home": "Go home",
+      "again": "Book another",
+      "statusPanel": {
+        "label": "Booking status",
+        "refresh": "Refresh",
+        "refreshing": "Loading…"
+      }
+    }
+  },
+  "branch": {
+    "description": "Choose the branch closest to you.",
+    "loadError": "Couldn't load the list of branches.",
+    "openHours": "Open {{open}}–{{close}}"
+  },
+  "service": {
+    "description": "Choose one or more services.",
+    "loadError": "Couldn't load the service catalog.",
+    "selectedSummary": "{{count}} services selected — estimated <bold>from {{amount}}</bold>. Add more services?"
+  },
+  "dateTime": {
+    "branchRequired": "Please choose a branch first.",
+    "loadError": "Couldn't load available slots.",
+    "slotInfo": "Each cell is a 30-minute slot.",
+    "noSlots": "No available slots for this day.",
+    "requiredSlots": "Your order needs {{count}} consecutive slots",
+    "legend": {
+      "free": "Available",
+      "held": "On hold",
+      "full": "Full"
+    }
+  },
+  "weekGrid": {
+    "hourColumn": "Time",
+    "remainingSlots": "{{count}} spots left",
+    "unavailable": "Unavailable"
+  },
+  "vehicle": {
+    "savedTitle": "Saved vehicles",
+    "useOtherVehicle": "Use another vehicle (manual entry)",
+    "sizeLabel": "Vehicle size",
+    "sizeNote": "Size-based pricing is recalculated in the Review step.",
+    "brandLabel": "Brand",
+    "brandPlaceholder": "Choose a brand",
+    "plateLabel": "License plate",
+    "platePlaceholder": "51K-123.45",
+    "contactTitle": "Confirmed via your account"
+  },
+  "review": {
+    "servicesTitle": "Services",
+    "comboBadge": "Combo",
+    "total": "Total",
+    "appointmentTitle": "Appointment",
+    "branch": "Branch",
+    "day": "Day",
+    "time": "Time",
+    "vehicleSize": "Vehicle size",
+    "vehicle": "Vehicle",
+    "contactTitle": "Contact",
+    "name": "Full name",
+    "phone": "Phone"
+  },
+  "confirm": {
+    "bookingTitle": "Confirm booking",
+    "bookingSubtitle": "Review the order total before submitting your request",
+    "totalLabel": "Order total",
+    "submitError": "Couldn't create the booking, please try again.",
+    "note": "Your request will be submitted for processing through the booking lifecycle."
+  },
+  "categoryGrid": {
+    "comboGroupTitle": "Combo packages",
+    "singleGroupTitle": "Individual services"
+  },
+  "picker": {
+    "closeAriaLabel": "Close",
+    "doneButton": "Done",
+    "fromPrefix": "from"
+  }
+}

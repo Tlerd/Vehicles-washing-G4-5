@@ -128,9 +128,9 @@ recomputes tiers.
 **Composite keys in the join table.** `BookingService` maps the many-to-many between bookings
 and wash services using an embeddable `BookingServiceId` — one booking can include several services.
 
-**Payment is display-only.** There is no payment entity, table, settlement, or reconciliation
-code. A VietQR URL string is built in `BookingManagementService.toResponse` and rendered by
-`StepPayment`; confirming is a UI acknowledgement, **not a verified payment**.
+**Payment integration is not complete.** Payment persistence and the planned provider
+scaffolding exist, but no customer action is accepted as verified settlement. Follow the
+approved PayOS plan before adding a payment screen or status update route.
 
 ---
 
@@ -183,7 +183,6 @@ Abridged to the files you will actually touch; the graph has the full 204.
 | M | `features/customer/pages/BookingWizardPage.tsx` | Orchestrates the six-step wizard — **the live booking path** |
 | C | `features/customer/components/StepServices.tsx` | Service catalogue with live price recalculation |
 | C | `features/customer/components/StepConfirmation.tsx` | Reviews draft, applies vouchers, submits booking |
-| C | `features/customer/components/StepPayment.tsx` | Renders VietQR details (display-only) |
 | C | `features/customer/components/VehicleList.tsx` | Vehicle CRUD + set-default |
 | C | `features/customer/components/VoucherShop.tsx` | Voucher redemption against point balance |
 | C | `features/customer/pages/DashboardPage.tsx` | Aggregates bookings, points, vehicles |

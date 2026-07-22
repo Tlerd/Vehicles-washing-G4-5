@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 1,
+  "transactionId": "autowash-harness-core-1838e92e-e1a5-4e47-907e-f16b746f45dc",
+  "entries": [
+    { "destination": ".claude/agents/backend-api-specialist.md", "sha256": "2283ab14dce8e0033ab4fd7a2c938e8f6e0cb4b47ac78d6540496f5744d88a69", "rendererVersion": "team-hierarchy-2026-07-21", "transactionId": "team-hierarchy-2026-07-21" },
+    { "destination": ".claude/agents/backend-data-specialist.md", "sha256": "3b31e3f8a2b2b188a95c6b3b694991c00fb4b00f57848db91cfe3df717d958e5", "rendererVersion": "team-hierarchy-2026-07-21", "transactionId": "team-hierarchy-2026-07-21" },
+    { "destination": ".claude/agents/backend-lead.md", "sha256": "a1b40fa9c6cba2393edfafa7874c6a797e0c7f36ac4002d9e23096a9e5391099", "rendererVersion": "team-hierarchy-2026-07-21", "transactionId": "team-hierarchy-2026-07-21" },
+    { "destination": ".claude/agents/backend-security-specialist.md", "sha256": "ebc2f99ca9acf3ea3fdc5165c865606efe759121fa87bc3b615e39019f1d6c1d", "rendererVersion": "team-hierarchy-2026-07-21", "transactionId": "team-hierarchy-2026-07-21" },
+    { "destination": ".claude/agents/frontend-lead.md", "sha256": "6eb00fd784cfc2e42007ee6d223862daf5ce523d3419d4cc84e4f9c9432f2fdf", "rendererVersion": "team-hierarchy-2026-07-21", "transactionId": "team-hierarchy-2026-07-21" },
+    { "destination": ".claude/agents/frontend-quality-specialist.md", "sha256": "b65b73cacef2d1eae0575182eb682dc7cb64bc72c8926acc5ca22834217276a7", "rendererVersion": "team-hierarchy-2026-07-21", "transactionId": "team-hierarchy-2026-07-21" },
+    { "destination": ".claude/agents/frontend-state-specialist.md", "sha256": "4f998bfe59e970e560efd16c1a7e00c6f1dd1254deb7b6f94eb76a48eb31fa3b", "rendererVersion": "team-hierarchy-2026-07-21", "transactionId": "team-hierarchy-2026-07-21" },
+    { "destination": ".claude/agents/frontend-ui-specialist.md", "sha256": "5e8c006f53f9dbf52f81e3eab90b482bd0002d7e90fe6134b5a0a6254ddbad01", "rendererVersion": "team-hierarchy-2026-07-21", "transactionId": "team-hierarchy-2026-07-21" },
+    { "destination": ".claude/agents/integration-test-specialist.md", "sha256": "b131247779382f799f10a1252ef353d9f90ec9f56bb569d650e30e899336c037", "rendererVersion": "team-hierarchy-2026-07-21", "transactionId": "team-hierarchy-2026-07-21" },
+    { "destination": ".claude/agents/testing-lead.md", "sha256": "3bf9d5840bb12d9cdfacca01c22aa8d6e5c826608ce243c663672e944d693e0f", "rendererVersion": "team-hierarchy-2026-07-21", "transactionId": "team-hierarchy-2026-07-21" },
+    { "destination": ".claude/agents/unit-test-specialist.md", "sha256": "05379c7b8fff63d90e8034edceb09bda06df02442ddab66cf20e717b87d4a87a", "rendererVersion": "team-hierarchy-2026-07-21", "transactionId": "team-hierarchy-2026-07-21" },
+    { "destination": ".codex/agents/backend-api-specialist.toml", "sha256": "9bcdc08545f9829ce5768d8d6c230a07fd4508d0d29856a93c65395d98cf1d6c", "rendererVersion": "team-hierarchy-2026-07-21", "transactionId": "team-hierarchy-2026-07-21" },
+    { "destination": ".codex/agents/backend-data-specialist.toml", "sha256": "b0d5ae5bf85f88cf80bd450d29c2b9f115e9c111cb45ba640d58aede97db48a2", "rendererVersion": "team-hierarchy-2026-07-21", "transactionId": "team-hierarchy-2026-07-21" },
+    { "destination": ".codex/agents/backend-lead.toml", "sha256": "556d4318cfdd53a6f54a8f57272632206b7ac32897c845eca720c8ff54e215b3", "rendererVersion": "team-hierarchy-2026-07-21", "transactionId": "team-hierarchy-2026-07-21" },
+    { "destination": ".codex/agents/backend-security-specialist.toml", "sha256": "3a8510184ac59fad4e54ab7a4d42df4ba3cfe503119845bddf6d631e8b7d45ae", "rendererVersion": "team-hierarchy-2026-07-21", "transactionId": "team-hierarchy-2026-07-21" },
+    { "destination": ".codex/agents/frontend-lead.toml", "sha256": "fd4d8d2b2e71cf4c822db46187c7e15a584c3d7cb1a403c1f36e5d1d346ae644", "rendererVersion": "team-hierarchy-2026-07-21", "transactionId": "team-hierarchy-2026-07-21" },
+    { "destination": ".codex/agents/frontend-quality-specialist.toml", "sha256": "99e118f8977b25be3a31903f710536a0cb452ede01c012a551efe4f8f3812a18", "rendererVersion": "team-hierarchy-2026-07-21", "transactionId": "team-hierarchy-2026-07-21" },
+    { "destination": ".codex/agents/frontend-state-specialist.toml", "sha256": "6fc54e99d5f9f25c162dd2f26909d690b6f621d75c1db127b876363c03c6036f", "rendererVersion": "team-hierarchy-2026-07-21", "transactionId": "team-hierarchy-2026-07-21" },
+    { "destination": ".codex/agents/frontend-ui-specialist.toml", "sha256": "be5d1941f1e2dfaf7da8961cf465f31760d3d713d082b6edbde8c68e498d263f", "rendererVersion": "team-hierarchy-2026-07-21", "transactionId": "team-hierarchy-2026-07-21" },
+    { "destination": ".codex/agents/integration-test-specialist.toml", "sha256": "65d79e231b53957825617da4de1a424723737e9016f4d3ac77a0430252482025", "rendererVersion": "team-hierarchy-2026-07-21", "transactionId": "team-hierarchy-2026-07-21" },
+    { "destination": ".codex/agents/testing-lead.toml", "sha256": "8e0e5867104bbe944d090dcd3683bb22850bf5474ee67947a071ea055a2617d7", "rendererVersion": "team-hierarchy-2026-07-21", "transactionId": "team-hierarchy-2026-07-21" },
+    { "destination": ".codex/agents/unit-test-specialist.toml", "sha256": "df50372dfa6d7ec4bb467c60ca8c5e3ef194669f4597e52b9c85068bf67fa2d0", "rendererVersion": "team-hierarchy-2026-07-21", "transactionId": "team-hierarchy-2026-07-21" },
+    {
+      "destination": ".agents/skills/api-design/SKILL.md",
+      "sha256": "ad7230f931b6d81a22e13c3bd41d97529fd15be8de2d91de19868a58f1b300b2",
+      "rendererVersion": "core-provisioning-2026-07-21",
+      "transactionId": "autowash-harness-core-1838e92e-e1a5-4e47-907e-f16b746f45dc"
+    },
+    {
+      "destination": ".agents/skills/e2e-testing/SKILL.md",
+      "sha256": "de79b897a7b99b98e325ece0eccb78645b2a9cac88bb0ca0c97ee3f24530eb24",
+      "rendererVersion": "core-provisioning-2026-07-21",
+      "transactionId": "autowash-harness-core-1838e92e-e1a5-4e47-907e-f16b746f45dc"
+    },
+    {
+      "destination": ".agents/skills/frontend-patterns/SKILL.md",
+      "sha256": "ab63402f3ecb3ea4078ade5785ef9c20fb44ba9c02b6976c080adfbd2b3094ac",
+      "rendererVersion": "core-provisioning-2026-07-21",
+      "transactionId": "autowash-harness-core-1838e92e-e1a5-4e47-907e-f16b746f45dc"
+    },
+    {
+      "destination": ".agents/skills/jpa-patterns/SKILL.md",
+      "sha256": "0e5e82029d158a8a27357ff23c7bdcd155743943fbd34a4a771cc7c8098e0e79",
+      "rendererVersion": "core-provisioning-2026-07-21",
+      "transactionId": "autowash-harness-core-1838e92e-e1a5-4e47-907e-f16b746f45dc"
+    },
+    {
+      "destination": ".agents/skills/security-review/cloud-infrastructure-security.md",
+      "sha256": "7d9a83852475a9396e04c59c73df84ac24ee0f41322016de7c11c62138c2a8ca",
+      "rendererVersion": "core-provisioning-2026-07-21",
+      "transactionId": "autowash-harness-core-1838e92e-e1a5-4e47-907e-f16b746f45dc"
+    },
+    {
+      "destination": ".agents/skills/security-review/SKILL.md",
+      "sha256": "fe6f9151fb15c1dffd47a55080c3ad147af7c95dd0ad3714735dec6824b060b7",
+      "rendererVersion": "core-provisioning-2026-07-21",
+      "transactionId": "autowash-harness-core-1838e92e-e1a5-4e47-907e-f16b746f45dc"
+    },
+    {
+      "destination": ".claude/agents/code-reviewer.md",
+      "sha256": "81b4ef0e7b1d8b69efa5dda411af6c3ac653fdb9f8595d8270c97ee551deb0a1",
+      "rendererVersion": "core-provisioning-2026-07-21",
+      "transactionId": "autowash-harness-core-1838e92e-e1a5-4e47-907e-f16b746f45dc"
+    },
+    {
+      "destination": ".claude/agents/architect.md",
+      "sha256": "dbb5b152e83e9842bd92a129f006246edd212e1b3ec69b9384df08c177d19f42",
+      "rendererVersion": "role-orchestration-2026-07-21",
+      "transactionId": "role-orchestration-2026-07-21"
+    },
+    {
+      "destination": ".claude/agents/build-error-resolver.md",
+      "sha256": "f0a2d1913571b0d1f1d03f4817ebaae7ba2468636c9450b40f3086ac99c9a191",
+      "rendererVersion": "role-orchestration-2026-07-21",
+      "transactionId": "role-orchestration-2026-07-21"
+    },
+    {
+      "destination": ".claude/agents/doc-updater.md",
+      "sha256": "9ae5d91cab737e2a9872da7ca78cc2107b014704ea3d899590e90347b13ddad4",
+      "rendererVersion": "role-orchestration-2026-07-21",
+      "transactionId": "role-orchestration-2026-07-21"
+    },
+    {
+      "destination": ".claude/agents/e2e-runner.md",
+      "sha256": "3e5b98f68eedca0ea64578744cece0f4a235a53c189f51406b01a1b8d5a1b9cf",
+      "rendererVersion": "role-orchestration-2026-07-21",
+      "transactionId": "role-orchestration-2026-07-21"
+    },
+    {
+      "destination": ".claude/agents/harmonyos-app-resolver.md",
+      "sha256": "186d6c7f7973a5fa43885c1c8a32a3d0b7d592fd1c9b6ed2df39198e4977f09f",
+      "rendererVersion": "role-orchestration-2026-07-21",
+      "transactionId": "role-orchestration-2026-07-21"
+    },
+    {
+      "destination": ".claude/agents/refactor-cleaner.md",
+      "sha256": "cf3459d135b9f00cb759a4c60fbd126b1133a96e8f147fb88bf4ff88cb2263fe",
+      "rendererVersion": "role-orchestration-2026-07-21",
+      "transactionId": "role-orchestration-2026-07-21"
+    },
+    {
+      "destination": ".claude/agents/rust-reviewer.md",
+      "sha256": "d549480c2c343d648256ca2affbd4bee89cbdf95a0b51ca82f84b17f02d5165e",
+      "rendererVersion": "role-orchestration-2026-07-21",
+      "transactionId": "role-orchestration-2026-07-21"
+    },
+    {
+      "destination": ".claude/agents/security-reviewer.md",
+      "sha256": "efbbb906877e9276888776b5cf0ea388f172b1fb0677734586e795a1d592933c",
+      "rendererVersion": "role-orchestration-2026-07-21",
+      "transactionId": "role-orchestration-2026-07-21"
+    },
+    {
+      "destination": ".claude/agents/tdd-guide.md",
+      "sha256": "855868606680c15dfadc97be7ad8a5552bbe952fe69d0fcc90e31aee92d11878",
+      "rendererVersion": "role-orchestration-2026-07-21",
+      "transactionId": "role-orchestration-2026-07-21"
+    },
+    {
+      "destination": ".claude/agents/planner.md",
+      "sha256": "b41e707430928aeb7302edf561c7c5cf043ccf18e53d01b7e23cb2c5831035b1",
+      "rendererVersion": "core-provisioning-2026-07-21",
+      "transactionId": "autowash-harness-core-1838e92e-e1a5-4e47-907e-f16b746f45dc"
+    },
+    {
+      "destination": ".claude/rules/project/source-priority.md",
+      "sha256": "2814c47764d01b450c9374ab8aff746a2ec5c22d49fcd4f90c1856f59356d49c",
+      "rendererVersion": "core-provisioning-2026-07-21",
+      "transactionId": "autowash-harness-core-1838e92e-e1a5-4e47-907e-f16b746f45dc"
+    },
+    {
+      "destination": ".codex/agents/code-reviewer.toml",
+      "sha256": "d4f2a06ecc8e7506fb0ad5ff56567b097e2b7285fba5442d163e4052d2fced77",
+      "rendererVersion": "core-provisioning-2026-07-21",
+      "transactionId": "autowash-harness-core-1838e92e-e1a5-4e47-907e-f16b746f45dc"
+    },
+    {
+      "destination": ".codex/agents/architect.toml",
+      "sha256": "348f3181d26fc9f247fe272d25595decdcab6acda045600666a5097abb88cbb4",
+      "rendererVersion": "role-orchestration-2026-07-21",
+      "transactionId": "role-orchestration-2026-07-21"
+    },
+    {
+      "destination": ".codex/agents/build-error-resolver.toml",
+      "sha256": "2cdc7fd611f91bcffb161b2b3f015e2ab23071b34d24f2fdf3845a1b23f1e5dc",
+      "rendererVersion": "role-orchestration-2026-07-21",
+      "transactionId": "role-orchestration-2026-07-21"
+    },
+    {
+      "destination": ".codex/agents/doc-updater.toml",
+      "sha256": "1c16a424aee526472799991b55668b5ab57f2bc57c67a5a53ac51fdb26d21984",
+      "rendererVersion": "role-orchestration-2026-07-21",
+      "transactionId": "role-orchestration-2026-07-21"
+    },
+    {
+      "destination": ".codex/agents/e2e-runner.toml",
+      "sha256": "9391c0f6409001fa2d03c7ecb8af65875209a4a27b512293ddaf4fb17be8952c",
+      "rendererVersion": "role-orchestration-2026-07-21",
+      "transactionId": "role-orchestration-2026-07-21"
+    },
+    {
+      "destination": ".codex/agents/harmonyos-app-resolver.toml",
+      "sha256": "441533779b88825e37c516c7c2d402f6a11cf41e8b53e43b20d36b6593e74288",
+      "rendererVersion": "role-orchestration-2026-07-21",
+      "transactionId": "role-orchestration-2026-07-21"
+    },
+    {
+      "destination": ".codex/agents/refactor-cleaner.toml",
+      "sha256": "a509179f86306d35db395b79260bec535ec1b117846f2e3f16e8bdea359fb264",
+      "rendererVersion": "role-orchestration-2026-07-21",
+      "transactionId": "role-orchestration-2026-07-21"
+    },
+    {
+      "destination": ".codex/agents/rust-reviewer.toml",
+      "sha256": "a8b6ff8e94ca07aed31e13d58fb1942f1ae15c54be96f296630cab31160b08cd",
+      "rendererVersion": "role-orchestration-2026-07-21",
+      "transactionId": "role-orchestration-2026-07-21"
+    },
+    {
+      "destination": ".codex/agents/security-reviewer.toml",
+      "sha256": "f399f25e022e4cf6e0276b12a90b11a086e94aeab357e799f59ca842f9f2bd15",
+      "rendererVersion": "role-orchestration-2026-07-21",
+      "transactionId": "role-orchestration-2026-07-21"
+    },
+    {
+      "destination": ".codex/agents/tdd-guide.toml",
+      "sha256": "2debf0e91765ef350b737dff7938229109f204e4cf1b48db04974bbc92073bea",
+      "rendererVersion": "role-orchestration-2026-07-21",
+      "transactionId": "role-orchestration-2026-07-21"
+    },
+    {
+      "destination": ".codex/agents/planner.toml",
+      "sha256": "f8285d3febc537b329b5552b20ca48a025727ad1b34a5d2f03a095afdde65140",
+      "rendererVersion": "core-provisioning-2026-07-21",
+      "transactionId": "autowash-harness-core-1838e92e-e1a5-4e47-907e-f16b746f45dc"
+    },
+    {
+      "destination": ".codex/config.toml",
+      "sha256": "002f1fab9452dbb7a913351deca26aa6df1c480efeabba0bd54419264dab6417",
+      "rendererVersion": "team-hierarchy-2026-07-21",
+      "transactionId": "team-hierarchy-2026-07-21"
+    },
+    {
+      "destination": "scripts/ai-harness/Test-AiHarness.ps1",
+      "sha256": "751a0fc2508c32b6ebdd0f934bc9ef1b813c3c91cd1f03042bfe3aed02929a06",
+      "rendererVersion": "role-orchestration-2026-07-21",
+      "transactionId": "role-orchestration-2026-07-21"
+    }
+  ]
+}

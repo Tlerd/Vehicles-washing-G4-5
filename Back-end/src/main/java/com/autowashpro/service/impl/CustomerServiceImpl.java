@@ -1,5 +1,6 @@
 package com.autowashpro.service.impl;
 
+import com.autowashpro.dto.request.CustomerProfileUpdateRequest;
 import com.autowashpro.dto.request.CustomerRequest;
 import com.autowashpro.dto.response.CustomerResponse;
 import com.autowashpro.entity.Customer;
@@ -54,6 +55,20 @@ public class CustomerServiceImpl implements CustomerService {
 
         customer.setFullName(request.getFullName());
         customer.setPhone(request.getPhone());
+        customer.setEmail(request.getEmail());
+        customer.setUpdatedAt(LocalDateTime.now());
+
+        Customer updatedCustomer = customerRepository.save(customer);
+
+        return customerMapper.toResponse(updatedCustomer);
+    }
+
+    @Override
+    public CustomerResponse updateOwnProfile(Long id, CustomerProfileUpdateRequest request) {
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + id));
+
+        customer.setFullName(request.getFullName());
         customer.setEmail(request.getEmail());
         customer.setUpdatedAt(LocalDateTime.now());
 

@@ -1,0 +1,253 @@
+{
+  "nav": {
+    "links": {
+      "benefits": "Benefits",
+      "packages": "Packages",
+      "process": "Process",
+      "locations": "Locations",
+      "reviews": "Reviews"
+    },
+    "bookNow": "Book now",
+    "toggleMenu": "Toggle menu"
+  },
+  "entryModal": {
+    "title": "Start your booking",
+    "subtitle": "Choose how you'd like to continue.",
+    "signIn": "Sign in",
+    "signInHint": "Already have an account? See your history, points, and vouchers.",
+    "register": "Register",
+    "registerHint": "Verify your phone to earn points and save vehicles for next time.",
+    "guest": "Continue as guest",
+    "guestHint": "Fast booking, no points or vouchers saved.",
+    "close": "Close"
+  },
+  "hero": {
+    "eyebrow": "Premium car care, booked in minutes",
+    "titleLine1": "A smarter way to",
+    "titleLine2": "book your car wash",
+    "description": "Instant booking, transparent pricing, real-time availability, and a loyalty program that rewards every visit.",
+    "startBooking": "Start booking",
+    "explorePackages": "Explore packages",
+    "stats": {
+      "washes": {
+        "value": "10,000+",
+        "label": "Happy wash sessions"
+      },
+      "turnaround": {
+        "value": "15–35",
+        "unit": "min",
+        "label": "Average turnaround"
+      },
+      "branches": {
+        "value": "2",
+        "label": "Branches in HCMC"
+      }
+    }
+  },
+  "benefits": {
+    "title": "Everything you need for a better wash",
+    "subtitle": "Designed to make professional car care faster, clearer, and more convenient.",
+    "items": {
+      "realtime": {
+        "title": "Real-time availability",
+        "description": "See available time slots and reserve your wash without calling the branch."
+      },
+      "pricing": {
+        "title": "Transparent pricing",
+        "description": "Know exactly what each package includes before confirming your booking."
+      },
+      "turnaround": {
+        "title": "Fast turnaround",
+        "description": "Standardized workflows help keep your waiting time predictable."
+      },
+      "loyalty": {
+        "title": "Loyalty rewards",
+        "description": "Earn points from every completed wash and unlock future benefits."
+      }
+    }
+  },
+  "packages": {
+    "title": "Choose the right wash for your car",
+    "subtitle": "Transparent pricing with no hidden fees. Select the package that fits your needs.",
+    "currencyLabel": "VND",
+    "mostPopular": "Most popular",
+    "selectButton": "Select package",
+    "items": {
+      "essential": {
+        "name": "Essential Wash",
+        "duration": "15–20 min",
+        "features": [
+          "Exterior foam wash",
+          "High-pressure rinse",
+          "Wheel cleaning",
+          "Microfiber drying"
+        ]
+      },
+      "premium": {
+        "name": "Premium Wash",
+        "duration": "25–35 min",
+        "features": [
+          "Everything in Essential",
+          "Interior vacuum",
+          "Dashboard cleaning",
+          "Tire shine",
+          "Protective wax finish"
+        ]
+      },
+      "signature": {
+        "name": "Signature Detail",
+        "duration": "45–60 min",
+        "features": [
+          "Deep interior cleaning",
+          "Premium exterior wash",
+          "Paint protection",
+          "Leather conditioning",
+          "Final quality inspection"
+        ]
+      }
+    }
+  },
+  "process": {
+    "title": "Book your wash in four simple steps",
+    "subtitle": "Our streamlined process gets your car in and out quickly and efficiently.",
+    "steps": {
+      "branch": { "title": "Choose a branch" },
+      "package": { "title": "Select a package" },
+      "time": { "title": "Pick a time slot" },
+      "confirm": { "title": "Confirm your booking" }
+    }
+  },
+  "locations": {
+    "title": "Find an AutoWash Pro near you",
+    "subtitle": "Conveniently located branches across Ho Chi Minh City with standardized quality.",
+    "openDaily": "Open daily: {{hours}}",
+    "serviceBays": "Available service bays",
+    "selectButton": "Select branch",
+    "items": {
+      "thu-duc": {
+        "name": "Thu Duc Branch",
+        "address": "503 Le Van Viet, Thu Duc City, Ho Chi Minh City"
+      },
+      "district-7": {
+        "name": "District 7 Branch",
+        "address": "Nguyen Thi Thap Street, District 7, Ho Chi Minh City"
+      }
+    }
+  },
+  "testimonials": {
+    "title": "Trusted by drivers across the city",
+    "subtitle": "See what our customers have to say about their AutoWash Pro experience.",
+    "items": {
+      "minh-tran": {
+        "quote": "“The booking process was quick, and my car was ready exactly when promised.”",
+        "name": "Minh Tran",
+        "service": "Premium Wash"
+      },
+      "linh-nguyen": {
+        "quote": "“Clear pricing, friendly staff, and no waiting around. I will definitely return.”",
+        "name": "Linh Nguyen",
+        "service": "Essential Wash"
+      },
+      "hoang-pham": {
+        "quote": "“The finish looked excellent, especially the interior. Very professional service.”",
+        "name": "Hoang Pham",
+        "service": "Signature Detail"
+      }
+    }
+  },
+  "faq": {
+    "title": "Frequently asked questions",
+    "subtitle": "Everything you need to know about our services and booking process.",
+    "items": {
+      "duration": {
+        "question": "How long does a car wash take?",
+        "answer": "It depends on the package you choose. Our Essential Wash takes about 15-20 minutes, while the Signature Detail can take up to 60 minutes."
+      },
+      "reschedule": {
+        "question": "Can I reschedule my booking?",
+        "answer": "Yes, you can easily reschedule or cancel your booking through the confirmation email up to 2 hours before your reserved time slot."
+      },
+      "suv": {
+        "question": "Do you accept SUVs and seven-seat vehicles?",
+        "answer": "Yes! We accommodate all standard passenger vehicles, including SUVs and 7-seaters. A small surcharge may apply for oversized vehicles, which is shown during booking."
+      },
+      "lateArrival": {
+        "question": "What happens if I arrive late?",
+        "answer": "We hold your reservation for 15 minutes past your booked time. After that, we may need to accommodate you as a walk-in customer depending on availability."
+      },
+      "payment": {
+        "question": "Can I pay at the branch?",
+        "answer": "Absolutely. We accept cash, credit cards, and local mobile payment options directly at all our branches upon completion of the service."
+      }
+    }
+  },
+  "finalCta": {
+    "title": "Your car deserves a better wash",
+    "subtitle": "Reserve your preferred package and time slot in less than two minutes.",
+    "cta": "Book your wash now",
+    "note": "No hidden fees • Real-time availability • Fast confirmation"
+  },
+  "footer": {
+    "description": "Professional car care with simple online booking. Quality guaranteed.",
+    "servicesHeading": "Services",
+    "companyHeading": "Company",
+    "contactHeading": "Contact",
+    "contactEmail": "hello@autowashpro.vn",
+    "contactPhone": "+84 28 0000 0000",
+    "address": "Ho Chi Minh City, Vietnam",
+    "copyright": "© {{year}} AutoWash Pro. All rights reserved.",
+    "hoursNote": "Open daily from 07:00 to 21:00"
+  },
+  "widget": {
+    "success": {
+      "title": "Booking Confirmed!",
+      "description": "Your wash slot has been reserved. We will see you soon.",
+      "again": "Book another wash"
+    },
+    "form": {
+      "title": "Complete Reservation",
+      "back": "Back",
+      "branchLabel": "Branch",
+      "branchPlaceholder": "Select branch",
+      "vehicleTypeLabel": "Vehicle Type",
+      "vehicleTypePlaceholder": "Select vehicle",
+      "vehicleTypes": {
+        "sedan": "Sedan / Hatchback",
+        "suv": "SUV / Crossover",
+        "truck": "Pickup Truck"
+      },
+      "dateLabel": "Date",
+      "timeLabel": "Time",
+      "timePlaceholder": "Select time",
+      "fullNameLabel": "Full Name",
+      "fullNamePlaceholder": "John Doe",
+      "phoneLabel": "Phone Number",
+      "phonePlaceholder": "0912345678",
+      "submit": "Confirm Booking",
+      "errors": {
+        "branch": "Please select a branch",
+        "package": "Please select a package",
+        "date": "Please select a date",
+        "time": "Please select a time",
+        "vehicleType": "Please select a vehicle type",
+        "fullNameTooShort": "Name is too short",
+        "phoneInvalid": "Invalid phone number"
+      }
+    },
+    "preview": {
+      "bestSlotToday": "BEST SLOT TODAY",
+      "currencyLabel": "VND",
+      "slotStatus": {
+        "available": "Available",
+        "fast-lane": "Fast lane",
+        "busy": "Busy"
+      },
+      "features": {
+        "carsOnly": "Cars only",
+        "standardizedProcess": "Standardized process",
+        "premiumFinish": "Premium finish"
+      },
+      "cta": "Book now"
+    }
+  }
+}

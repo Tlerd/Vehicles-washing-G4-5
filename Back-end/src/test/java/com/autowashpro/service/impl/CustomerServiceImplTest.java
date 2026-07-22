@@ -1,5 +1,6 @@
 package com.autowashpro.service.impl;
 
+import com.autowashpro.dto.request.CustomerProfileUpdateRequest;
 import com.autowashpro.dto.request.CustomerRequest;
 import com.autowashpro.dto.response.CustomerResponse;
 import com.autowashpro.entity.Customer;
@@ -62,6 +63,38 @@ class CustomerServiceImplTest {
         new CustomerServiceImpl(customerRepository, customerMapper).updateCustomer(7L, request);
 
         assertThat(customer.getFullName()).isEqualTo("After");
+        assertThat(customer.getTier()).isEqualTo("GOLD");
+        assertThat(customer.getAccumulatedPoints()).isEqualTo(700);
+        assertThat(customer.getTotalSpent()).isEqualByComparingTo("7000000");
+        assertThat(customer.getTotalWashes()).isEqualTo(17);
+    }
+
+    @Test
+    void updateOwnProfile_onlyChangesNameAndEmail() {
+        Customer customer = new Customer();
+        customer.setCustomerId(7L);
+        customer.setFullName("Before");
+        customer.setPhone("+84901111111");
+        customer.setRole("CUSTOMER");
+        customer.setTier("GOLD");
+        customer.setAccumulatedPoints(700);
+        customer.setTotalSpent(new BigDecimal("7000000"));
+        customer.setTotalWashes(17);
+
+        CustomerProfileUpdateRequest request = new CustomerProfileUpdateRequest();
+        request.setFullName("After");
+        request.setEmail("after@example.test");
+
+        when(customerRepository.findById(7L)).thenReturn(Optional.of(customer));
+        when(customerRepository.save(same(customer))).thenReturn(customer);
+        when(customerMapper.toResponse(customer)).thenReturn(new CustomerResponse());
+
+        new CustomerServiceImpl(customerRepository, customerMapper).updateOwnProfile(7L, request);
+
+        assertThat(customer.getFullName()).isEqualTo("After");
+        assertThat(customer.getEmail()).isEqualTo("after@example.test");
+        assertThat(customer.getPhone()).isEqualTo("+84901111111");
+        assertThat(customer.getRole()).isEqualTo("CUSTOMER");
         assertThat(customer.getTier()).isEqualTo("GOLD");
         assertThat(customer.getAccumulatedPoints()).isEqualTo(700);
         assertThat(customer.getTotalSpent()).isEqualByComparingTo("7000000");

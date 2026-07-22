@@ -28,5 +28,4 @@ public class BookingResponse {
     private Integer pointsEarned;
     private Long appliedVoucherId;
     private LocalDateTime createdAt;
-    private String vietQrUrl;
 }

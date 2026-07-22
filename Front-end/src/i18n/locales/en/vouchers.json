@@ -1,0 +1,26 @@
+{
+  "title": "Redeem points for vouchers",
+  "subtitle": "Use your loyalty points to redeem exclusive offers for your membership tier.",
+  "yourPoints": "Your points: {{points}}",
+  "costPoints": "{{points}} pts",
+  "redeemAction": "Redeem voucher",
+  "redeeming": "Processing...",
+  "confirmPrompt": "Redeem {{points}} points for \"{{name}}\"?",
+  "confirmYes": "Confirm",
+  "confirmNo": "Cancel",
+  "redeemSuccess": "Voucher redeemed successfully! Your points balance has been updated.",
+  "dismiss": "Dismiss",
+  "reasons": {
+    "tier": "Requires {{tier}} tier or higher",
+    "points": "Need {{points}} more points"
+  },
+  "errors": {
+    "load": "Couldn't load vouchers. Please try again.",
+    "redeem": "Couldn't redeem the voucher. Please try again."
+  },
+  "empty": {
+    "title": "No vouchers yet",
+    "description": "There are no offers available right now. Please check back later."
+  },
+  "loading": "Loading vouchers..."
+}

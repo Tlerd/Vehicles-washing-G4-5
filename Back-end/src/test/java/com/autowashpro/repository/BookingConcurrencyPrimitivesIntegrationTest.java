@@ -176,7 +176,7 @@ class BookingConcurrencyPrimitivesIntegrationTest {
         LocalDateTime now = LocalDateTime.now();
 
         Future<Long> first = executor.submit(() -> tx().execute(status -> {
-            Long id = bookings.findDueForExpiry(now, 1).get(0).getBookingId();
+            Long id = bookings.findDueIdsForExpiry(now, 1).get(0);
             firstClaimed.countDown();
             await(releaseFirst);
             status.setRollbackOnly();
@@ -185,7 +185,7 @@ class BookingConcurrencyPrimitivesIntegrationTest {
         assertThat(firstClaimed.await(5, TimeUnit.SECONDS)).isTrue();
 
         Future<Long> second = executor.submit(() -> tx().execute(status -> {
-            Long id = bookings.findDueForExpiry(now, 1).get(0).getBookingId();
+            Long id = bookings.findDueIdsForExpiry(now, 1).get(0);
             status.setRollbackOnly();
             return id;
         }));

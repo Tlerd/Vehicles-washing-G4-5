@@ -1,5 +1,6 @@
 package com.autowashpro.service;
 
+import com.autowashpro.dto.request.CustomerProfileUpdateRequest;
 import com.autowashpro.dto.request.CustomerRequest;
 import com.autowashpro.dto.response.CustomerResponse;
 
@@ -16,4 +17,6 @@ public interface CustomerService {
     CustomerResponse updateCustomer(Long id, CustomerRequest request);
 
     void deleteCustomer(Long id);
+
+    CustomerResponse updateOwnProfile(Long id, CustomerProfileUpdateRequest request);
 }

@@ -1,0 +1,40 @@
+{
+  "greeting": "Hello, {{name}}!",
+  "subtitle": "Manage your vehicles, bookings and rewards in one place.",
+  "tier": {
+    "title": "Membership tier",
+    "pointsLabel": "points",
+    "toNextTier": "{{points}} points to {{tier}}",
+    "maxTierReached": "You've reached the highest tier!"
+  },
+  "upcoming": {
+    "title": "Upcoming booking",
+    "viewDetail": "View details",
+    "dateTime": "{{date}} · {{time}}",
+    "empty": {
+      "title": "No upcoming bookings",
+      "description": "Book a wash now to keep your car spotless."
+    }
+  },
+  "cta": {
+    "newBooking": "Book now"
+  },
+  "quickLinks": {
+    "title": "Quick links",
+    "garage": { "title": "My vehicles", "description": "Manage your vehicle list" },
+    "points": { "title": "Reward points", "description": "View your points history" },
+    "vouchers": { "title": "Vouchers", "description": "Redeem points for offers" },
+    "history": { "title": "History", "description": "See your past washes" }
+  },
+  "status": {
+    "CONFIRMED": "Confirmed",
+    "CHECKED_IN": "Checked in",
+    "COMPLETED": "Completed",
+    "NO_SHOW": "No show",
+    "CHANGE_REQUESTED": "Change requested"
+  },
+  "errors": {
+    "profile": "Couldn't load your profile. Please try again.",
+    "bookings": "Couldn't load your booking history. Please try again."
+  }
+}

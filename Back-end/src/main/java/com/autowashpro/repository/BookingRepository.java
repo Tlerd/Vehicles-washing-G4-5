@@ -2,10 +2,11 @@ package com.autowashpro.repository;
 
 import com.autowashpro.entity.Booking;
 import jakarta.persistence.LockModeType;
+import jakarta.persistence.QueryHint;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,23 +33,18 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT b FROM Booking b WHERE b.bookingId = :bookingId")
+    @QueryHints(@QueryHint(name = "jakarta.persistence.query.timeout", value = "2000"))
     Optional<Booking> findByIdForUpdate(@Param("bookingId") Long bookingId);
 
-    @Query(value = "SELECT TOP (:batchSize) * FROM dbo.bookings " +
-            "WITH (UPDLOCK, READPAST, ROWLOCK) WHERE status = 'PENDING_DEPOSIT' " +
+    @Query(value = "SELECT TOP (:batchSize) booking_id FROM dbo.bookings " +
+            "WITH (UPDLOCK, READPAST, READCOMMITTEDLOCK, ROWLOCK, " +
+            "INDEX(IX_bookings_expiry_claim)) WHERE status = 'PENDING_DEPOSIT' " +
             "AND deposit_expires_at <= :now ORDER BY deposit_expires_at, booking_id",
             nativeQuery = true)
-    List<Booking> findDueForExpiry(
+    @QueryHints(@QueryHint(name = "jakarta.persistence.query.timeout", value = "2000"))
+    List<Long> findDueIdsForExpiry(
             @Param("now") LocalDateTime now,
             @Param("batchSize") int batchSize);
-
-    @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("UPDATE Booking b SET b.status = 'EXPIRED', b.depositExpiresAt = NULL " +
-            "WHERE b.bookingId = :bookingId AND b.status = 'PENDING_DEPOSIT' " +
-            "AND b.depositExpiresAt <= :now")
-    int expirePendingDeposit(
-            @Param("bookingId") Long bookingId,
-            @Param("now") LocalDateTime now);
 
     @Query("SELECT b FROM Booking b " +
             "LEFT JOIN FETCH b.customer " +
