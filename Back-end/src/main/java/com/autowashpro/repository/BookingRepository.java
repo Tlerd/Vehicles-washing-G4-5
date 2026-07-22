@@ -10,6 +10,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
+    interface LegacyAvailabilityProjection {
+        Long getBookingId();
+        String getStatus();
+        LocalTime getBookingTime();
+        LocalTime getEndTime();
+        Integer getDurationMinutes();
+        Boolean getLegacyFinancialSnapshot();
+    }
     boolean existsByBranchBranchIdAndBookingDateAndBookingTimeAndStatusNot(Long branchId, LocalDate date, LocalTime time, String status);
     List<Booking> findByCustomerCustomerIdOrderByCreatedAtDesc(Long customerId);
     List<Booking> findByBookingDateOrderByBookingTimeAsc(LocalDate date);
@@ -25,4 +33,22 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "JOIN FETCH b.branch " +
             "WHERE b.bookingRef = :bookingRef")
     Optional<Booking> findForLookupByBookingRef(@Param("bookingRef") String bookingRef);
+
+    @Query("""
+            SELECT b.bookingId AS bookingId,
+                   b.status AS status,
+                   b.bookingTime AS bookingTime,
+                   b.endTime AS endTime,
+                   b.durationMinutes AS durationMinutes,
+                   b.legacyFinancialSnapshot AS legacyFinancialSnapshot
+            FROM Booking b
+            WHERE b.branch.branchId = :branchId
+              AND b.bookingDate = :date
+              AND b.legacyFinancialSnapshot = true
+              AND b.status IN :statuses
+            """)
+    List<LegacyAvailabilityProjection> findLegacyAvailabilityCandidates(
+            @Param("branchId") Long branchId,
+            @Param("date") LocalDate date,
+            @Param("statuses") List<String> statuses);
 }

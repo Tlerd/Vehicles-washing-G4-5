@@ -4,6 +4,7 @@ import com.autowashpro.exception.custom.TooManyRequestsException;
 import com.autowashpro.repository.BranchRepository;
 import com.autowashpro.repository.ServiceRepository;
 import com.autowashpro.service.BookingLookupService;
+import com.autowashpro.service.BookingAvailabilityService;
 import com.autowashpro.service.BookingManagementService;
 import com.autowashpro.service.RateLimiter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +32,8 @@ class BookingControllerRateLimitTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         BookingController controller = new BookingController(
                 mock(BookingManagementService.class), mock(BranchRepository.class),
-                mock(ServiceRepository.class), lookup, limiter);
+                mock(ServiceRepository.class), lookup,
+                mock(BookingAvailabilityService.class), limiter);
         AtomicInteger originAttempts = new AtomicInteger();
 
         when(request.getRemoteAddr()).thenReturn("192.0.2.55");

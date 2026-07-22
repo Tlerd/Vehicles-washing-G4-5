@@ -1,21 +1,19 @@
 package com.autowashpro.config;
 
-import com.autowashpro.entity.Bay;
 import com.autowashpro.entity.Branch;
 import com.autowashpro.repository.BayRepository;
 import com.autowashpro.repository.BranchRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,25 +39,35 @@ class BaySeederTest {
         Branch branch = new Branch();
         branch.setBranchId(1L);
         when(branchRepository.findAll()).thenReturn(List.of(branch));
-        when(bayRepository.findByBranchBranchId(1L)).thenReturn(List.of());
 
         baySeeder.run();
 
-        ArgumentCaptor<Bay> captor = ArgumentCaptor.forClass(Bay.class);
-        verify(bayRepository, times(4)).save(captor.capture());
-        List<String> types = captor.getAllValues().stream().map(Bay::getBayType).toList();
-        assertThat(types).containsExactly("QUICK", "QUICK", "DETAIL", "UNIVERSAL");
+        verify(bayRepository).insertDefaultIfMissing(1L, "Q1", "QUICK");
+        verify(bayRepository).insertDefaultIfMissing(1L, "Q2", "QUICK");
+        verify(bayRepository).insertDefaultIfMissing(1L, "D1", "DETAIL");
+        verify(bayRepository).insertDefaultIfMissing(1L, "U1", "UNIVERSAL");
     }
 
     @Test
-    void run_branchAlreadySeeded_skipsSeeding() throws Exception {
-        Branch branch = new Branch();
-        branch.setBranchId(1L);
-        when(branchRepository.findAll()).thenReturn(List.of(branch));
-        when(bayRepository.findByBranchBranchId(1L)).thenReturn(List.of(new Bay()));
+    void run_withoutBranches_performsNoBayWrites() throws Exception {
+        when(branchRepository.findAll()).thenReturn(List.of());
 
         baySeeder.run();
 
-        verify(bayRepository, never()).save(any());
+        verify(bayRepository, never()).insertDefaultIfMissing(anyLong(), anyString(), anyString());
+    }
+
+    @Test
+    void run_twoBranches_delegatesEightAtomicInsertIfMissingOperations() throws Exception {
+        Branch first = new Branch();
+        first.setBranchId(1L);
+        Branch second = new Branch();
+        second.setBranchId(2L);
+        when(branchRepository.findAll()).thenReturn(List.of(first, second));
+
+        baySeeder.run();
+
+        verify(bayRepository, times(8)).insertDefaultIfMissing(
+                anyLong(), anyString(), anyString());
     }
 }

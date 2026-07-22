@@ -6,6 +6,10 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Bean;
+import org.springdoc.core.customizers.OpenApiCustomizer;
+
+import java.util.List;
 
 @Configuration
 @OpenAPIDefinition(info = @Info(
@@ -25,4 +29,21 @@ import org.springframework.context.annotation.Configuration;
         paramName = "X-Guest-Verification-Proof",
         description = "Short-lived, single-use proof issued after backend-verified Firebase Phone OTP.")
 public class OpenApiConfig {
+
+    @Bean
+    OpenApiCustomizer optionalAvailabilityAuthentication() {
+        return openApi -> List.of(
+                        "/api/v1/branches",
+                        "/api/v1/branches/{branchId}/slots",
+                        "/api/v1/bookings/availability")
+                .forEach(path -> {
+                    io.swagger.v3.oas.models.PathItem item = openApi.getPaths().get(path);
+                    if (item != null && item.getGet() != null) {
+                        item.getGet().setSecurity(List.of(
+                                new io.swagger.v3.oas.models.security.SecurityRequirement(),
+                                new io.swagger.v3.oas.models.security.SecurityRequirement()
+                                        .addList("bearerAuth")));
+                    }
+                });
+    }
 }

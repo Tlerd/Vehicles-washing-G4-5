@@ -5,6 +5,7 @@ import com.autowashpro.entity.*;
 import com.autowashpro.repository.*;
 import com.autowashpro.service.BookingManagementService;
 import com.autowashpro.service.BookingLookupService;
+import com.autowashpro.service.BookingAvailabilityService;
 import com.autowashpro.service.RateLimiter;
 import com.autowashpro.dto.response.BookingLookupResponse;
 import com.autowashpro.exception.custom.BadRequestException;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Duration;
 import java.util.*;
@@ -39,11 +41,18 @@ public class BookingController {
     private static final Duration LOOKUP_CUSTOMER_WINDOW = Duration.ofMinutes(15);
     private static final String LOOKUP_RATE_LIMIT_ERROR =
             "Too many verification requests. Please try again later.";
+    private static final int AVAILABILITY_ORIGIN_MAX_ATTEMPTS = 180;
+    private static final int AVAILABILITY_PRINCIPAL_MAX_ATTEMPTS = 300;
+    private static final int AVAILABILITY_GLOBAL_MAX_ATTEMPTS = 10_000;
+    private static final Duration AVAILABILITY_WINDOW = Duration.ofMinutes(1);
+    private static final String AVAILABILITY_RATE_LIMIT_ERROR =
+            "Too many availability requests. Please try again later.";
 
     private final BookingManagementService bookings;
     private final BranchRepository branches;
     private final ServiceRepository services;
     private final BookingLookupService bookingLookupService;
+    private final BookingAvailabilityService availabilityService;
     private final RateLimiter rateLimiter;
 
     @GetMapping("/catalog/branches") public List<Branch> branches() { return branches.findByStatusIgnoreCase("ACTIVE"); }
@@ -85,19 +94,37 @@ public class BookingController {
                 .header(HttpHeaders.PRAGMA, "no-cache")
                 .body(bookingLookupService.lookup(bookingRef, authentication, guestProof));
     }
-    @GetMapping("/bookings/availability") public List<Map<String,Object>> availability(@RequestParam Long branchId,@RequestParam LocalDate date,@RequestParam List<String> serviceCodes) {
-        Branch branch=branches.findById(branchId).orElseThrow();
-        List<com.autowashpro.entity.Service> selected=services.findByServiceCodeIn(serviceCodes);
-        if(selected.size()!=new HashSet<>(serviceCodes).size()) throw new BadRequestException("Invalid service codes");
-        int duration=selected.stream().mapToInt(s -> Optional.ofNullable(s.getDurationMinutes()).orElse(30)).sum();
-        List<BookingResponse> existing=bookings.queue(date).stream().filter(b->b.getBranchId().equals(branchId)&&!"CANCELLED".equals(b.getStatus())).toList();
-        List<Map<String,Object>> result=new ArrayList<>();
-        for(LocalTime t=branch.getOpenTime();!t.plusMinutes(duration).isAfter(branch.getCloseTime());t=t.plusMinutes(30)) {
-            LocalTime start=t,end=t.plusMinutes(duration);
-            boolean overlap=existing.stream().anyMatch(b->{LocalTime oldEnd=b.getEndTime()!=null?b.getEndTime():b.getBookingTime().plusMinutes(Optional.ofNullable(b.getDurationMinutes()).orElse(30));return start.isBefore(oldEnd)&&end.isAfter(b.getBookingTime());});
-            result.add(Map.of("time",t.toString(),"endTime",end.toString(),"durationMinutes",duration,"available",!overlap));
-        }
-        return result;
+    @GetMapping("/bookings/availability")
+    @Operation(
+            summary = "Deprecated service-code availability adapter",
+            description = "Delegates to the trusted 15-minute bay-capacity engine. New clients use " +
+                    "GET /api/v1/branches/{branchId}/slots.",
+            deprecated = true)
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Compatibility slot list"),
+            @ApiResponse(responseCode = "400", description = "Invalid service selection",
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Active branch not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
+            @ApiResponse(responseCode = "429", description = "Availability polling quota exceeded",
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    public List<LegacyAvailabilitySlotResponse> availability(
+            @RequestParam Long branchId,
+            @RequestParam LocalDate date,
+            @RequestParam List<String> serviceCodes,
+            Authentication authentication,
+            HttpServletRequest request) {
+        enforceAvailabilityRateLimit(authentication, request);
+        SlotAvailabilityResponse response = availabilityService.findByServiceCodes(
+                branchId, date, serviceCodes, null,
+                BranchSlotController.authenticatedCustomerId(authentication));
+        return response.slots().stream()
+                .map(slot -> new LegacyAvailabilitySlotResponse(
+                        LocalDateTime.ofInstant(slot.startAt(), BookingAvailabilityService.BUSINESS_ZONE).toLocalTime(),
+                        LocalDateTime.ofInstant(slot.endAt(), BookingAvailabilityService.BUSINESS_ZONE).toLocalTime(),
+                        response.reservedMinutes(), slot.available()))
+                .toList();
     }
     @GetMapping("/bookings/customer/{customerId}") public List<BookingResponse> customer(@PathVariable Long customerId,@AuthenticationPrincipal String callerId) { return bookings.customerBookings(Long.valueOf(callerId)); }
     @GetMapping("/washing-counter/queue") public List<BookingResponse> queue(@RequestParam(defaultValue = "#{T(java.time.LocalDate).now()}") LocalDate date) { return bookings.queue(date); }
@@ -113,6 +140,32 @@ public class BookingController {
         return isAuthenticatedBearer(authentication)
                 && authentication.getAuthorities().stream()
                 .anyMatch(authority -> "ROLE_CUSTOMER".equals(authority.getAuthority()));
+    }
+
+    private void enforceAvailabilityRateLimit(
+            Authentication authentication, HttpServletRequest request) {
+        if (isAuthenticatedBearer(authentication)) {
+            if (!rateLimiter.tryConsume(
+                    RateLimiter.Scope.AUTHENTICATED_PRINCIPAL,
+                    "availability:" + authentication.getName(),
+                    AVAILABILITY_PRINCIPAL_MAX_ATTEMPTS, AVAILABILITY_WINDOW)) {
+                throw new TooManyRequestsException(AVAILABILITY_RATE_LIMIT_ERROR);
+            }
+            return;
+        }
+        String remoteAddress = request.getRemoteAddr();
+        String key = "availability:"
+                + (remoteAddress == null || remoteAddress.isBlank() ? "unknown" : remoteAddress);
+        if (!rateLimiter.tryConsume(
+                RateLimiter.Scope.REQUEST_ORIGIN, key,
+                AVAILABILITY_ORIGIN_MAX_ATTEMPTS, AVAILABILITY_WINDOW)) {
+            throw new TooManyRequestsException(AVAILABILITY_RATE_LIMIT_ERROR);
+        }
+        if (!rateLimiter.tryConsume(
+                RateLimiter.Scope.PUBLIC_ENDPOINT_GLOBAL, "availability",
+                AVAILABILITY_GLOBAL_MAX_ATTEMPTS, AVAILABILITY_WINDOW)) {
+            throw new TooManyRequestsException(AVAILABILITY_RATE_LIMIT_ERROR);
+        }
     }
 
     private void enforcePublicLookupRateLimits(String remoteAddress) {

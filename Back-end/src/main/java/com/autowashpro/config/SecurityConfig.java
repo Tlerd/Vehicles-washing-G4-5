@@ -60,6 +60,9 @@ public class SecurityConfig {
                                 "/v3/api-docs/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/bookings/availability").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/branches").permitAll()
+                        .requestMatchers(new RegexRequestMatcher(
+                                "^/api/v1/branches/[1-9][0-9]*/slots$", "GET")).permitAll()
                         .requestMatchers(new RegexRequestMatcher(
                                 "^/api/v1/bookings/AWP-[A-Z0-9]{6,8}$", "GET")).permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")

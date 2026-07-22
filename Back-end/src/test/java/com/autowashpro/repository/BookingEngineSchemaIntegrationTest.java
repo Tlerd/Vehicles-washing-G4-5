@@ -37,6 +37,7 @@ class BookingEngineSchemaIntegrationTest {
         assertColumns("tiers", List.of(
                 "tier_id", "tier_code", "tier_rank", "booking_window_days",
                 "points_multiplier", "deposit_waived"));
+        assertColumns("bays", List.of("is_active"));
 
         List<String> tierCodes = jdbc.queryForList(
                 "SELECT tier_code FROM dbo.tiers", String.class);
@@ -57,6 +58,18 @@ class BookingEngineSchemaIntegrationTest {
                 """, String.class);
         assertThat(slotIndexes).contains("IX_slot_lookup", "IX_slot_expiry");
 
+        List<String> bayIndexes = jdbc.queryForList("""
+                SELECT name FROM sys.indexes
+                WHERE object_id = OBJECT_ID('dbo.bays')
+                """, String.class);
+        assertThat(bayIndexes).contains("IX_bays_allocation");
+
+        List<String> bookingIndexes = jdbc.queryForList("""
+                SELECT name FROM sys.indexes
+                WHERE object_id = OBJECT_ID('dbo.bookings')
+                """, String.class);
+        assertThat(bookingIndexes).contains("IX_bookings_legacy_availability");
+
         List<String> foreignKeys = jdbc.queryForList("""
                 SELECT name FROM sys.foreign_keys
                 WHERE parent_object_id IN (
@@ -66,12 +79,13 @@ class BookingEngineSchemaIntegrationTest {
                 """, String.class);
         assertThat(foreignKeys).contains(
                 "FK_slot_reservations_bay_branch", "FK_vouchers_min_tier",
-                "FK_bookings_vehicle_owner");
+                "FK_bookings_vehicle_owner", "FK_slot_reservations_booking_branch");
 
         Integer unsafeForeignKeys = jdbc.queryForObject("""
                 SELECT COUNT(*) FROM sys.foreign_keys
                 WHERE name IN (
                     'FK_slot_reservations_bay_branch',
+                    'FK_slot_reservations_booking_branch',
                     'FK_vouchers_min_tier',
                     'FK_bookings_vehicle_owner'
                 ) AND (is_not_trusted = 1 OR is_disabled = 1)
@@ -90,6 +104,16 @@ class BookingEngineSchemaIntegrationTest {
                 "CK_bookings_payment_amounts",
                 "CK_bookings_vehicle_by_actor",
                 "CK_idempotency_records_key_digest");
+
+        List<String> trustedSlotChecks = jdbc.queryForList("""
+                SELECT name FROM sys.check_constraints
+                WHERE is_not_trusted = 0 AND is_disabled = 0 AND name IN (
+                    'CK_slot_reservations_grid',
+                    'CK_slot_reservations_expiry'
+                )
+                """, String.class);
+        assertThat(trustedSlotChecks).containsExactlyInAnyOrder(
+                "CK_slot_reservations_grid", "CK_slot_reservations_expiry");
     }
 
     private void assertColumns(String table, List<String> expectedColumns) {
