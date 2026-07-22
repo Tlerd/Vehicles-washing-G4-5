@@ -17,10 +17,6 @@ yarn-error.log*
 *.sln
 *.sw?
 
-# Local MCP Settings (Stitch)
-.gemini/mcp-settings.json
-mcp-settings.json
-
 # Local Environment Variables
 .env
 .env.local
@@ -39,3 +35,20 @@ firebase-service-account.json
 /Back-end/target/
 *.jar
 Back-end/src/main/resources/firebase-service-account.json
+
+# Local Claude Code instructions
+
+.claude/settings.local.json
+CLAUDE.local.md
+.ua/intermediate/
+.ua/diff-overlay.json
+.ua/tmp/
+.ua/.trash-*/
+<<<<<<< Updated upstream
+
+.env
+**/target/
+*.log
+node_modules/
+=======
+>>>>>>> Stashed changes

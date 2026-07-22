@@ -1,112 +1,119 @@
-# AutoWash Pro - Hệ Thống Quản Lý Rửa Xe Thông Minh & Khách Hàng Thân Thiết
+# AutoWash Pro
 
-**AutoWash Pro** là một giải pháp công nghệ toàn diện giúp tối ưu hóa quy trình đặt lịch rửa xe ô tô thông minh, tích hợp công cụ tính điểm thành viên tự động và quản lý chiến dịch marketing định hướng AI.
+AutoWash Pro là hệ thống hỗ trợ đặt lịch và quản lý dịch vụ chăm sóc **ô tô**. Dự án gồm ứng dụng khách hàng React và API Spring Boot sử dụng SQL Server. Xe máy không thuộc phạm vi dự án.
 
-> [!IMPORTANT]
-> **Giới hạn phạm vi**: Hệ thống được thiết kế độc quyền phục vụ xe ô tô (Cars). **Xe máy (Motorbikes) hoàn toàn bị loại bỏ khỏi phạm vi thiết kế và nghiệp vụ của hệ thống này.**
+> Trạng thái: mã nguồn frontend đã được refactor sang React 19/Vite 6 và một phần đã kết nối API thật. Đây chưa phải bản triển khai đầy đủ của toàn bộ thiết kế v2; các giới hạn hiện tại được ghi rõ bên dưới.
 
----
+## Những phần đã có
 
-## 📌 Các Phân Hệ Chính & Vai Trò (Roles)
+- Landing page, giao diện đặt lịch 6 bước và trang đăng nhập khách hàng.
+- Giao diện tiếng Việt/tiếng Anh, chế độ sáng/tối và thiết kế đáp ứng.
+- Đăng nhập bằng số điện thoại + mật khẩu qua backend JWT.
+- Đăng ký xác minh số điện thoại bằng Firebase Phone OTP, sau đó tạo tài khoản tại backend.
+- Customer console: dashboard, garage, điểm, voucher, lịch sử và chi tiết lịch hẹn/đánh giá.
+- Garage đã kết nối API thật: tạo, sửa, xoá xe và chọn xe mặc định theo JWT.
+- Backend có API xác thực, xe, catalog, booking, loyalty, quầy rửa và quản trị; tài liệu OpenAPI/Swagger được cung cấp khi backend chạy.
 
-Hệ thống được chia thành 3 cổng thông tin (portals) chính tương tác thời gian thực:
+## Giới hạn đang biết
 
-1. **Khách hàng (Customer Portal)**:
-   * **Đăng ký & Đăng nhập**: Xác thực bằng số điện thoại và mã OTP.
-   * **Đặt lịch 6 bước (Booking Wizard)**:
-     1. Chọn kích cỡ xe (Small, Medium, Large) - tự động nhân hệ số giá dịch vụ.
-     2. Chọn chi nhánh (Quận 1 / Quận 7) kèm trạng thái chỗ trống.
-     3. Chọn ngày & giờ (múi giờ GMT+7, nhắc nhở tự động trước 1 ngày).
-     4. Chọn dịch vụ (chi tiết combo hiển thị chuyên nghiệp).
-     5. Cung cấp thông tin liên hệ.
-     6. Xác nhận đặt lịch & hiển thị mã VietQR chuyển khoản (thanh toán 100%).
-   * **Bảng điều khiển khách hàng (Customer Dashboard)**: Quản lý thông tin cá nhân, CRUD danh sách xe cá nhân, theo dõi lịch sử rửa xe, tích điểm thăng hạng và đổi điểm nhận Voucher giảm giá.
+- Wizard đặt lịch hiện mới hoàn tất luồng UI; chưa gọi API tạo booking hay thanh toán thực tế.
+- Dashboard, điểm, voucher, lịch sử và chi tiết booking hiện vẫn dùng mock data; chỉ Garage đã nối API thật, nên dữ liệu hiển thị có thể không khớp phiên đăng nhập.
+- Check-in, hoàn tất và feedback ở frontend vẫn là mock flow.
+- Chưa có tích hợp cổng thanh toán, webhook/IPN, đối soát hoặc xác thực thanh toán. Backend hiện chỉ tạo dữ liệu/URL QR hiển thị.
+- Luồng booking và cơ chế giữ chỗ/phân bổ khoang hiện có đơn giản hơn thiết kế v2; chưa có soft hold, idempotency hay kiểm soát cạnh tranh an toàn.
+- Google Sign-In không có trong giao diện hiện tại vì chưa tương thích với hợp đồng đăng ký backend.
+- Frontend chưa có script test hoặc lint; backend chưa có thư mục `src/test`.
 
-2. **Quầy Rửa xe (Washing Counter Portal - LPR)**:
-   * Tiếp nhận danh sách xe đặt lịch theo ngày.
-   * Phê duyệt trạng thái đặt lịch (`PENDING` ➔ `CONFIRMED`).
-   * Điểm danh xe vào tiệm (`CHECKED-IN`).
-   * Xác nhận hoàn thành thanh toán và rửa xe (`COMPLETED`), kích hoạt công cụ tự động tích điểm cho khách hàng.
+## Luồng nghiệp vụ mục tiêu v2
 
-3. **Quản trị viên (Admin Portal)**:
-   * **Quản lý Khách hàng**: Tra cứu, tìm kiếm, lọc theo hạng thẻ thành viên, sắp xếp và xem lịch sử rửa xe chi tiết của khách.
-   * **Quản lý Lịch đặt**: Giao diện cuộn vô hạn (Infinite Scroll) hỗ trợ tải dữ liệu mượt mà, phân loại theo ngày và trạng thái.
-   * **Báo cáo doanh thu & Log giao dịch**: Thống kê doanh thu động theo Ngày/Tháng/Năm; lưu vết lịch sử giao dịch điểm thẻ.
-   * **AI Campaign Builder**: Công cụ AI gợi ý và tạo chiến dịch khuyến mãi, tích lũy điểm thưởng dựa trên mục tiêu chiến dịch và hạng thành viên.
+Thứ tự wizard mục tiêu là: **Chi nhánh → Dịch vụ → Ngày giờ → Xe → Xem lại → Xác nhận**. Thiết kế v2 còn mô tả booking cho khách/khách hàng, cọc thanh toán, quản lý khoang, loyalty và các cổng staff/admin. Đây là tài liệu định hướng, không phải cam kết rằng mọi chức năng đã được hiện thực trong source hiện tại.
 
----
+Xem chi tiết tại [yêu cầu chức năng](docs/srs/functional_requirements.md), [luồng v2](docs/design/01-LUONG-CHAY-MOI.md) và [báo cáo refactor tài liệu](docs/reports/milestone/REFACTOR-REPORT.md).
 
-## 🛠️ Công Nghệ Phát Triển (Tech Stack)
+## Công nghệ
 
-### 1. Front-end (React + TS + CSS Modules / Tailwind)
-* **Framework**: React 18, TypeScript, Vite.
-* **Styling**: CSS Modules (Vanilla CSS) kết hợp Tailwind CSS với phong cách tối giản, hiện đại và tối ưu trên **Giao diện sáng (Light Mode)**.
-* **Thư viện icon**: Lucide React.
-* **Quản lý State**: Context API dùng chung.
+| Thành phần | Công nghệ |
+| --- | --- |
+| Frontend | React 19, TypeScript, Vite 6, Tailwind CSS 4 |
+| UI và trạng thái | React Router 7, TanStack Query, Zustand, React Hook Form, Zod |
+| Trải nghiệm | i18next (vi/en), Motion, GSAP, Lucide, date-fns/date-fns-tz |
+| Backend | Java 17, Spring Boot 3.5.6, Spring Web/Security/JPA/Validation |
+| Dữ liệu và xác thực | SQL Server, JWT, Firebase Admin/Phone OTP |
+| API docs | springdoc OpenAPI / Swagger |
 
-### 2. Back-end (Spring Boot)
-* **Ngôn ngữ**: Java 17 (LTS).
-* **Framework**: Spring Boot 3.x, Spring Data JPA.
-* **Cấu trúc**: Layered Architecture (`Controller -> Service -> Repository`).
-* **Tài liệu hóa API**: Swagger / OpenAPI 3.
+## Yêu cầu môi trường
 
-### 3. Database (MS SQL Server)
-* Hệ quản trị cơ sở dữ liệu: Microsoft SQL Server local.
-* **Cấu hình mặc định chung cho cả nhóm**:
-  * **Cổng kết nối**: `1433`
-  * **Tài khoản**: `sa`
-  * **Mật khẩu**: `123456`
-  * **Tên database**: `autowash_pro`
+- Node.js 18+ và npm.
+- JDK 17 và Apache Maven (repository không có Maven Wrapper).
+- SQL Server đang chạy, có database `autowash_pro` tại cổng `1433`, cùng schema/migration trong `Back-end/database/`.
+- Cấu hình Firebase hợp lệ nếu cần đăng ký bằng Phone OTP.
 
----
+Không commit file `.env`, JWT secret, mật khẩu database hoặc Firebase service account.
 
-## 🚀 Hướng Dẫn Thiết Lập & Chạy Dự Án
+## Cấu hình biến môi trường
 
-### 💻 1. Front-end Setup
+Tạo các file local (đều phải được gitignore):
 
-Yêu cầu cài đặt sẵn Node.js (v18 trở lên).
-
-```bash
-# Di chuyển vào thư mục Front-end
-cd Front-end
-
-# Cài đặt thư viện
-npm install
-
-# Khởi chạy máy chủ phát triển (Dev server)
-npm run dev
-
-# Kiểm tra biên dịch và build thử dự án
-npm run build
+```powershell
+Copy-Item Front-end/.env.example Front-end/.env
+Copy-Item Back-end/.env.example Back-end/.env
 ```
 
-### ☕ 2. Back-end Setup
+Điền tối thiểu `DB_PASSWORD` trong `Back-end/.env`. Script backend sẽ tự tạo `JWT_SECRET` nếu biến này để trống. File `Front-end/.env.example` hiện đặt ví dụ `VITE_API_BASE_URL=http://localhost:8080/api/v1`; hãy giữ biến này khi tạo `Front-end/.env`, vì mã frontend không có fallback.
 
-Yêu cầu cài đặt sẵn JDK 17 và Apache Maven.
+Để dùng luồng đăng ký Phone OTP, đặt Firebase Admin service-account JSON do quản trị viên Firebase cấp tại `Back-end/src/main/resources/firebase-service-account.json`. File này phải luôn không được theo dõi bởi Git. Nếu chưa có service account hoặc cấu hình `VITE_FIREBASE_*`, backend vẫn có thể chạy và người dùng hiện có vẫn đăng nhập bằng số điện thoại/mật khẩu, nhưng không thể hoàn tất đăng ký OTP.
 
-```bash
-# Di chuyển vào thư mục Back-end
-cd Back-end
+> Hai file `.env.example` đang là cấu hình khởi tạo trong worktree hiện tại. Nếu branch/clone của bạn chưa có chúng, hãy tạo các file `.env` theo các biến được nêu ở trên, không chép bí mật vào source hoặc Git.
 
-# Build dự án bằng Maven
-mvn clean install
+## Chạy dự án
 
-# Khởi chạy dịch vụ Spring Boot
-mvn spring-boot:run
+Từ thư mục gốc repository:
+
+```powershell
+# Cài dependencies frontend
+npm --prefix Front-end ci
+
+# Chạy frontend (Vite sẽ in URL, thường là http://localhost:5173)
+npm --prefix Front-end run dev
 ```
 
-### 🗄️ 3. Cơ Sở Dữ Liệu SQL Server (Docker Compose)
+Mở một terminal khác để chạy backend:
 
-Nếu bạn đã cài đặt Docker Desktop, bạn có thể khởi động nhanh cơ sở dữ liệu SQL Server với cấu hình kết nối chuẩn của dự án bằng lệnh:
-
-```bash
-# Tại thư mục gốc dự án (chứa docker-compose.yml)
-docker compose up -d
+```powershell
+# Khuyến nghị: tự nạp Back-end/.env và kiểm tra DB_PASSWORD
+pwsh -File Back-end/run-local.ps1
 ```
 
-Lệnh trên sẽ khởi chạy container SQL Server lắng nghe trên cổng `1433` với tài khoản `sa` / mật khẩu `123456` và tự động tạo cơ sở dữ liệu `autowash_pro`.
+Hoặc, sau khi đã thiết lập `DB_PASSWORD` và `JWT_SECRET` trong môi trường:
 
----
+```powershell
+mvn -f Back-end/pom.xml spring-boot:run
+```
 
-## 👥 Nhóm Phát Triển (SU26SWP08 - Group 4 & 5)
-Dự án được xây dựng và duy trì bởi nhóm 6 thành viên lớp SWP391. Vui lòng tuân thủ nghiêm ngặt các quy tắc phát triển Front-end & Back-end được ghi cụ thể trong file [.agents/AGENTS.md](file:///d:/demoSWP/Vehicles-washing-G4-5/.agents/AGENTS.md).
+Backend mặc định chạy tại `http://localhost:8080`. Khi đã khởi động, Swagger UI có tại `http://localhost:8080/swagger-ui/index.html`.
+
+## Kiểm tra chất lượng
+
+```powershell
+# Frontend
+npm --prefix Front-end run typecheck
+npm --prefix Front-end run build
+
+# Backend (hiện không có Back-end/src/test; kết quả 0 test không phải bằng chứng hành vi)
+mvn -f Back-end/pom.xml test
+```
+
+Không có lệnh `npm test` hoặc `npm run lint` trong frontend hiện tại.
+
+## Tài liệu tham khảo
+
+- [Tiến độ, bằng chứng và các blocker](PROGRESS.md)
+- [Yêu cầu chức năng](docs/srs/functional_requirements.md)
+- [Quy tắc nghiệp vụ v2](docs/srs/business_rules.md)
+- [Luồng booking v2](docs/design/01-LUONG-CHAY-MOI.md)
+- [Kế hoạch refactor frontend](docs/plans/PLAN-V2-LAM-LAI-FE.md)
+- [Báo cáo refactor tài liệu](docs/reports/milestone/REFACTOR-REPORT.md)
+
+## Lưu ý bảo mật
+
+Đây chưa nên được coi là cấu hình production. Ngoài việc hoàn thiện thanh toán và concurrency, cần xử lý các hạng mục hardening đã ghi trong `PROGRESS.md`, gồm seed password trong source và chính sách CORS quá rộng.
