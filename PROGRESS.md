@@ -1,6 +1,14 @@
 # Progress — AutoWash Pro
 
 ## Current state
+- 2026-07-22 — Demo-priority frontend connection pass: the existing React
+  booking wizard already calls the backend catalog, availability, vehicle,
+  authentication, and booking routes. This pass hardens the API client with a
+  localhost backend fallback when `VITE_API_BASE_URL` is absent and switches
+  branch loading to the minimized public `GET /api/v1/branches` contract.
+  No frontend tests were run by explicit demo instruction. Full backend gate,
+  lifecycle expiry, guest booking, VNPAY, and Swagger completion remain
+  pending; do not treat this demo pass as final FR-001…FR-013 evidence.
 - 2026-07-22 — FR-004/FR-005 booking-engine Phase 3B trusted availability is
   **implemented, independently reviewed, migrated, verified, documented, and
   committed** as `7543192`. The backend now exposes minimized canonical branch
