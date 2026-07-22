@@ -1,18 +1,11 @@
 import { ArrowLeft, ArrowRight, CheckCircle2, Droplets } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-<<<<<<< HEAD
 import { Badge, Button, LanguageToggle, Stepper, ThemeToggle } from '@/components/ui';
 import { formatVND } from '@/lib/money';
 import { cn } from '@/lib/utils';
 import { useCreateBooking, useCustomerBookings, type Booking } from '@/lib/api/bookings';
 import { useAuth } from '@/features/auth/AuthContext';
-=======
-import { Button, LanguageToggle, Stepper, ThemeToggle } from '@/components/ui';
-import { formatVND } from '@/lib/money';
-import { cn } from '@/lib/utils';
-import { useCreateBooking, type Booking } from '@/lib/api/bookings';
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 import { LAST_STEP, WIZARD_STEPS, useBookingStore } from './store';
 import { useCartSummary } from './selectors';
 import { StepBranch } from './steps/StepBranch';
@@ -166,7 +159,6 @@ function BookingSuccess({
   onAgain: () => void;
 }) {
   const { t } = useTranslation('booking');
-<<<<<<< HEAD
   const { customer } = useAuth();
   const {
     data: myBookings,
@@ -175,8 +167,6 @@ function BookingSuccess({
   } = useCustomerBookings(customer?.id);
   const bookingStatus = myBookings?.find((b) => b.bookingRef === booking.bookingRef)?.status ?? booking.status;
 
-=======
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6 text-center">
       <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-success/10 text-success">
@@ -186,7 +176,6 @@ function BookingSuccess({
         {t('wizard.success.title')}
       </h1>
       <p className="text-text-secondary">{t('wizard.success.ref', { ref: booking.bookingRef })}</p>
-<<<<<<< HEAD
       <div className="mb-6 flex w-full max-w-sm items-center justify-between rounded-2xl border border-border bg-surface p-4 text-sm">
         <div className="flex items-center gap-2">
           <span className="text-text-secondary">{t('wizard.success.statusPanel.label')}</span>
@@ -203,13 +192,6 @@ function BookingSuccess({
         </button>
       </div>
 
-=======
-      <img
-        src={booking.vietQrUrl}
-        alt="VietQR"
-        className="my-6 w-56 rounded-2xl border border-border"
-      />
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
       <p className="mb-8 max-w-sm text-text-secondary">{t('wizard.success.description')}</p>
       <div className="flex gap-3">
         <Button variant="secondary" onClick={onHome}>

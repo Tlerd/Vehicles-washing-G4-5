@@ -1,7 +1,6 @@
 # Progress — AutoWash Pro
 
 ## Current state
-<<<<<<< HEAD
 - 2026-07-22 — Added project-local Engram identification in
   `.engram/config.json` for the `autowash-pro` memory namespace. The verified
   local Engram binary and existing Codex MCP registration use an explicit
@@ -279,11 +278,6 @@
   and one direct child only; it does not verify every adapter or nested
   lead-to-specialist dispatch. See
   docs/ai-logs/m1/2026-07-21-be-first-plan-and-codex-subagent-repair.md.
-=======
-<<<<<<< Updated upstream
-- Last AI-assisted work: 2026-07-21 — corrected public role routing and entry
-=======
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 - Last AI-assisted work: 2026-07-21 — implemented FR-004 Phase 1 (owner
   approved 5 decisions unblocking the plan doc) plus the separately-scoped
   `BookingManagementService` 400→403 fix. **Backend**: `resolveVehicle()` and
@@ -359,10 +353,6 @@
   See docs/ai-logs/m1/2026-07-21-fr003-fix-fr001-002-docs-fr004-audit.md.
   Not yet owner-reviewed; no commit made.
 - Previous AI-assisted work: 2026-07-21 — corrected public role routing and entry
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
   points: the landing header now opens a guest overview through a person icon;
   public booking CTAs go directly to `/guest/booking` without the identity
   modal; post-login and post-registration redirect by the server-returned role
@@ -383,7 +373,6 @@
   docs/ai-logs/m1/2026-07-21-andrej-karpathy-guidelines-import.md.
 - Milestone: VERIFY WITH THE LECTURER OR TEAM
 - Status: Full 11-role Claude/Codex sub-agent inventory is provisioned with
-<<<<<<< HEAD
   mandatory dispatch policy and Codex skill mirrors. The local Codex `planner`
   adapter has passed a read-only child-agent smoke test after repairing the
   Windows sandbox helper installation; broader adapter discovery, nested
@@ -395,25 +384,6 @@
   phase starts only after the BE-first plan is reviewed and its external
   prerequisites (notably VNPAY sandbox configuration and test environment) are
   available; frontend work begins only after the plan's BE + Swagger gate.
-=======
-  mandatory dispatch policy, canonical local ECC inventory, and Codex skill
-  mirrors; Superpowers
-  installation was attempted but is blocked by this managed runtime's user-cache
-  permissions; runtime discovery, vendor approval, human approval, and security
-  blockers remain open
-- Baseline commit: see docs/tooling/BASELINE.md
-- Active scope: Owner-directed FR-001..FR-013 completion, phased with explicit
-<<<<<<< Updated upstream
-  approval gates between phases. Audit + Phase 0 done; Phase 1 not started.
-=======
-  approval gates between phases. Audit + Phase 0 done. Phase 1: FR-003 fix,
-  FR-001/FR-002 doc correction, and FR-004 Phase 1 (real booking wizard +
-  BookingManagementService 400→403 fix) all implemented (2026-07-21, not yet
-  owner-reviewed). FR-004 Phase 2 (FR-005 v2 schema, VNPAY, real slot/bay
-  model) and Phase 3 (guest booking) remain blocked on separate owner sign-off
-  per docs/superpowers/specs/2026-07-21-fr004-real-booking-implementation-plan.md.
->>>>>>> Stashed changes
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 - Last AI-assisted work: 2026-07-21 — FR-001..FR-013 current-state audit
   (4-agent parallel dispatch: frontend-lead, backend-lead, testing-lead,
   security-reviewer, 245 tool calls) plus Phase 0 startup verification.
@@ -494,22 +464,11 @@
   (FR001_FR013 + FR004 scripts applied, idempotent); `mvn spring-boot:run`
   starts in ~4.5s with Firebase Admin SDK initialized and DB connected
   (Back-end/run-local.ps1 automates env loading + JWT secret generation).
-<<<<<<< HEAD
-=======
-<<<<<<< Updated upstream
-- No Back-end/src/test tree exists. JUnit appears in pom.xml dependencies only;
-  it is not test evidence.
-=======
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 - Back-end/src/test exists with 3 files (AuthServiceImplTest,
   VehicleServiceImplTest, GlobalExceptionHandlerTest), 11 tests total, all
   plain JUnit 5 + Mockito unit tests with no Spring context, no MockMvc, no
   Testcontainers, no spring-security-test dependency. `mvn -f Back-end/pom.xml
   test` — exit 0, 11/11 passing (2026-07-21).
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 - Repository size as scanned on 2026-07-20: 195 files analysed, 66 filtered.
 - docs/srs/SRS.md, docs/design/architecture.md, docs/design/ERD.md,
   docs/design/state-diagram.md, docs/rubric/rubric-checklist.md,
@@ -522,7 +481,6 @@
 - Understand-Anything is for navigation, not requirements.
 - Codex provides an independent review pass.
 - The 11 ECC-listed roles have project adapters for Codex and Claude Code. Root
-<<<<<<< HEAD
   AGENTS.md mandates dispatch of every applicable role. Claude's planner smoke
   test passed previously; Codex's project `planner` adapter passed a read-only
   local CLI child-agent smoke test on 2026-07-21 after the Windows sandbox
@@ -533,15 +491,6 @@
 - FE/BE/testing leads and their specialist children are provisioned. Codex
   allows root → lead → specialist depth. Only a direct `planner` child has
   runtime evidence so far; nested runtime validation remains unrun.
-=======
-  AGENTS.md mandates dispatch of every applicable role; Claude planner runtime
-  smoke test passed, while Codex planner runtime smoke test is blocked by its
-  Windows sandbox helper and must be re-run after remediation.
-- `ai/workflows/` defines the shared planning, implementation, verification,
-  and review dispatch lifecycle for those roles.
-- FE/BE/testing leads and their specialist children are provisioned. Codex
-  allows root → lead → specialist depth, but runtime validation remains blocked.
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 - AI-HARNESS-SETUP_v1.md is the migration runbook. The core harness has been
   provisioned, but runtime discovery, vendor approval, Superpowers delivery,
   build/test evidence, security review, and human approval are still separate
@@ -611,17 +560,10 @@ Navigation data, not requirements. None of this satisfies a rubric item.
       wants a clean slate.
 - [x] STAFF (+84900000001) and ADMIN (+84900000002) DB passwords rotated
       2026-07-21 (fresh bcrypt hashes, verified via live login), replacing the
-<<<<<<< HEAD
       seeder's hardcoded legacy credentials (now redacted). New passwords reported to the
       owner in chat only, not written to any file. **Still open**:
       Back-end/src/main/java/com/autowashpro/config/SystemAccountSeeder.java
       itself still hardcoded legacy credentials in tracked source — those
-=======
-      seeder's hardcoded Staff@123/Admin@123. New passwords reported to the
-      owner in chat only, not written to any file. **Still open**:
-      Back-end/src/main/java/com/autowashpro/config/SystemAccountSeeder.java
-      itself still hardcodes Staff@123/Admin@123 in tracked source — those
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
       values are permanently exposed via git history regardless of what's live
       in the DB now, and the seeder will silently stop mattering only because
       `existsByPhone` skips already-seeded rows; it should still be changed to
@@ -657,20 +599,9 @@ Navigation data, not requirements. None of this satisfies a rubric item.
 3. [x] Frontend build/backend run commands executed and evidence recorded —
    see "Frontend build evidence" and "Local backend run evidence" above and
    docs/ai-logs/m1/2026-07-21-fe-rebuild-phase1.md /
-<<<<<<< HEAD
    2026-07-21-fe-rebuild-phase2.md. Correction: `mvn -f Back-end/pom.xml test`
    has since been run repeatedly and passes (11/11 as of 2026-07-21's FR-003
    fix) — the "no test tree exists" note above was stale.
-=======
-<<<<<<< Updated upstream
-   2026-07-21-fe-rebuild-phase2.md. Still open: `mvn -f Back-end/pom.xml test`
-   has not been run (no Back-end/src/test tree exists to run).
-=======
-   2026-07-21-fe-rebuild-phase2.md. Correction: `mvn -f Back-end/pom.xml test`
-   has since been run repeatedly and passes (11/11 as of 2026-07-21's FR-003
-   fix) — the "no test tree exists" note above was stale.
->>>>>>> Stashed changes
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 4. Human-review the generated graphs and docs/ONBOARDING.md, then decide whether
    to commit .ua/ artifacts to the repository.
 5. Decide whether the empty SRS, ERD, state-diagram and rubric stubs will be
@@ -680,7 +611,6 @@ Navigation data, not requirements. None of this satisfies a rubric item.
    update D-001 with the observed installed version. Complete D-002 through D-004,
    run the PowerShell 7 verifier and actual Claude/Codex runtime discovery, then
    record only observed results.
-<<<<<<< HEAD
 7. [x] Repair the Codex Windows sandbox-helper installation and run the
    direct `planner` read-only child-agent smoke test (2026-07-21). Next:
    exercise the remaining applicable adapters and one nested lead-to-specialist
@@ -688,18 +618,6 @@ Navigation data, not requirements. None of this satisfies a rubric item.
 8. Review and approve the active backend-first plan:
    `docs/superpowers/specs/2026-07-21-be-first-api-swagger-plan.md`. Do not
    start new frontend work until its BE + Swagger gate has passed.
-=======
-7. Repair the Codex Windows sandbox-helper installation, then re-run the
-   read-only sub-agent smoke test before treating Codex dispatch as verified.
-<<<<<<< Updated upstream
-=======
-8. [x] FR-004's 5 owner decisions were made and Phase 1 was implemented
-   2026-07-21 accordingly (see Current state and
-   docs/ai-logs/m1/2026-07-21-fr004-phase1-booking-fix.md). Still open: owner
-   review of the Phase 1 implementation itself, and separate sign-off before
-   Phase 2 (FR-005 v2 schema/VNPAY/real slot-bay model) or Phase 3 (guest
-   booking) can start.
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 9. [x] `BookingManagementService.resolveVehicle()`/`create()`'s voucher check
    400→403 fix implemented 2026-07-21 (see Current state above).
 10. New fast, tightly-scoped follow-up (found 2026-07-21 during FR-004 Phase 1
@@ -710,19 +628,10 @@ Navigation data, not requirements. None of this satisfies a rubric item.
     validation, unlike `VehicleServiceImpl.createVehicle()`'s regex check
     (`^[0-9]{2}[A-Z]-[0-9]{3}\.?[0-9]{2}$`). This path pre-dates this session
     but was unreachable while the wizard was 100% mock; it is now live.
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 
 ## Evidence
 - Link command logs, reports, pull requests, commits, screenshots, or exports.
 - Do not mark an item complete without evidence.
-<<<<<<< HEAD
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 - 2026-07-21 FR-004 Phase 1 (real booking wizard) + BookingManagementService
   403 fix: docs/ai-logs/m1/2026-07-21-fr004-phase1-booking-fix.md
   `mvn -f Back-end/pom.xml test` — exit 0, 13/13 tests passing (RED confirmed
@@ -744,10 +653,6 @@ Navigation data, not requirements. None of this satisfies a rubric item.
   before the fix, GREEN after). Independent code review + security review
   (background Workflow) both returned `approved: true`. No frontend files
   changed this session, so no frontend build/typecheck evidence applies.
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 - 2026-07-21 FE rebuild Phase 2 (auth, customer console, theme, i18n):
   docs/ai-logs/m1/2026-07-21-fe-rebuild-phase2.md
   `npx tsc --noEmit` and `npm run build` both clean (0 errors) after an 18-agent

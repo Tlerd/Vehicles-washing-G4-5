@@ -66,10 +66,7 @@ public class SecurityConfig {
                         .requestMatchers(new RegexRequestMatcher(
                                 "^/api/v1/bookings/AWP-[A-Z0-9]{6,8}$", "GET")).permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-<<<<<<< HEAD
                         .requestMatchers("/api/v1/customers/me").hasAnyRole("CUSTOMER", "STAFF", "ADMIN")
-=======
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
                         .requestMatchers("/api/v1/customers/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/washing-counter/**").hasAnyRole("STAFF", "ADMIN")
                         .requestMatchers("/api/v1/loyalty/maintenance/**").hasRole("ADMIN")

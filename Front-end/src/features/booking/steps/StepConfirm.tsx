@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import { AlertTriangle, ShieldCheck, CalendarCheck } from 'lucide-react';
-=======
-import { AlertTriangle, ShieldCheck, Wallet } from 'lucide-react';
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 import { useTranslation } from 'react-i18next';
 import { formatVND } from '@/lib/money';
 import { ApiError } from '@/lib/api/client';
@@ -17,19 +13,11 @@ export function StepConfirm({ error }: { error?: unknown }) {
       <div className="rounded-2xl border border-border p-5">
         <div className="mb-4 flex items-center gap-3">
           <span className="rounded-xl bg-primary-light/60 p-2.5 text-primary-dark">
-<<<<<<< HEAD
             <CalendarCheck className="h-5 w-5" />
           </span>
           <div>
             <p className="font-semibold text-text-primary">{t('confirm.bookingTitle')}</p>
             <p className="text-sm text-text-secondary">{t('confirm.bookingSubtitle')}</p>
-=======
-            <Wallet className="h-5 w-5" />
-          </span>
-          <div>
-            <p className="font-semibold text-text-primary">{t('confirm.paymentTitle')}</p>
-            <p className="text-sm text-text-secondary">{t('confirm.paymentSubtitle')}</p>
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
           </div>
         </div>
         <div className="flex justify-between text-sm">

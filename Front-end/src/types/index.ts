@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-/** Domain types — align these shapes with approved backend DTOs. */
-=======
 /** Domain types — aligned to the planned BE DTOs. Phase 1 is served by mock
  *  data (src/lib/mock); swapping to the real API keeps these shapes. */
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 
 export type VehicleSize = 'S' | 'M' | 'L';
 
@@ -83,14 +79,9 @@ export interface ContactInfo {
 }
 
 /* ---------------------------------------------------------------------- *
-<<<<<<< HEAD
- * Customer domain types. Add UI consumers only when an approved backend
- * contract is available.
-=======
  * Customer domain (Phase 2). Served by src/lib/mock/customer.ts until the
  * real API lands; TanStack Query hooks in customerApi.ts are the only files
  * that change when it does.
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
  * ---------------------------------------------------------------------- */
 
 export type TierId = 'member' | 'silver' | 'gold' | 'platinum';

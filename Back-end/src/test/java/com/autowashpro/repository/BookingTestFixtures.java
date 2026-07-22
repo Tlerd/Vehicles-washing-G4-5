@@ -61,10 +61,7 @@ final class BookingTestFixtures {
         booking.setBookingTime(LocalTime.of(9, 0));
         booking.setStatus("PENDING_DEPOSIT");
         booking.setCreatedAt(LocalDateTime.now());
-<<<<<<< HEAD
         booking.setLegacyFinancialSnapshot(true);
-=======
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
         return booking;
     }
 }

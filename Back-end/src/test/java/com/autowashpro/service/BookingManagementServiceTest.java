@@ -1,10 +1,6 @@
 package com.autowashpro.service;
 
 import com.autowashpro.dto.booking.CreateBookingRequest;
-<<<<<<< HEAD
-import com.autowashpro.entity.Booking;
-=======
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 import com.autowashpro.entity.Branch;
 import com.autowashpro.entity.Customer;
 import com.autowashpro.entity.Vehicle;
@@ -23,17 +19,9 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
-<<<<<<< HEAD
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-=======
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -121,8 +109,4 @@ class BookingManagementServiceTest {
         assertThatThrownBy(() -> bookingManagementService.create(request))
                 .isInstanceOf(ForbiddenException.class);
     }
-<<<<<<< HEAD
-
-=======
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 }

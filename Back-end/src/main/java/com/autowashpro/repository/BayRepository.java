@@ -2,13 +2,10 @@ package com.autowashpro.repository;
 
 import com.autowashpro.entity.Bay;
 import org.springframework.data.jpa.repository.JpaRepository;
-<<<<<<< HEAD
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
-=======
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 
 import java.util.List;
 
@@ -17,7 +14,6 @@ public interface BayRepository extends JpaRepository<Bay, Long> {
     List<Bay> findByBranchBranchId(Long branchId);
 
     List<Bay> findByBranchBranchIdAndBayType(Long branchId, String bayType);
-<<<<<<< HEAD
 
     @Query("SELECT b FROM Bay b WHERE b.branch.branchId = :branchId AND b.active = true " +
             "ORDER BY b.bayCode ASC, b.bayId ASC")
@@ -50,6 +46,4 @@ public interface BayRepository extends JpaRepository<Bay, Long> {
             @Param("branchId") Long branchId,
             @Param("bayCode") String bayCode,
             @Param("bayType") String bayType);
-=======
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 }

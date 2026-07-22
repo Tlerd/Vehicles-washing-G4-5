@@ -56,7 +56,6 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setFullName(request.getFullName());
         customer.setPhone(request.getPhone());
         customer.setEmail(request.getEmail());
-<<<<<<< HEAD
         customer.setUpdatedAt(LocalDateTime.now());
 
         Customer updatedCustomer = customerRepository.save(customer);
@@ -71,12 +70,6 @@ public class CustomerServiceImpl implements CustomerService {
 
         customer.setFullName(request.getFullName());
         customer.setEmail(request.getEmail());
-=======
-        customer.setTier(request.getTier());
-        customer.setAccumulatedPoints(request.getAccumulatedPoints());
-        customer.setTotalSpent(request.getTotalSpent());
-        customer.setTotalWashes(request.getTotalWashes());
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
         customer.setUpdatedAt(LocalDateTime.now());
 
         Customer updatedCustomer = customerRepository.save(customer);

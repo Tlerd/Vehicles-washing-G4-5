@@ -1,7 +1,6 @@
 package com.autowashpro.exception.handler;
 
 import com.autowashpro.exception.custom.ForbiddenException;
-<<<<<<< HEAD
 import com.autowashpro.exception.custom.TooManyRequestsException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -124,25 +123,5 @@ class GlobalExceptionHandlerTest {
 
     record ValidationProbe(@NotBlank(message = "Name is required.") String name,
                            @NotBlank(message = "Phone is required.") String phone) {
-=======
-import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-class GlobalExceptionHandlerTest {
-
-    private final GlobalExceptionHandler handler = new GlobalExceptionHandler();
-
-    @Test
-    void handleForbidden_returnsHttp403() {
-        ResponseEntity<Map<String, Object>> response =
-                handler.handleForbidden(new ForbiddenException("Unauthorized vehicle access or vehicle not found."));
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
     }
 }

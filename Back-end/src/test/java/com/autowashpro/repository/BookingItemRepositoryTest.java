@@ -13,22 +13,16 @@ import com.autowashpro.repository.ServiceRepository;
 import com.autowashpro.repository.VehicleRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-<<<<<<< HEAD
 import org.springframework.dao.DataIntegrityViolationException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-=======
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-<<<<<<< HEAD
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-=======
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 
 class BookingItemRepositoryTest extends RepositoryIntegrationTest {
 
@@ -50,12 +44,9 @@ class BookingItemRepositoryTest extends RepositoryIntegrationTest {
     @Autowired
     private BookingItemRepository bookingItemRepository;
 
-<<<<<<< HEAD
     @PersistenceContext
     private EntityManager entityManager;
 
-=======
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
     @Test
     void findByBookingBookingId_returnsSnapshottedLineItem() {
         Branch branch = branchRepository.saveAndFlush(BookingTestFixtures.newBranch("Booking Item Test Branch"));
@@ -91,7 +82,6 @@ class BookingItemRepositoryTest extends RepositoryIntegrationTest {
         assertThat(items.get(0).getDurationMinutes()).isEqualTo(20);
         assertThat(items.get(0).getBufferMinutes()).isEqualTo(10);
     }
-<<<<<<< HEAD
 
     @Test
     void invalidQuantityAboveTrustedPolicy_isRejectedByDatabase() {
@@ -152,6 +142,4 @@ class BookingItemRepositoryTest extends RepositoryIntegrationTest {
     private record ItemFixture(
             Booking booking, com.autowashpro.entity.Service service) {
     }
-=======
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 }

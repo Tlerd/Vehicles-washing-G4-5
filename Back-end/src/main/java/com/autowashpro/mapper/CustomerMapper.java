@@ -13,7 +13,6 @@ public interface CustomerMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "passwordHash", ignore = true)
-<<<<<<< HEAD
     @Mapping(target = "role", ignore = true)
     @Mapping(target = "tier", ignore = true)
     @Mapping(target = "accumulatedPoints", ignore = true)
@@ -22,8 +21,6 @@ public interface CustomerMapper {
     @Mapping(target = "noShowCount", ignore = true)
     @Mapping(target = "requiresFullPrepay", ignore = true)
     @Mapping(target = "vehicles", ignore = true)
-=======
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
     Customer toEntity(CustomerRequest request);
 
     CustomerResponse toResponse(Customer customer);

@@ -5,10 +5,7 @@ import com.autowashpro.dto.response.ApiFieldError;
 import com.autowashpro.exception.custom.BadRequestException;
 import com.autowashpro.exception.custom.ConflictException;
 import com.autowashpro.exception.custom.ForbiddenException;
-<<<<<<< HEAD
 import com.autowashpro.exception.custom.GoneException;
-=======
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 import com.autowashpro.exception.custom.ResourceNotFoundException;
 import com.autowashpro.exception.custom.ServiceUnavailableException;
 import com.autowashpro.exception.custom.TooManyRequestsException;
@@ -73,7 +70,6 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ForbiddenException.class)
-<<<<<<< HEAD
     public ResponseEntity<ApiErrorResponse> handleForbidden(
             ForbiddenException ex, HttpServletRequest request) {
         return build(HttpStatus.FORBIDDEN, "FORBIDDEN", ex.getMessage(), request, List.of());
@@ -154,17 +150,6 @@ public class GlobalExceptionHandler {
             HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
         return build(HttpStatus.METHOD_NOT_ALLOWED, "METHOD_NOT_ALLOWED",
                 "The HTTP method is not supported for this resource.", request, List.of());
-=======
-    public ResponseEntity<Map<String, Object>> handleForbidden(ForbiddenException ex) {
-        return buildAuthStyleError(HttpStatus.FORBIDDEN, ex.getMessage());
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
-        FieldError fieldError = ex.getBindingResult().getFieldError();
-        String message = fieldError != null ? fieldError.getDefaultMessage() : "Validation failed.";
-        return buildAuthStyleError(HttpStatus.BAD_REQUEST, message);
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
     }
 
     @ExceptionHandler(Exception.class)

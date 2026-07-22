@@ -13,13 +13,8 @@ import java.time.LocalDateTime;
 public class IdempotencyRecord {
 
     @Id
-<<<<<<< HEAD
     @Column(name = "idempotency_key", length = 64)
     private String scopedKeyHash;
-=======
-    @Column(name = "idempotency_key", length = 100)
-    private String idempotencyKey;
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 
     @Column(name = "request_path", nullable = false, length = 200)
     private String requestPath;
@@ -30,7 +25,6 @@ public class IdempotencyRecord {
     @Column(name = "guest_phone", length = 20)
     private String guestPhone;
 
-<<<<<<< HEAD
     @Column(name = "request_hash", nullable = false, length = 64)
     private String requestHash;
 
@@ -46,23 +40,18 @@ public class IdempotencyRecord {
     @Column(name = "hash_version", nullable = false)
     private Integer hashVersion = 2;
 
-=======
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
     @Column(name = "response_status", nullable = false)
     private Integer responseStatus;
 
     @Column(name = "response_body", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String responseBody;
 
-<<<<<<< HEAD
     @Column(name = "response_location", length = 200)
     private String responseLocation;
 
     @Column(name = "response_cache_control", length = 100)
     private String responseCacheControl;
 
-=======
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 

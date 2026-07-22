@@ -44,7 +44,6 @@ class BayRepositoryTest extends RepositoryIntegrationTest {
         assertThat(quickBays.get(0).getBayCode()).isEqualTo("Q1");
         assertThat(bayRepository.findByBranchBranchId(branch.getBranchId())).hasSize(2);
     }
-<<<<<<< HEAD
 
     @Test
     void insertDefaultIfMissing_isIdempotentAtTheDatabaseBoundary() {
@@ -58,6 +57,4 @@ class BayRepositoryTest extends RepositoryIntegrationTest {
                 .extracting(Bay::getBayCode)
                 .containsExactly("Q1");
     }
-=======
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 }

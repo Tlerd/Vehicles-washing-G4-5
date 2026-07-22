@@ -1,23 +1,18 @@
 package com.autowashpro.repository;
 
 import com.autowashpro.entity.SlotReservation;
-<<<<<<< HEAD
 import jakarta.persistence.QueryHint;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
-=======
-import org.springframework.data.jpa.repository.JpaRepository;
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface SlotReservationRepository extends JpaRepository<SlotReservation, Long> {
 
-<<<<<<< HEAD
     interface BlockingSlotProjection {
         Long getBayId();
         Long getBookingId();
@@ -57,9 +52,4 @@ public interface SlotReservationRepository extends JpaRepository<SlotReservation
     @Query("UPDATE SlotReservation r SET r.status = 'BOOKED', r.expiresAt = NULL " +
             "WHERE r.booking.bookingId = :bookingId AND r.status = 'HOLD'")
     int confirmHoldsByBookingId(@Param("bookingId") Long bookingId);
-=======
-    List<SlotReservation> findByBayBayIdAndSlotTimeBetween(Long bayId, LocalDateTime from, LocalDateTime to);
-
-    List<SlotReservation> findByBookingBookingId(Long bookingId);
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 }

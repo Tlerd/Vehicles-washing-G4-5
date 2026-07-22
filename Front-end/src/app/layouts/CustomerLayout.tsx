@@ -1,11 +1,5 @@
 import { Navigate, NavLink, Outlet, useLocation } from 'react-router-dom';
 import {
-<<<<<<< HEAD
-  Car,
-  Droplets,
-  LogOut,
-  UserCircle,
-=======
   CalendarClock,
   Car,
   Droplets,
@@ -13,7 +7,7 @@ import {
   LogOut,
   Star,
   Ticket,
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
+  UserCircle,
 } from 'lucide-react';
 import { useAuth } from '@/features/auth/AuthContext';
 import { roleHomePath } from '@/features/auth/roleNavigation';
@@ -21,16 +15,12 @@ import { LanguageToggle, ThemeToggle } from '@/components/ui';
 import { cn } from '@/lib/utils';
 
 const NAV_ITEMS = [
-<<<<<<< HEAD
-  { to: '/app/garage', label: 'Xe của tôi', icon: Car },
-  { to: '/app/profile', label: 'Hồ sơ', icon: UserCircle },
-=======
   { to: '/app', label: 'Tổng quan', icon: LayoutDashboard, end: true },
   { to: '/app/garage', label: 'Xe của tôi', icon: Car },
   { to: '/app/points', label: 'Điểm thưởng', icon: Star },
   { to: '/app/vouchers', label: 'Voucher', icon: Ticket },
   { to: '/app/history', label: 'Lịch sử', icon: CalendarClock },
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
+  { to: '/app/profile', label: 'Hồ sơ', icon: UserCircle },
 ];
 
 /** Authenticated shell for Phase 2 customer pages. Redirects to /login,
@@ -61,18 +51,11 @@ export function CustomerLayout() {
           </NavLink>
 
           <nav className="hidden items-center gap-1 md:flex">
-<<<<<<< HEAD
-            {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
-              <NavLink
-                key={to}
-                to={to}
-=======
             {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => (
               <NavLink
                 key={to}
                 to={to}
                 end={end}
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
                 className={({ isActive }) =>
                   cn(
                     'flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium transition-colors',
@@ -103,18 +86,11 @@ export function CustomerLayout() {
         </div>
 
         <nav className="flex items-center gap-1 overflow-x-auto border-t border-border px-4 py-2 md:hidden">
-<<<<<<< HEAD
-          {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
-            <NavLink
-              key={to}
-              to={to}
-=======
           {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => (
             <NavLink
               key={to}
               to={to}
               end={end}
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
               className={({ isActive }) =>
                 cn(
                   'flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium',

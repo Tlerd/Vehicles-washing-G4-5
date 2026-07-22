@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 const BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1').replace(/\/$/, '');
-=======
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
->>>>>>> 1a4749d53d08f657bcd129de981b4ddf3a383d4e
 
 export class ApiError extends Error {
   status: number;
