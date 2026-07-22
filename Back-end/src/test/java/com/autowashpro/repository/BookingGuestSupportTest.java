@@ -39,24 +39,28 @@ class BookingGuestSupportTest extends RepositoryIntegrationTest {
     @Test
     void save_bookingWithGuestAndNoCustomer_persistsSuccessfully() {
         Branch branch = branchRepository.saveAndFlush(BookingTestFixtures.newBranch("Guest Booking Test Branch"));
-        Customer vehicleOwner = customerRepository.saveAndFlush(BookingTestFixtures.newCustomer("+84911333005"));
-        Vehicle vehicle = vehicleRepository.saveAndFlush(BookingTestFixtures.newVehicle(vehicleOwner, "51A-55555"));
 
         Guest guest = new Guest();
         guest.setFullName("Guest Booker");
         guest.setPhone("+84911333006");
+        guest.setVehicleBrand("Toyota");
         guest.setCreatedAt(LocalDateTime.now());
         guest = guestRepository.saveAndFlush(guest);
 
-        Booking booking = BookingTestFixtures.newBooking(vehicleOwner, vehicle, branch, "AWP-TESTE1");
+        Booking booking = BookingTestFixtures.newBooking(null, null, branch, "AWP-TESTE1");
         booking.setCustomer(null);
         booking.setGuest(guest);
+        booking.setGuestLicensePlate("51A-55555");
+        booking.setGuestVehicleBrand("Toyota");
+        booking.setGuestVehicleSize(com.autowashpro.entity.VehicleSize.SEDAN);
 
         Booking saved = bookingRepository.saveAndFlush(booking);
 
         assertThat(saved.getBookingId()).isNotNull();
         assertThat(saved.getCustomer()).isNull();
+        assertThat(saved.getVehicle()).isNull();
         assertThat(saved.getGuest().getGuestId()).isEqualTo(guest.getGuestId());
+        assertThat(saved.getGuestLicensePlate()).isEqualTo("51A-55555");
     }
 
     @Test
@@ -86,6 +90,51 @@ class BookingGuestSupportTest extends RepositoryIntegrationTest {
 
         Booking booking = BookingTestFixtures.newBooking(customer, vehicle, branch, "AWP-TESTE3");
         booking.setGuest(guest);
+
+        assertThatThrownBy(() -> bookingRepository.saveAndFlush(booking))
+                .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void save_guestBookingWithPersistedMemberVehicle_violatesCheckConstraint() {
+        Branch branch = branchRepository.saveAndFlush(BookingTestFixtures.newBranch("Guest Booking Test Branch 4"));
+        Customer vehicleOwner = customerRepository.saveAndFlush(BookingTestFixtures.newCustomer("+84911333010"));
+        Vehicle vehicle = vehicleRepository.saveAndFlush(BookingTestFixtures.newVehicle(vehicleOwner, "51A-88888"));
+        Guest guest = new Guest();
+        guest.setFullName("Guest Booker 3");
+        guest.setPhone("+84911333011");
+        guest.setVehicleBrand("Toyota");
+        guest.setCreatedAt(LocalDateTime.now());
+        guest = guestRepository.saveAndFlush(guest);
+
+        Booking booking = BookingTestFixtures.newBooking(null, vehicle, branch, "AWP-TESTE4");
+        booking.setGuest(guest);
+        booking.setGuestLicensePlate("51A-88888");
+        booking.setGuestVehicleBrand("Toyota");
+        booking.setGuestVehicleSize(com.autowashpro.entity.VehicleSize.SEDAN);
+
+        assertThatThrownBy(() -> bookingRepository.saveAndFlush(booking))
+                .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void save_memberBookingWithoutOwnedVehicle_violatesCheckConstraint() {
+        Branch branch = branchRepository.saveAndFlush(BookingTestFixtures.newBranch("Guest Booking Test Branch 5"));
+        Customer customer = customerRepository.saveAndFlush(BookingTestFixtures.newCustomer("+84911333012"));
+        Booking booking = BookingTestFixtures.newBooking(customer, null, branch, "AWP-TESTE5");
+
+        assertThatThrownBy(() -> bookingRepository.saveAndFlush(booking))
+                .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void save_memberBookingWithAnotherCustomersVehicle_violatesForeignKey() {
+        Branch branch = branchRepository.saveAndFlush(BookingTestFixtures.newBranch("Guest Booking Test Branch 6"));
+        Customer bookingCustomer = customerRepository.saveAndFlush(BookingTestFixtures.newCustomer("+84911333013"));
+        Customer vehicleOwner = customerRepository.saveAndFlush(BookingTestFixtures.newCustomer("+84911333014"));
+        Vehicle otherVehicle = vehicleRepository.saveAndFlush(BookingTestFixtures.newVehicle(vehicleOwner, "51A-99999"));
+        Booking booking = BookingTestFixtures.newBooking(
+                bookingCustomer, otherVehicle, branch, "AWP-TESTE6");
 
         assertThatThrownBy(() -> bookingRepository.saveAndFlush(booking))
                 .isInstanceOf(DataIntegrityViolationException.class);

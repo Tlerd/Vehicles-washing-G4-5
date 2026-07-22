@@ -28,7 +28,7 @@ public class Booking {
     private Customer customer;
 
     @ManyToOne
-    @JoinColumn(name = "vehicle_id", nullable = false)
+    @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
 
     @ManyToOne
@@ -70,4 +70,44 @@ public class Booking {
     @ManyToOne
     @JoinColumn(name = "applied_promotion_id")
     private Promotion appliedPromotion;
+
+    @Column(name = "guest_license_plate", length = 20)
+    private String guestLicensePlate;
+
+    @Column(name = "guest_vehicle_brand", length = 100)
+    private String guestVehicleBrand;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "guest_vehicle_size", length = 20)
+    private VehicleSize guestVehicleSize;
+
+    @Column(name = "booking_mode", nullable = false, length = 20)
+    private String bookingMode = "SLOT";
+
+    @Column(name = "subtotal", nullable = false, precision = 12, scale = 2)
+    private BigDecimal subtotal = BigDecimal.ZERO;
+
+    @Column(name = "size_adjustment", nullable = false, precision = 12, scale = 2)
+    private BigDecimal sizeAdjustment = BigDecimal.ZERO;
+
+    @Column(name = "voucher_discount", nullable = false, precision = 12, scale = 2)
+    private BigDecimal voucherDiscount = BigDecimal.ZERO;
+
+    @Column(name = "deposit_amount", nullable = false, precision = 12, scale = 2)
+    private BigDecimal depositAmount = BigDecimal.ZERO;
+
+    @Column(name = "paid_amount", nullable = false, precision = 12, scale = 2)
+    private BigDecimal paidAmount = BigDecimal.ZERO;
+
+    @Column(name = "counter_balance", nullable = false, precision = 12, scale = 2)
+    private BigDecimal counterBalance = BigDecimal.ZERO;
+
+    @Column(name = "deposit_expires_at")
+    private LocalDateTime depositExpiresAt;
+
+    @Column(name = "note", length = 500)
+    private String note;
+
+    @Column(name = "legacy_financial_snapshot", nullable = false)
+    private Boolean legacyFinancialSnapshot = false;
 }

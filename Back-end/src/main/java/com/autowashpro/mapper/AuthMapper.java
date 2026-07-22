@@ -24,6 +24,9 @@ public interface AuthMapper {
     @Mapping(target = "totalWashes", constant = "0")
     @Mapping(target = "createdAt", expression = "java(LocalDateTime.now())")
     @Mapping(target = "updatedAt", expression = "java(LocalDateTime.now())")
+    @Mapping(target = "noShowCount", ignore = true)
+    @Mapping(target = "requiresFullPrepay", ignore = true)
+    @Mapping(target = "vehicles", ignore = true)
     Customer toCustomer(RegisterRequest request);
 
     @Mapping(target = "success", constant = "true")

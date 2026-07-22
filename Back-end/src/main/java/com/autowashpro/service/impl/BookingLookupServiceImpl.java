@@ -71,12 +71,14 @@ public class BookingLookupServiceImpl implements BookingLookupService {
     private BookingLookupResponse toResponse(Booking booking) {
         String licensePlate = booking.getVehicle() != null
                 ? booking.getVehicle().getLicensePlate()
-                : booking.getGuest() != null ? booking.getGuest().getLicensePlate() : null;
-        String vehicleBrand = booking.getVehicle() != null ? booking.getVehicle().getBrand() : null;
+                : booking.getGuestLicensePlate();
+        String vehicleBrand = booking.getVehicle() != null
+                ? booking.getVehicle().getBrand()
+                : booking.getGuestVehicleBrand();
         String vehicleSize = booking.getVehicle() != null && booking.getVehicle().getVehicleSize() != null
                 ? booking.getVehicle().getVehicleSize().name()
-                : booking.getGuest() != null && booking.getGuest().getVehicleSize() != null
-                ? booking.getGuest().getVehicleSize().name() : null;
+                : booking.getGuestVehicleSize() != null
+                ? booking.getGuestVehicleSize().name() : null;
         return new BookingLookupResponse(
                 booking.getBookingRef(), booking.getStatus(), booking.getBranch().getBranchId(),
                 booking.getBranch().getBranchName(), booking.getBranch().getAddress(),

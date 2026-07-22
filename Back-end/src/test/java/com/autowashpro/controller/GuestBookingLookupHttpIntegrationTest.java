@@ -105,7 +105,7 @@ class GuestBookingLookupHttpIntegrationTest {
                         org.hamcrest.Matchers.containsString("no-store")))
                 .andExpect(jsonPath("$.bookingRef").value(testBooking.booking().getBookingRef()))
                 .andExpect(jsonPath("$.status").value("CONFIRMED"))
-                .andExpect(jsonPath("$.licensePlate").value(testBooking.vehicle().getLicensePlate()))
+                .andExpect(jsonPath("$.licensePlate").value(testBooking.booking().getGuestLicensePlate()))
                 .andExpect(jsonPath("$.customerId").doesNotExist())
                 .andExpect(jsonPath("$.customerPhone").doesNotExist())
                 .andExpect(jsonPath("$.guestPhone").doesNotExist())
@@ -115,6 +115,25 @@ class GuestBookingLookupHttpIntegrationTest {
                         .header(PROOF_HEADER, proof))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("BAD_REQUEST"));
+    }
+
+    @Test
+    void guestLookup_usesImmutableBookingVehicleSnapshot() throws Exception {
+        TestBooking testBooking = createGuestBooking();
+        String originalPlate = testBooking.booking().getGuestLicensePlate();
+        String originalBrand = testBooking.booking().getGuestVehicleBrand();
+        testBooking.guest().setLicensePlate("MUTATED-PLATE");
+        testBooking.guest().setVehicleBrand("Mutated Brand");
+        testBooking.guest().setVehicleSize(VehicleSize.PICKUP);
+        guestRepository.saveAndFlush(testBooking.guest());
+        String proof = saveProof(testBooking.guest().getPhone(), VerificationPurpose.GUEST_BOOKING_LOOKUP);
+
+        mvc.perform(get("/api/v1/bookings/{bookingRef}", testBooking.booking().getBookingRef())
+                        .header(PROOF_HEADER, proof))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.licensePlate").value(originalPlate))
+                .andExpect(jsonPath("$.vehicleBrand").value(originalBrand))
+                .andExpect(jsonPath("$.vehicleSize").value("SEDAN"));
     }
 
     @Test
@@ -270,21 +289,20 @@ class GuestBookingLookupHttpIntegrationTest {
     }
 
     private TestBooking createGuestBooking() {
-        Customer vehicleOwner = saveCustomer();
         Branch branch = saveBranch();
-        Vehicle vehicle = saveVehicle(vehicleOwner);
         Guest guest = new Guest();
         guest.setFullName("Guest Test");
         guest.setPhone(nextPhone());
         guest.setEmail(unique("guest") + "@example.test");
-        guest.setLicensePlate(vehicle.getLicensePlate());
+        guest.setLicensePlate(unique("TST").substring(0, 11));
+        guest.setVehicleBrand("Toyota");
         guest.setVehicleSize(VehicleSize.SEDAN);
         guest.setCreatedAt(LocalDateTime.now());
         guest = guestRepository.saveAndFlush(guest);
         guestIds.add(guest.getGuestId());
 
-        Booking booking = saveBooking(null, guest, vehicle, branch);
-        return new TestBooking(booking, null, guest, vehicle);
+        Booking booking = saveBooking(null, guest, null, branch);
+        return new TestBooking(booking, null, guest, null);
     }
 
     private TestBooking createMemberBooking() {
@@ -348,13 +366,21 @@ class GuestBookingLookupHttpIntegrationTest {
         booking.setBookingRef(bookingRef);
         booking.setCustomer(customer);
         booking.setGuest(guest);
-        booking.setVehicle(vehicle);
+        if (guest == null) {
+            booking.setVehicle(vehicle);
+        } else {
+            booking.setGuestLicensePlate(guest.getLicensePlate());
+            booking.setGuestVehicleBrand(guest.getVehicleBrand());
+            booking.setGuestVehicleSize(guest.getVehicleSize());
+        }
         booking.setBranch(branch);
         booking.setBookingDate(LocalDate.now().plusDays(1));
         booking.setBookingTime(LocalTime.of(9, 0));
         booking.setEndTime(LocalTime.of(9, 30));
         booking.setDurationMinutes(30);
+        booking.setSubtotal(new BigDecimal("150000.00"));
         booking.setTotalPrice(new BigDecimal("150000.00"));
+        booking.setCounterBalance(new BigDecimal("150000.00"));
         booking.setStatus("CONFIRMED");
         booking.setCreatedAt(LocalDateTime.now());
         booking = bookingRepository.saveAndFlush(booking);

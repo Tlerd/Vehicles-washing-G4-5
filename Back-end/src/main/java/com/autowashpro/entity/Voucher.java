@@ -42,4 +42,12 @@ public class Voucher {
 
     @Column(name = "redeemed_at")
     private LocalDateTime redeemedAt;
+
+    @Column(name = "min_tier", length = 20, insertable = false, updatable = false)
+    private String minTier;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @JoinColumn(name = "min_tier_id")
+    private Tier minimumTier;
 }

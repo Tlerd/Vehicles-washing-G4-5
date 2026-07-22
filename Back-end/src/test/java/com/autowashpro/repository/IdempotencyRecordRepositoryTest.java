@@ -15,10 +15,14 @@ class IdempotencyRecordRepositoryTest extends RepositoryIntegrationTest {
 
     @Test
     void save_and_findById_roundTripsAllFields() {
+        String rawKey = "test-key-001";
+        String scopedKeyHash = "c".repeat(64);
         IdempotencyRecord record = new IdempotencyRecord();
-        record.setIdempotencyKey("test-key-001");
+        record.setScopedKeyHash(scopedKeyHash);
         record.setRequestPath("/api/v1/bookings");
         record.setCustomerId(1L);
+        record.setRequestHash("a".repeat(64));
+        record.setPrincipalScopeHash("b".repeat(64));
         record.setResponseStatus(201);
         record.setResponseBody("{\"bookingRef\":\"AWP-TESTD1\"}");
         record.setCreatedAt(LocalDateTime.now());
@@ -26,9 +30,12 @@ class IdempotencyRecordRepositoryTest extends RepositoryIntegrationTest {
 
         idempotencyRecordRepository.saveAndFlush(record);
 
-        IdempotencyRecord found = idempotencyRecordRepository.findById("test-key-001").orElseThrow();
+        IdempotencyRecord found = idempotencyRecordRepository.findById(scopedKeyHash).orElseThrow();
         assertThat(found.getRequestPath()).isEqualTo("/api/v1/bookings");
+        assertThat(found.getRequestHash()).isEqualTo("a".repeat(64));
+        assertThat(found.getPrincipalScopeHash()).isEqualTo("b".repeat(64));
         assertThat(found.getResponseStatus()).isEqualTo(201);
         assertThat(found.getResponseBody()).contains("AWP-TESTD1");
+        assertThat(idempotencyRecordRepository.findById(rawKey)).isEmpty();
     }
 }

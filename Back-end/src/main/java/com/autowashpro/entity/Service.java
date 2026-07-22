@@ -34,4 +34,22 @@ public class Service {
 
     @Column(name = "status", nullable = false, length = 20)
     private String status;
+
+    @Column(name = "is_size_dependent", nullable = false)
+    private Boolean sizeDependent = true;
+
+    @Column(name = "pricing_unit", nullable = false, length = 20)
+    private String pricingUnit = "PER_CAR";
+
+    @Column(name = "booking_mode", nullable = false, length = 20)
+    private String bookingMode = "SLOT";
+
+    @Column(name = "buffer_minutes", nullable = false)
+    private Integer bufferMinutes = 10;
+
+    @Column(name = "required_bay_type", nullable = false, length = 20)
+    private String requiredBayType = "QUICK";
+
+    @Column(name = "booking_configured", nullable = false)
+    private Boolean bookingConfigured = false;
 }

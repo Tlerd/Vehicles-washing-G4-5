@@ -4,6 +4,7 @@ import com.autowashpro.dto.request.CustomerRequest;
 import com.autowashpro.dto.response.CustomerResponse;
 import com.autowashpro.entity.Customer;
 import com.autowashpro.exception.custom.ResourceNotFoundException;
+import com.autowashpro.exception.custom.BadRequestException;
 import com.autowashpro.mapper.CustomerMapper;
 import com.autowashpro.repository.CustomerRepository;
 import com.autowashpro.service.CustomerService;
@@ -42,12 +43,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerResponse createCustomer(CustomerRequest request) {
-        Customer customer = customerMapper.toEntity(request);
-        customer.setCreatedAt(LocalDateTime.now());
-        customer.setUpdatedAt(LocalDateTime.now());
-        Customer savedCustomer = customerRepository.save(customer);
-
-        return customerMapper.toResponse(savedCustomer);
+        throw new BadRequestException(
+                "Customer accounts must be created through verified registration.");
     }
 
     @Override
@@ -58,10 +55,6 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setFullName(request.getFullName());
         customer.setPhone(request.getPhone());
         customer.setEmail(request.getEmail());
-        customer.setTier(request.getTier());
-        customer.setAccumulatedPoints(request.getAccumulatedPoints());
-        customer.setTotalSpent(request.getTotalSpent());
-        customer.setTotalWashes(request.getTotalWashes());
         customer.setUpdatedAt(LocalDateTime.now());
 
         Customer updatedCustomer = customerRepository.save(customer);

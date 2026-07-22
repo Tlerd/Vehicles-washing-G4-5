@@ -13,6 +13,14 @@ public interface CustomerMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "passwordHash", ignore = true)
+    @Mapping(target = "role", ignore = true)
+    @Mapping(target = "tier", ignore = true)
+    @Mapping(target = "accumulatedPoints", ignore = true)
+    @Mapping(target = "totalSpent", ignore = true)
+    @Mapping(target = "totalWashes", ignore = true)
+    @Mapping(target = "noShowCount", ignore = true)
+    @Mapping(target = "requiresFullPrepay", ignore = true)
+    @Mapping(target = "vehicles", ignore = true)
     Customer toEntity(CustomerRequest request);
 
     CustomerResponse toResponse(Customer customer);

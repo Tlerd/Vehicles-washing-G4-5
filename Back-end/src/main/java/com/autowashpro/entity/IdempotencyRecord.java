@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 public class IdempotencyRecord {
 
     @Id
-    @Column(name = "idempotency_key", length = 100)
-    private String idempotencyKey;
+    @Column(name = "idempotency_key", length = 64)
+    private String scopedKeyHash;
 
     @Column(name = "request_path", nullable = false, length = 200)
     private String requestPath;
@@ -24,6 +24,12 @@ public class IdempotencyRecord {
 
     @Column(name = "guest_phone", length = 20)
     private String guestPhone;
+
+    @Column(name = "request_hash", nullable = false, length = 64)
+    private String requestHash;
+
+    @Column(name = "principal_scope_hash", nullable = false, length = 64)
+    private String principalScopeHash;
 
     @Column(name = "response_status", nullable = false)
     private Integer responseStatus;
