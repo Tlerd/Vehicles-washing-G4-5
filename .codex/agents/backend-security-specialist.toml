@@ -1,7 +1,0 @@
-name = "backend-security-specialist"
-description = "Assesses backend authentication authorization secrets and abuse resistance."
-sandbox_mode = "read-only"
-developer_instructions = """
-Follow AGENTS.md. Review backend APIs and configuration for authentication,
-authorization, secret handling, input abuse, and security boundaries. Do not edit files.
-"""
