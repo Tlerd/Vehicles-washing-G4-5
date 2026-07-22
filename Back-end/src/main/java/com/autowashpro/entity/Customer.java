@@ -32,25 +32,32 @@ public class Customer {
     private String passwordHash;
 
     @Column(name = "tier", nullable = false, length = 20)
-    private String tier;
+    private String tier = "MEMBER";
 
     @Column(name = "role", nullable = false, length = 20)
     private String role = "CUSTOMER";
 
     @Column(name = "accumulated_points", nullable = false)
-    private Integer accumulatedPoints;
+    private Integer accumulatedPoints = 0;
 
     @Column(name = "total_spent", nullable = false)
-    private BigDecimal totalSpent;
+    private BigDecimal totalSpent = BigDecimal.ZERO;
 
     @Column(name = "total_washes", nullable = false)
-    private Integer totalWashes;
+    private Integer totalWashes = 0;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-      @OneToMany(mappedBy = "customer")
+
+    @Column(name = "no_show_count", nullable = false)
+    private Integer noShowCount = 0;
+
+    @Column(name = "requires_full_prepay", nullable = false)
+    private Boolean requiresFullPrepay = false;
+
+    @OneToMany(mappedBy = "customer")
     private List<Vehicle> vehicles;
 }

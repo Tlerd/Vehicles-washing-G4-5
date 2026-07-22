@@ -22,7 +22,7 @@ public class RegisterRequest {
 
     @NotBlank
     @Size(min = 6, max = 100)
-    @Schema(description = "Account password", example = "secret123")
+    @Schema(description = "Account password", format = "password")
     private String password;
 
     @Email
@@ -31,6 +31,6 @@ public class RegisterRequest {
     private String email;
 
     @NotBlank
-    @Schema(description = "Firebase ID Token verified on the client", example = "eyJhbGciOiJSUzI1NiIs...")
+    @Schema(description = "Firebase ID Token verified by the backend", format = "password")
     private String firebaseToken;
 }

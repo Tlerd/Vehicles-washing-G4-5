@@ -27,6 +27,9 @@ public class Bay {
     @Column(name = "bay_type", nullable = false, length = 20)
     private String bayType;
 
+    @Column(name = "is_active", nullable = false)
+    private Boolean active = true;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 }

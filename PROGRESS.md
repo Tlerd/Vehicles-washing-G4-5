@@ -1,9 +1,283 @@
 # Progress — AutoWash Pro
 
 ## Current state
-<<<<<<< Updated upstream
-- Last AI-assisted work: 2026-07-21 — corrected public role routing and entry
-=======
+- 2026-07-22 — Added project-local Engram identification in
+  `.engram/config.json` for the `autowash-pro` memory namespace. The verified
+  local Engram binary and existing Codex MCP registration use an explicit
+  executable path; cloud/Git sync and exports remain unconfigured. A fresh
+  Codex or Claude Code session still needs to run `mem_current_project` before
+  MCP project detection is claimed verified; do not broadly stage `.engram/`
+  or enable Git sync without an approved sharing and sensitive-data policy. See
+  `docs/ai-logs/m1/2026-07-22-engram-local-project-configuration.md`.
+- 2026-07-22 — Connected workspace code discovery to codebase-memory MCP v0.9.0
+  after verifying the release SHA-256, and indexed this repository successfully
+  (5,817 nodes, 13,612 edges; status `ready`). The server is configured in
+  `.codex/config.toml`; a new Codex session is required for its tools to appear
+  in the conversation tool list. See
+  `docs/ai-logs/m1/2026-07-22-codebase-memory-mcp-connection.md`.
+- 2026-07-22 — Removed the customer self-confirmation/VietQR payment surface
+  because it is demo-only and cannot verify settlement. The obsolete payment
+  endpoint, service, test, generated QR response/UI, and related text were
+  deleted; payment persistence, locking, lifecycle support, and PayOS
+  scaffolding were retained for the approved implementation path. The latest
+  `.env`-loaded full backend run was 237/246 passing (1 failure, 8 errors);
+  focused backend validation and frontend typecheck/build passed. See
+  `docs/ai-logs/m1/2026-07-22-remove-demo-payment-surface.md`.
+- 2026-07-22 — Owner-authorized local credential rotation: the single STAFF
+  and single ADMIN rows were updated in one guarded SQL Server transaction,
+  keyed by their existing phone+role identities (not by role alone). Fresh
+  BCrypt hashes were generated in a local JVM; no plaintext password, hash,
+  token, or database credential was written to source or logs. Both stored
+  hashes passed BCrypt format and `matches()` verification. Existing JWTs are
+  stateless and remain valid until expiry; invalidating them would require a
+  separate JWT-secret rotation. See
+  `docs/ai-logs/m1/2026-07-22-local-staff-admin-password-rotation.md`.
+- 2026-07-22 — Local backend-startup guidance was corrected after the owner
+  ran `./Back-end/run-local.ps1` and Spring Boot failed with `Could not resolve
+  placeholder 'JWT_SECRET'`, despite the local `.env` containing that value.
+  The same-process PowerShell `.env` loader followed by `mvn spring-boot:run`
+  was verified with `GET /api/v1/branches` returning HTTP 200. `README.md` now
+  documents that verified command and explicitly says `.env` is not executable.
+  `run-local.ps1` has not been claimed fixed; its effective environment
+  propagation needs a separate investigation. See
+  `docs/ai-logs/m1/2026-07-22-local-backend-startup-env-loader.md`.
+- 2026-07-22 — FR-004/FR-005 booking-engine Phase 3B trusted availability is
+  **implemented, independently reviewed, migrated, verified, documented, and
+  committed** as `7543192`. The backend now exposes minimized canonical branch
+  summaries and a public 15-minute slot contract driven by active server-owned
+  services, quantities, durations, booking modes, branch policy, customer tier,
+  active compatible bays, real HOLD/BOOKED reservations, and explicitly marked
+  BR-012 legacy capacity. It returns all 44 cells for the approved 07:00-18:00
+  schedule, UTC timestamps, stable unavailability reasons, remaining compatible
+  capacity, and up to three forward alternatives. The old service-code route is
+  retained only as a deprecated adapter.
+
+  The additive Phase 3B migration was applied successfully and idempotently to
+  both `autowash_pro_test` and `autowash_pro`. It adds active-bay allocation
+  support, trusted slot-grid/expiry checks, and booking/branch referential
+  integrity; startup bay seeding is atomic under SQL Server locks. Public and
+  authenticated polling uses bounded, expiring quotas, and optional bearer
+  handling is covered by real HTTP/JWT regressions. Focused gates passed 41/41
+  and 8/8. The final command `& Back-end/run-tests.ps1 -Clean` passed
+  **184/184** against SQL Server with 0 failures, 0 errors, and 0 skipped.
+  A direct Maven attempt without process-local `DB_PASSWORD` failed before test
+  execution and is not counted as evidence.
+
+  Independent reviews found no unresolved Critical or High findings. The
+  optional-auth test gap was fixed. Lifecycle-coupled `PENDING_DEPOSIT` expiry
+  and cleanup-versus-payment concurrency are binding work for Phase 3C, where
+  v2 booking creation becomes reachable. Direct socket addresses remain the
+  safe rate-limit identity; deployments behind a proxy require trusted ingress
+  address handling rather than arbitrary forwarding headers. **The Backend +
+  Swagger gate has NOT passed**: transactional member/guest creation, atomic
+  holds/idempotency/expiry, VNPAY, lifecycle/RBAC, and remaining endpoint/OpenAPI
+  coverage are pending. Detailed evidence is in
+  `docs/ai-logs/m1/2026-07-22-fr004-fr005-booking-availability-phase3b.md`.
+- 2026-07-22 — FR-004/FR-005 booking-engine Phase 3A schema/domain foundation
+  is **implemented, independently reviewed, verified, migrated, and committed**
+  as `bff3ab0`. The additive SQL Server migration now supplies trusted catalog
+  metadata, approved prices/durations for the ten existing service codes,
+  data-driven tiers, branch scheduling policy, immutable booking/pricing and
+  guest-vehicle snapshots, nullable guest vehicle ownership, safe legacy-row
+  upgrades, canonical voucher-tier linkage, legacy-financial markers, scoped
+  idempotency hashes, and trusted DB constraints for booking actor/vehicle
+  ownership, price arithmetic, bay/branch consistency, and 64-hex storage
+  keys. Both `autowash_pro_test` and `autowash_pro` accepted the migration and
+  a repeat execution; the development DB contains six explicitly marked
+  legacy financial snapshots, zero guest bookings, and zero legacy
+  idempotency rows. Server-owned loyalty fields can no longer be mass-assigned,
+  and the obsolete direct customer-creation route now requires the verified
+  registration flow.
+
+  RED evidence included missing schema/catalog fields, invalid guest rows under
+  the strengthened actor constraint, raw idempotency inserts, mutable guest
+  lookup data, and an unsafe SQL Server primary-key narrowing attempt that
+  rolled back. The final command `& Back-end/run-tests.ps1 -Clean` passed
+  **108/108** against the live SQL Server test database, with 0 failures,
+  0 errors, and 0 skipped. The independent post-fix review found no unresolved
+  Critical or High findings. Accepted binding work for Phase 3B/3C: the new
+  availability engine must conservatively include six legacy active bookings
+  until they have equivalent slot reservations. The 64-hex migration ambiguity
+  is accepted because both idempotency tables were verified empty.
+  **The Backend + Swagger gate has NOT passed**: pure pricing/duration,
+  15-minute availability, atomic creation/holds/idempotency/expiry, VNPAY,
+  lifecycle/RBAC, and full OpenAPI remain pending.
+- 2026-07-22 — Backend HTTP/security foundation for FR-004/FR-005 is
+  **implemented, reviewed, committed, and locally verified**. Scoped commits:
+  `861dd9d` (booking/vehicle owner-only access), `8aa636e` (customer credential
+  update hardening), and `b8e49fc` (guest proof and booking-lookup HTTP APIs).
+  The phase adds purpose-bound Firebase Phone OTP proof issuance; JWT-or-proof
+  booking lookup with principal-derived ownership and a minimized response;
+  proof digests at rest; atomic `REQUIRES_NEW` single-use consumption; bounded,
+  expiring, independently scoped throttles; bounded proof cleanup; exact public
+  route matchers; exact-origin CORS; unified MVC/Spring Security error bodies;
+  partial OpenAPI security/error contracts; and environment-only, disabled-by-
+  default privileged-account provisioning. The post-review focused command
+  `& Back-end/run-tests.ps1 -Tests
+  "BookingControllerRateLimitTest,GuestBookingLookupHttpIntegrationTest,GlobalExceptionHandlerTest"`
+  passed **18/18**. The final clean backend command
+  `& Back-end/run-tests.ps1 -Clean` passed **98/98** against the configured live
+  `autowash_pro_test` SQL Server database, with 0 failures, 0 errors, and 0
+  skipped. Independent code and adversarial security re-reviews found no
+  unresolved Critical or High findings after fixes.
+
+  Accepted residuals: guest lookup consumes a proof before returning `200`,
+  `403`, or `404`; the approved differentiated `404`/`403` contract is a bounded
+  reference-existence oracle; rate limiting is process-local; and direct
+  `getRemoteAddr()` deliberately ignores spoofable forwarding headers, so a
+  proxy deployment must use an explicitly trusted address-resolution setup.
+  Real Firebase Phone OTP, VNPAY callbacks, and browser E2E were not exercised
+  in this backend-only phase. The lecturer's original rubric was not present.
+  **The Backend + Swagger gate has NOT passed**: guest booking creation,
+  15-minute bay allocation/holds, VNPAY, lifecycle/loyalty/admin completion,
+  and complete OpenAPI documentation remain pending.
+- 2026-07-22 — FR-004/FR-005 v2 backend Phase 2 (guest identity & OTP/Firebase
+  verification-proof foundation) is **complete**, committed, and reviewed
+  under `docs/superpowers/plans/2026-07-22-fr004v2-phase2-guest-verification.md`.
+  All 9 application-code tasks done: server-side Firebase identity
+  verification that never trusts a client `otpVerified` flag
+  (`GuestVerificationService.issueProof`); a short-lived (5-minute),
+  single-use, phone-and-purpose-bound verification proof persisted in a new
+  `phone_verification_proofs` SQL Server table, with atomic
+  conditional-UPDATE single-use consumption proven under real concurrent
+  threads (`PhoneVerificationProofConcurrencyTest`, 10 threads, exactly one
+  winner); a deterministic in-memory `RateLimiter`; and a tested
+  `GuestBookingLookupAuthorizationService` primitive for a future guest
+  booking-lookup endpoint — this phase adds **no HTTP controller**, no
+  VNPAY, no slot allocation, no Swagger, no frontend change. Evidence:
+  `mvn -f Back-end/pom.xml test` — BUILD SUCCESS, **59/59** passing (26
+  pre-existing from Phase 1 + 33 new: the plan predicted 32, and a review
+  found one more real gap — `consumeProofForPhone`'s untested blank-token
+  short-circuit — closed with one additional test). `AuthServiceImplTest`
+  re-run in isolation first (7/7, unchanged) to prove the existing
+  registration Firebase flow has no regression. Both databases confirmed to
+  have the new table via `sys.tables`; `phone_verification_proofs` row
+  count is 0 on both (expected — no controller exists yet to issue a real
+  proof against the dev DB, and `@DataJpaTest`/manual `@AfterEach` cleanup
+  leave the test DB clean).
+
+  This phase went through a heavier process than Phase 1, warranted by its
+  security sensitivity: a 4-agent parallel investigation established ground
+  truth on the existing codebase before any plan was written (found that a
+  canonical `PhoneNormalizer.toE164` utility and a `FirebaseTokenVerifier`
+  seam already existed — Phase 2 reuses both rather than reinventing them);
+  a planner then drafted the full plan; **3 parallel adversarial reviewers
+  (JPA/Hibernate correctness, security design, test-coverage completeness)
+  reviewed the draft plan itself before any code was written**, and found
+  real problems: a `@Modifying` bulk-update missing `clearAutomatically =
+  true` that would have broken the first task's own test; a repository
+  method with zero real-database test coverage on the exact query the
+  IDOR/lookup path depends on; a rate-limiting design that let an attacker
+  lock out a victim's real phone using garbage tokens before Firebase
+  verification ran; and an undocumented transactional invariant on the
+  lookup-authorization primitive that could silently reopen a replay hole
+  if a future maintainer added `@Transactional` to it. All four were fixed
+  in the plan before implementation began. **A fifth, distinct bug was
+  found empirically during implementation, not in planning**: Task 3's
+  `@Modifying` consumption methods worked under `@DataJpaTest` (which
+  auto-wraps every test in a transaction) but threw
+  `TransactionRequiredException` under Task 4's `@SpringBootTest` (which
+  doesn't) — the implementer correctly reported this as BLOCKED instead of
+  forcing a pass; fixed by adding `@Transactional` directly to the
+  repository's consumption methods, re-verified with no regression on
+  Task 3's own 8 tests. Every task went through the same fresh-implementer +
+  independent-task-reviewer loop as Phase 1; the two security-fix outcomes
+  (Task 6's `issueProof` reordering, Task 9's non-transactional `authorize()`)
+  were each independently re-verified correct in the *actual implementation*
+  by a reviewer, not just accepted as designed-correctly-on-paper. One
+  incident along the way, unrelated to Phase 2's own code: committing a
+  file Task 2 needed to touch surfaced a `ForbiddenException`/`handleForbidden`
+  addition from an earlier session's documented-but-never-committed FR-003
+  fix, sitting in the same file; separated into its own accurately-labeled
+  commit rather than silently absorbed into Task 2's.
+
+  A final whole-branch review (opus, full 13-commit Phase 2 diff) returned
+  **Ready to merge** — no Critical findings. It traced the full composed
+  call chain end-to-end (`issueProof` → `consumeProofForLookup`/
+  `consumeProofForPhone` → `authorize()`) and confirmed every one of the
+  plan's "Frozen decision" sections holds in the actual diff, not just on
+  paper. It raised 1 Important finding, binding on whichever phase adds a
+  real consumption endpoint (not a Phase 2 defect — unreachable today with
+  no controller in place): `RateLimiter` never evicts entries, and
+  `consumeProofForPhone`/`consumeProofForLookup` key on
+  attacker-suppliable proof tokens — once a real HTTP endpoint exists, a
+  flood of distinct garbage tokens grows the in-memory rate-limiter map
+  without bound (unbounded-memory DoS). The controller phase must add
+  stale-window eviction or a bounded cache before exposing consumption
+  externally. 5 Minor notes recorded, including a recommendation to switch
+  `consumeProofForLookup`/`consumeProofForPhone` to
+  `Propagation.REQUIRES_NEW` as belt-and-suspenders once a controller
+  exists, so the single-use burn stays durable regardless of future caller
+  transaction context (today's non-`@Transactional` `authorize()` design is
+  correct, but entirely contingent on that invariant never being violated).
+  Full findings, the complete investigation/review trail, and per-task
+  evidence are recorded in `.superpowers/sdd/progress.md` and
+  `docs/ai-logs/m1/2026-07-22-fr004v2-phase2-guest-verification.md`.
+  **No HTTP endpoint exists for any of this yet** — proof issuance/
+  consumption and the lookup authorization primitive are tested
+  service-layer components only, ready for whichever phase builds guest
+  booking creation and the real `GET /api/v1/bookings/{ref}` endpoint.
+  **The Backend + Swagger gate has NOT passed.**
+- 2026-07-22 — FR-004/FR-005 v2 backend Phase 1 (schema + entity/repository
+  layer) is **complete**, committed, and reviewed under
+  `docs/superpowers/plans/2026-07-22-fr004v2-phase1-schema-entities.md`. All
+  12 tasks done: the 7 new v2 booking-engine tables (`guests`, `bays`,
+  `slot_reservations`, `booking_items`, `payments`, `idempotency_records`,
+  `audit_logs`) plus the additive `bookings` guest-support evolution
+  (nullable `customer_id`, new `guest_id`, `CK_bookings_customer_xor_guest`,
+  `IX_bookings_customer_status`) are live on both `autowash_pro` (dev) and
+  `autowash_pro_test` (test) SQL Server databases; matching JPA entities and
+  Spring Data repositories exist for all 7 new tables plus the evolved
+  `Booking` entity; a new idempotent `BaySeeder` (`CommandLineRunner`) seeds
+  2 QUICK + 1 DETAIL + 1 UNIVERSAL bays per branch on startup (BR-029).
+  Evidence: `mvn -f Back-end/pom.xml test` — BUILD SUCCESS, **26/26** passing
+  (13 pre-existing + 13 new from this plan; the plan document itself
+  mislabeled this as "14 new/27 total" — its own task-by-task breakdown
+  actually sums to 13 new, and 26 is the correct, verified total). Live SQL
+  Server evidence (not code-reading alone): booted the real app once against
+  the real dev DB — `BaySeeder` inserted exactly 8 rows into `bays` (2
+  branches × [Q1/Q2 QUICK, D1 DETAIL, U1 UNIVERSAL]), confirmed via direct
+  `sqlcmd` query, then the process was stopped; both DBs confirmed to have
+  all 7 new tables via `sys.tables`. Every task was implemented via a fresh
+  implementer subagent (TDD RED/GREEN) followed by an independent task
+  reviewer (spec compliance + code quality); all 4 tasks in this session
+  (9–12) reviewed clean/Approved with no Critical or Important findings.
+  A final whole-branch review (opus, full 13-commit Phase 1 diff) returned
+  **Ready to merge** — no Critical findings, and nothing built in Phase 1 is
+  a defect. It raised 3 Important findings that are binding design input
+  for later phases, not Phase 1 fixes: (1) `Booking.vehicle_id` is still
+  `nullable = false`, so a real guest booking with no owned vehicle cannot
+  yet persist — Phase 2's guest-booking plan must resolve this; (2)
+  `IdempotencyRecord` will hold response-body PII for 24h keyed only by a
+  client-supplied header with no principal-scoped lookup yet — Phase 3's
+  idempotency check must scope replay to the requesting principal; (3) the
+  test suite is no longer hermetic (11 of 13 new tests need a live SQL
+  Server `autowash_pro_test` + `DB_PASSWORD`) and that prerequisite isn't
+  documented anywhere committed yet (only in the plan file) — worth adding
+  to the README/AGENTS.md before another contributor hits a red build on a
+  fresh checkout. Full findings (plus 5 non-blocking Minor notes) recorded
+  in `.superpowers/sdd/progress.md` and the AI log below.
+  **No business logic has been implemented yet** — OTP, slot/bay allocation,
+  pricing, VNPAY, and the RBAC state machine are deferred to Phase 2+, each
+  requiring its own plan. **The Backend + Swagger gate has NOT passed.** Full
+  details, file lists, and commit references are recorded in
+  `docs/ai-logs/m1/2026-07-22-fr004-fr005-v2-phase1-schema-entities.md` and
+  `.superpowers/sdd/progress.md`.
+- Last AI-assisted work: 2026-07-21 — owner changed the active delivery
+  direction to **backend/API and Swagger first**. The replacement plan is
+  `docs/superpowers/specs/2026-07-21-be-first-api-swagger-plan.md`: complete
+  FR-004/FR-005 v2 backend capabilities and prove them in Swagger, HTTP,
+  security, concurrency, VNPAY, and SQL Server checks before any new frontend
+  work or FE–BE integration. This planning pass made no application-code,
+  database-migration, or frontend change. Codex local custom-agent runtime was
+  repaired and smoke-tested: the official 0.144.6 sandbox helper executables
+  were installed beside the Codex launcher from the matching standalone
+  release after child spawning failed with Windows error 2. A read-only local
+  CLI smoke test then spawned the project `planner` sub-agent, waited without
+  error, and returned `PLANNER_AGENT_OK`. This verifies the `planner` adapter
+  and one direct child only; it does not verify every adapter or nested
+  lead-to-specialist dispatch. See
+  docs/ai-logs/m1/2026-07-21-be-first-plan-and-codex-subagent-repair.md.
 - Last AI-assisted work: 2026-07-21 — implemented FR-004 Phase 1 (owner
   approved 5 decisions unblocking the plan doc) plus the separately-scoped
   `BookingManagementService` 400→403 fix. **Backend**: `resolveVehicle()` and
@@ -79,7 +353,6 @@
   See docs/ai-logs/m1/2026-07-21-fr003-fix-fr001-002-docs-fr004-audit.md.
   Not yet owner-reviewed; no commit made.
 - Previous AI-assisted work: 2026-07-21 — corrected public role routing and entry
->>>>>>> Stashed changes
   points: the landing header now opens a guest overview through a person icon;
   public booking CTAs go directly to `/guest/booking` without the identity
   modal; post-login and post-registration redirect by the server-returned role
@@ -100,23 +373,17 @@
   docs/ai-logs/m1/2026-07-21-andrej-karpathy-guidelines-import.md.
 - Milestone: VERIFY WITH THE LECTURER OR TEAM
 - Status: Full 11-role Claude/Codex sub-agent inventory is provisioned with
-  mandatory dispatch policy, canonical local ECC inventory, and Codex skill
-  mirrors; Superpowers
-  installation was attempted but is blocked by this managed runtime's user-cache
-  permissions; runtime discovery, vendor approval, human approval, and security
-  blockers remain open
+  mandatory dispatch policy and Codex skill mirrors. The local Codex `planner`
+  adapter has passed a read-only child-agent smoke test after repairing the
+  Windows sandbox helper installation; broader adapter discovery, nested
+  dispatch, vendor approval, human approval, and security blockers remain open.
 - Baseline commit: see docs/tooling/BASELINE.md
-- Active scope: Owner-directed FR-001..FR-013 completion, phased with explicit
-<<<<<<< Updated upstream
-  approval gates between phases. Audit + Phase 0 done; Phase 1 not started.
-=======
-  approval gates between phases. Audit + Phase 0 done. Phase 1: FR-003 fix,
-  FR-001/FR-002 doc correction, and FR-004 Phase 1 (real booking wizard +
-  BookingManagementService 400→403 fix) all implemented (2026-07-21, not yet
-  owner-reviewed). FR-004 Phase 2 (FR-005 v2 schema, VNPAY, real slot/bay
-  model) and Phase 3 (guest booking) remain blocked on separate owner sign-off
-  per docs/superpowers/specs/2026-07-21-fr004-real-booking-implementation-plan.md.
->>>>>>> Stashed changes
+- Active scope: Owner-directed backend-first completion of FR-004/FR-005 v2.
+  No new frontend work, FE–BE integration, application code, or database
+  migration is authorized in the plan-change pass. The next implementation
+  phase starts only after the BE-first plan is reviewed and its external
+  prerequisites (notably VNPAY sandbox configuration and test environment) are
+  available; frontend work begins only after the plan's BE + Swagger gate.
 - Last AI-assisted work: 2026-07-21 — FR-001..FR-013 current-state audit
   (4-agent parallel dispatch: frontend-lead, backend-lead, testing-lead,
   security-reviewer, 245 tool calls) plus Phase 0 startup verification.
@@ -197,16 +464,11 @@
   (FR001_FR013 + FR004 scripts applied, idempotent); `mvn spring-boot:run`
   starts in ~4.5s with Firebase Admin SDK initialized and DB connected
   (Back-end/run-local.ps1 automates env loading + JWT secret generation).
-<<<<<<< Updated upstream
-- No Back-end/src/test tree exists. JUnit appears in pom.xml dependencies only;
-  it is not test evidence.
-=======
 - Back-end/src/test exists with 3 files (AuthServiceImplTest,
   VehicleServiceImplTest, GlobalExceptionHandlerTest), 11 tests total, all
   plain JUnit 5 + Mockito unit tests with no Spring context, no MockMvc, no
   Testcontainers, no spring-security-test dependency. `mvn -f Back-end/pom.xml
   test` — exit 0, 11/11 passing (2026-07-21).
->>>>>>> Stashed changes
 - Repository size as scanned on 2026-07-20: 195 files analysed, 66 filtered.
 - docs/srs/SRS.md, docs/design/architecture.md, docs/design/ERD.md,
   docs/design/state-diagram.md, docs/rubric/rubric-checklist.md,
@@ -219,13 +481,16 @@
 - Understand-Anything is for navigation, not requirements.
 - Codex provides an independent review pass.
 - The 11 ECC-listed roles have project adapters for Codex and Claude Code. Root
-  AGENTS.md mandates dispatch of every applicable role; Claude planner runtime
-  smoke test passed, while Codex planner runtime smoke test is blocked by its
-  Windows sandbox helper and must be re-run after remediation.
+  AGENTS.md mandates dispatch of every applicable role. Claude's planner smoke
+  test passed previously; Codex's project `planner` adapter passed a read-only
+  local CLI child-agent smoke test on 2026-07-21 after the Windows sandbox
+  helper repair. This is not evidence that every adapter or nested dispatch
+  path has passed.
 - `ai/workflows/` defines the shared planning, implementation, verification,
   and review dispatch lifecycle for those roles.
 - FE/BE/testing leads and their specialist children are provisioned. Codex
-  allows root → lead → specialist depth, but runtime validation remains blocked.
+  allows root → lead → specialist depth. Only a direct `planner` child has
+  runtime evidence so far; nested runtime validation remains unrun.
 - AI-HARNESS-SETUP_v1.md is the migration runbook. The core harness has been
   provisioned, but runtime discovery, vendor approval, Superpowers delivery,
   build/test evidence, security review, and human approval are still separate
@@ -295,10 +560,10 @@ Navigation data, not requirements. None of this satisfies a rubric item.
       wants a clean slate.
 - [x] STAFF (+84900000001) and ADMIN (+84900000002) DB passwords rotated
       2026-07-21 (fresh bcrypt hashes, verified via live login), replacing the
-      seeder's hardcoded Staff@123/Admin@123. New passwords reported to the
+      seeder's hardcoded legacy credentials (now redacted). New passwords reported to the
       owner in chat only, not written to any file. **Still open**:
       Back-end/src/main/java/com/autowashpro/config/SystemAccountSeeder.java
-      itself still hardcodes Staff@123/Admin@123 in tracked source — those
+      itself still hardcoded legacy credentials in tracked source — those
       values are permanently exposed via git history regardless of what's live
       in the DB now, and the seeder will silently stop mattering only because
       `existsByPhone` skips already-seeded rows; it should still be changed to
@@ -334,14 +599,9 @@ Navigation data, not requirements. None of this satisfies a rubric item.
 3. [x] Frontend build/backend run commands executed and evidence recorded —
    see "Frontend build evidence" and "Local backend run evidence" above and
    docs/ai-logs/m1/2026-07-21-fe-rebuild-phase1.md /
-<<<<<<< Updated upstream
-   2026-07-21-fe-rebuild-phase2.md. Still open: `mvn -f Back-end/pom.xml test`
-   has not been run (no Back-end/src/test tree exists to run).
-=======
    2026-07-21-fe-rebuild-phase2.md. Correction: `mvn -f Back-end/pom.xml test`
    has since been run repeatedly and passes (11/11 as of 2026-07-21's FR-003
    fix) — the "no test tree exists" note above was stale.
->>>>>>> Stashed changes
 4. Human-review the generated graphs and docs/ONBOARDING.md, then decide whether
    to commit .ua/ artifacts to the repository.
 5. Decide whether the empty SRS, ERD, state-diagram and rubric stubs will be
@@ -351,16 +611,13 @@ Navigation data, not requirements. None of this satisfies a rubric item.
    update D-001 with the observed installed version. Complete D-002 through D-004,
    run the PowerShell 7 verifier and actual Claude/Codex runtime discovery, then
    record only observed results.
-7. Repair the Codex Windows sandbox-helper installation, then re-run the
-   read-only sub-agent smoke test before treating Codex dispatch as verified.
-<<<<<<< Updated upstream
-=======
-8. [x] FR-004's 5 owner decisions were made and Phase 1 was implemented
-   2026-07-21 accordingly (see Current state and
-   docs/ai-logs/m1/2026-07-21-fr004-phase1-booking-fix.md). Still open: owner
-   review of the Phase 1 implementation itself, and separate sign-off before
-   Phase 2 (FR-005 v2 schema/VNPAY/real slot-bay model) or Phase 3 (guest
-   booking) can start.
+7. [x] Repair the Codex Windows sandbox-helper installation and run the
+   direct `planner` read-only child-agent smoke test (2026-07-21). Next:
+   exercise the remaining applicable adapters and one nested lead-to-specialist
+   dispatch before claiming full runtime coverage.
+8. Review and approve the active backend-first plan:
+   `docs/superpowers/specs/2026-07-21-be-first-api-swagger-plan.md`. Do not
+   start new frontend work until its BE + Swagger gate has passed.
 9. [x] `BookingManagementService.resolveVehicle()`/`create()`'s voucher check
    400→403 fix implemented 2026-07-21 (see Current state above).
 10. New fast, tightly-scoped follow-up (found 2026-07-21 during FR-004 Phase 1
@@ -371,13 +628,10 @@ Navigation data, not requirements. None of this satisfies a rubric item.
     validation, unlike `VehicleServiceImpl.createVehicle()`'s regex check
     (`^[0-9]{2}[A-Z]-[0-9]{3}\.?[0-9]{2}$`). This path pre-dates this session
     but was unreachable while the wizard was 100% mock; it is now live.
->>>>>>> Stashed changes
 
 ## Evidence
 - Link command logs, reports, pull requests, commits, screenshots, or exports.
 - Do not mark an item complete without evidence.
-<<<<<<< Updated upstream
-=======
 - 2026-07-21 FR-004 Phase 1 (real booking wizard) + BookingManagementService
   403 fix: docs/ai-logs/m1/2026-07-21-fr004-phase1-booking-fix.md
   `mvn -f Back-end/pom.xml test` — exit 0, 13/13 tests passing (RED confirmed
@@ -399,7 +653,6 @@ Navigation data, not requirements. None of this satisfies a rubric item.
   before the fix, GREEN after). Independent code review + security review
   (background Workflow) both returned `approved: true`. No frontend files
   changed this session, so no frontend build/typecheck evidence applies.
->>>>>>> Stashed changes
 - 2026-07-21 FE rebuild Phase 2 (auth, customer console, theme, i18n):
   docs/ai-logs/m1/2026-07-21-fe-rebuild-phase2.md
   `npx tsc --noEmit` and `npm run build` both clean (0 errors) after an 18-agent

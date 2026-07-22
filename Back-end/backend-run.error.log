@@ -1,0 +1,7 @@
+Cannot index into a null array.
+At D:\demoSWP\demomain\Vehicles-washing-G4-5\Back-end\run-local.ps1:54 char:1
++ $env:DB_PASSWORD = $environmentValues['DB_PASSWORD']
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : NullArray
+ 

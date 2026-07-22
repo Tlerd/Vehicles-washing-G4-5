@@ -1,5 +1,6 @@
 package com.autowashpro.controller;
 
+import com.autowashpro.dto.request.CustomerProfileUpdateRequest;
 import com.autowashpro.dto.request.CustomerRequest;
 import com.autowashpro.dto.response.CustomerResponse;
 import com.autowashpro.service.CustomerService;
@@ -8,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +26,20 @@ public class CustomerController {
 
     public CustomerController(CustomerService customerService) {
         this.customerService = customerService;
+    }
+
+    @Operation(summary = "Get the authenticated customer's own profile")
+    @GetMapping("/me")
+    public ResponseEntity<CustomerResponse> getOwnProfile(@AuthenticationPrincipal String callerId) {
+        return ResponseEntity.ok(customerService.getCustomerById(Long.valueOf(callerId)));
+    }
+
+    @Operation(summary = "Update the authenticated customer's own profile (name and email only)")
+    @PutMapping("/me")
+    public ResponseEntity<CustomerResponse> updateOwnProfile(
+            @AuthenticationPrincipal String callerId,
+            @Valid @RequestBody CustomerProfileUpdateRequest request) {
+        return ResponseEntity.ok(customerService.updateOwnProfile(Long.valueOf(callerId), request));
     }
 
     @Operation(summary = "Get all customers")

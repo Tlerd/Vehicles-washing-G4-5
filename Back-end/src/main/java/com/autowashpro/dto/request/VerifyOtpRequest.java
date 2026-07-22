@@ -18,6 +18,6 @@ public class VerifyOtpRequest {
     @NotBlank(message = "Mã OTP không được để trống")
     @Size(min = 6, max = 6, message = "Mã OTP phải gồm 6 chữ số")
     @Pattern(regexp = "^[0-9]{6}$", message = "Mã OTP phải gồm 6 chữ số")
-    @Schema(description = "Six-digit OTP code", example = "123456")
+    @Schema(description = "Six-digit OTP code", format = "password")
     private String code;
 }

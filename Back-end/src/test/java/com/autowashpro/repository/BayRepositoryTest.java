@@ -44,4 +44,17 @@ class BayRepositoryTest extends RepositoryIntegrationTest {
         assertThat(quickBays.get(0).getBayCode()).isEqualTo("Q1");
         assertThat(bayRepository.findByBranchBranchId(branch.getBranchId())).hasSize(2);
     }
+
+    @Test
+    void insertDefaultIfMissing_isIdempotentAtTheDatabaseBoundary() {
+        Branch branch = branchRepository.saveAndFlush(
+                BookingTestFixtures.newBranch("Atomic Bay Seed"));
+
+        bayRepository.insertDefaultIfMissing(branch.getBranchId(), "Q1", "QUICK");
+        bayRepository.insertDefaultIfMissing(branch.getBranchId(), "Q1", "QUICK");
+
+        assertThat(bayRepository.findByBranchBranchId(branch.getBranchId()))
+                .extracting(Bay::getBayCode)
+                .containsExactly("Q1");
+    }
 }

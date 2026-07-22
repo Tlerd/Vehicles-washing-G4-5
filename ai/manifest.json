@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "rendererVersion": "role-orchestration-2026-07-21",
-  "status": "role-inventory-provisioned-pending-runtime-and-human-review",
+  "status": "role-inventory-provisioned-planner-runtime-smoke-passed-pending-broader-runtime-and-human-review",
   "protectedPaths": [
     "AGENTS.md",
     "CLAUDE.md",

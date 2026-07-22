@@ -31,7 +31,8 @@ SQL Server-compatible repository test fixtures.
 
 ## Completed work
 
-The following tasks are complete, committed, and independently reviewed:
+**Phase 1 is now complete.** All 12 tasks are done, committed, and
+independently reviewed:
 
 1. Additive/idempotent SQL Server migration for `guests`, `bays`,
    `slot_reservations`, `booking_items`, `payments`, `idempotency_records`,
@@ -49,27 +50,195 @@ The following tasks are complete, committed, and independently reviewed:
 7. `Payment` entity and repository.
 8. `IdempotencyRecord` entity and repository, using a client-assigned String
    primary key and no generated ID.
+9. `AuditLog` entity and repository (`findByEntityTypeAndEntityIdOrderByCreatedAtDesc`),
+   mapped onto the `audit_logs` table from Task 1 (matches BR-025's schema
+   field-for-field, independently re-verified by the reviewer against the
+   real migration DDL, not just the plan's copy of it).
+10. `Booking` entity evolved to support exactly one of customer or guest: the
+    `customer` join column's `nullable = false` was dropped and a new
+    `@ManyToOne guest` field was added. A new `BookingGuestSupportTest`
+    proves all three cases the DB-level `CK_bookings_customer_xor_guest`
+    check constraint is meant to enforce: guest-only persists with
+    `customer == null`; neither set violates the constraint; both set also
+    violates it. Regression-checked against the existing
+    `BookingManagementServiceTest` (unaffected, since that service always
+    sets a customer). The task reviewer independently confirmed — by reading
+    `BookingManagementService.create()` — that no code path creates
+    guest-only bookings yet, so a known, flagged issue
+    (`BookingManagementService.complete()`/`toResponse()` and
+    `AdminService.bookingMap()` would NPE on `booking.getCustomer()` for a
+    guest-only booking) is genuinely unreachable today and correctly left
+    unfixed as out of this task's scope — it belongs to whichever later
+    phase first creates guest bookings.
+11. `BaySeeder` — an idempotent `CommandLineRunner` `@Component` (matching
+    the existing `SystemAccountSeeder` pattern) that seeds 2 QUICK + 1
+    DETAIL + 1 UNIVERSAL bays (codes Q1/Q2/D1/U1) for every branch that has
+    none yet, per BR-029. Proven both by a Mockito unit test (exact 4-bay
+    type-ordered insert; zero inserts for an already-seeded branch) and by
+    live evidence (see below).
+12. Full-suite verification, live SQL Server evidence, and this evidence
+    record (this task).
 
-Relevant commits:
+Relevant commits (chronological):
 
 `1139569`, `2433aa2`, `9801311`, `e75e929`, `76f7314`, `6169a6a`,
-`26884a3`, `53bce7b`, `f258ce5`.
+`26884a3`, `53bce7b`, `f258ce5`, `89e58f5` (Task 9), `84657bc` (Task 10),
+`c5f40d0` (Task 11).
 
-## Current checkpoint
+## Files created/modified across Phase 1
 
-Work is paused immediately before Task 9. The next task is:
+- `Back-end/database/FR004v2_booking_engine_schema_migration.sql` (new)
+- `Back-end/src/main/resources/application-test.properties` (new)
+- `Back-end/src/test/java/com/autowashpro/repository/RepositoryIntegrationTest.java` (new)
+- `Back-end/src/test/java/com/autowashpro/repository/BookingTestFixtures.java` (new)
+- `Back-end/src/main/java/com/autowashpro/entity/{Guest,Bay,SlotReservation,BookingItem,Payment,IdempotencyRecord,AuditLog}.java` (new, one per table)
+- `Back-end/src/main/java/com/autowashpro/repository/{Guest,Bay,SlotReservation,BookingItem,Payment,IdempotencyRecord,AuditLog}Repository.java` (new, one per entity)
+- `Back-end/src/test/java/com/autowashpro/repository/{Guest,Bay,SlotReservation,BookingItem,Payment,IdempotencyRecord,AuditLog}RepositoryTest.java` (new, one per repository)
+- `Back-end/src/main/java/com/autowashpro/entity/Booking.java` (modified — nullable `customer`, new `guest` field)
+- `Back-end/src/test/java/com/autowashpro/repository/BookingGuestSupportTest.java` (new)
+- `Back-end/src/main/java/com/autowashpro/config/BaySeeder.java` (new)
+- `Back-end/src/test/java/com/autowashpro/config/BaySeederTest.java` (new)
 
-- Implement and test `AuditLog` entity and repository.
+## Verification evidence (Task 12)
 
-Then complete:
+**Full test suite**: `mvn -f Back-end/pom.xml test` — `BUILD SUCCESS`,
+**26 tests run, 0 failures, 0 errors, 0 skipped**. Breakdown: 13
+pre-existing (`AuthServiceImplTest` 7, `VehicleServiceImplTest` 3,
+`GlobalExceptionHandlerTest` 1, `BookingManagementServiceTest` 2) + 13 new
+from this plan (`GuestRepositoryTest` 2, `BayRepositoryTest` 1,
+`SlotReservationRepositoryTest` 1, `BookingItemRepositoryTest` 1,
+`PaymentRepositoryTest` 1, `IdempotencyRecordRepositoryTest` 1,
+`AuditLogRepositoryTest` 1, `BookingGuestSupportTest` 3, `BaySeederTest` 2).
+Correction to the plan document itself: its Task 12 text claimed "14 new
+tests / 27 total," but its own per-file breakdown lists items summing to 13,
+not 14 — 26 is the actual, correct, verified total; the plan's arithmetic
+was wrong, not the implementation.
 
-- Task 10: evolve the `Booking` entity to support exactly one customer or
-  guest, matching the migration and existing JPA conventions.
-- Task 11: add an idempotent `BaySeeder` with 2 QUICK, 1 DETAIL, and 1
-  UNIVERSAL bay for every branch.
-- Task 12: run sequential Maven tests, verify against SQL Server, perform the
-  final Phase 1 review, and record actual evidence in `PROGRESS.md` and this
-  AI-log directory.
+**Live SQL Server schema check** (both databases): `sys.tables` confirms all
+7 new tables (`guests`, `bays`, `slot_reservations`, `booking_items`,
+`payments`, `idempotency_records`, `audit_logs`) exist on both `autowash_pro`
+and `autowash_pro_test`.
+
+**Live application-boot evidence** (not code-reading or unit tests alone):
+the real Spring Boot app was started once against the real `autowash_pro`
+dev database (`mvn -f Back-end/pom.xml spring-boot:run`, default profile).
+It started cleanly in 4.57s, Hibernate connected via HikariCP, and the
+Hibernate SQL log shows `BaySeeder` running for real: for each of the 2
+existing branches, one `SELECT` (idempotency check) followed by 4 `INSERT
+INTO bays` statements. A direct `sqlcmd` query immediately after confirmed
+exactly 8 rows in `bays`:
+
+```
+branch_id  bay_code  bay_type
+1          D1        DETAIL
+1          Q1        QUICK
+1          Q2        QUICK
+1          U1        UNIVERSAL
+2          D1        DETAIL
+2          Q1        QUICK
+2          Q2        QUICK
+2          U1        UNIVERSAL
+```
+
+This is the exact 2-QUICK/1-DETAIL/1-UNIVERSAL-per-branch composition BR-029
+requires. `slot_reservations` row count is 0 (expected — nothing in Phase 1
+creates a reservation). The process was then stopped
+(`taskkill /PID <pid> /F`) to leave a clean local state; the app was not left
+running. `autowash_pro_test`'s `bays` count is 0, as expected — `@DataJpaTest`
+rolls every test back, so nothing persists there outside the tests
+themselves.
+
+## Independent review summary (Tasks 9–12)
+
+Each of Tasks 9–11 went through a fresh implementer subagent (TDD RED/GREEN,
+self-review, no commit) followed by an independent task-reviewer subagent
+(spec compliance + code quality verdicts, cross-checked against the real
+migration DDL and existing codebase files, not just the brief). All three
+reviews returned **Approved** with **no Critical or Important findings**.
+Minor notes (all confirmed non-blocking, several confirmed correct-not-a-defect
+on inspection): `AuditLog.id`'s column naming (correct per the real schema);
+`BookingGuestSupportTest`'s slightly indirect customer-then-null-override
+setup (inherited from the brief, not an implementer artifact); `BaySeeder`
+test coverage limited to single-branch scenarios (loop independence verified
+by manual code reading instead) and no DB-level idempotency integration test
+(a unit test was what the brief specified); `BaySeeder`'s verbosity relative
+to `SystemAccountSeeder`'s terser style (inherited from the brief's own code).
+The controller performed every `git add`/`git commit` itself, each scoped to
+an explicit pathspec naming only that task's files, consistent with the
+mitigation adopted after the Tasks 1–2 incident described below.
+
+## Final whole-branch review
+
+After all 12 tasks were individually reviewed, a final whole-branch review
+was dispatched on the most capable available model (opus), covering the
+complete Phase 1 diff as one unit (13 commits, `7db2916..e6097f3` — the
+range starting right after the prior, separately-completed Google Sign-In
+feature on this same branch, so it does not re-review that unrelated work).
+Its job was different from the per-task reviews: look for problems only
+visible with the whole plan's diff in view at once — cross-task
+consistency, migration-to-entity fidelity checked holistically in one pass,
+and whether the collective test suite gives real confidence.
+
+**Verdict: Ready to merge.** No Critical findings. The reviewer confirmed,
+in one pass across all 8 entities: migration↔entity field-by-field fidelity
+holds everywhere; zero Lombok/JPA convention drift across the 12 tasks; the
+scope boundary held across all 13 commits (no controller/service/DTO leaked
+in, the pre-existing ~150-file pile stayed uncontaminated); and the
+evidence recorded in PROGRESS.md/this log (26 tests / 13 new, the corrected
+plan arithmetic, the `BaySeeder` live-boot evidence) is internally
+consistent with the diff, not inflated.
+
+**3 Important findings** — explicitly *not* Phase 1 defects or blockers;
+binding design input for whichever later phase they belong to:
+
+1. **Guest bookings cannot actually persist yet.** `Booking.vehicle_id`
+   remains `@JoinColumn(nullable = false)` (unchanged by Task 10), while
+   `guests` carries its own inline `license_plate`/`vehicle_size` — meaning
+   the intended design is that guests describe their vehicle without an
+   owned `vehicles` row. `BookingGuestSupportTest`'s guest-with-no-customer
+   test only passes because it borrows a vehicle from an unrelated
+   `vehicleOwner` customer fixture, not a realistic guest flow. **Phase 2's
+   guest-booking plan must resolve this** — either make `vehicle_id`
+   nullable or synthesize/attach a vehicle row for guests.
+2. **`IdempotencyRecord` needs principal-scoped lookup before Phase 3 uses
+   it.** `response_body` (`NVARCHAR(MAX) NOT NULL`) will hold full
+   serialized responses (customer name/phone, `bookingRef`, payment URLs)
+   for 24h, keyed only by a client-supplied `Idempotency-Key` header; the
+   repository currently exposes only inherited key-only `findById`. Without
+   principal scoping, one caller could replay another caller's key and read
+   cached PII. Not a live vulnerability today (no Phase 1 code performs
+   this lookup) — but **Phase 3's idempotency check must scope by
+   requesting principal, not raw key**.
+3. **The test suite lost hermeticity, undocumented.** Before this branch,
+   `mvn -f Back-end/pom.xml test` was 13 pure Mockito unit tests with no
+   external dependency. 11 of the 13 new tests are `@DataJpaTest` against a
+   live SQL Server `autowash_pro_test`, requiring that database (fully
+   migrated) plus `DB_PASSWORD` in the process environment — intentional,
+   owner-confirmed (no Testcontainers), but this prerequisite currently
+   lives only in the plan document, not in any committed README/AGENTS.md
+   note. **Recommend documenting the test-DB prerequisite** before another
+   contributor hits an unexplained red build on a fresh checkout.
+
+**5 Minor findings**, all confirmed non-blocking: uneven constraint-test
+coverage (`UX_payments_provider_txn` — the exact filtered index Task 1's
+`SET QUOTED_IDENTIFIER ON` fix targeted — has no test proving it actually
+enforces uniqueness; `CK_bays_type`, `UX_bays_branch_code`,
+`CK_slot_reservations_status`, `CK_payments_status` likewise untested;
+reasonable for a repository-layer phase, natural first tests for whichever
+phase starts writing those rows); `slot_reservations.branch_id` duplicates
+`bays.branch_id` with no DB-level guarantee they agree (Phase 3's
+allocation logic must self-enforce this); `IdempotencyRecord`'s
+`customerId`/`guestPhone` are raw fields rather than `@ManyToOne` (the
+plan's one intentional, DDL-driven exception to the object-reference
+convention — not a defect); `application-test.properties` lives under
+`src/main/resources` rather than `src/test/resources`, so it ships inside
+the production jar (no secret leak — the password is the `${DB_PASSWORD}`
+env placeholder — but conventionally belongs under test resources); Phase 1
+is not literally 100% inert — `BaySeeder` is a genuine runtime write
+side-effect on every app boot, within Task 11's explicit scope.
+
+Full review dispatch context, the diff reviewed, and the complete report
+text are preserved in `.superpowers/sdd/progress.md`.
 
 ## Important incident and safeguards
 
@@ -77,16 +246,50 @@ One commit attempt accidentally included the unrelated pre-existing staged
 pile because `git commit` was not given a pathspec. It was corrected safely
 with a soft reset before anything was pushed, and the intended task files were
 then committed separately. Future commits must explicitly scope the commit
-pathspec; never reset or discard unrelated work.
+pathspec; never reset or discard unrelated work. This mitigation held for the
+remainder of Phase 1 (Tasks 3–11): the controller performed every commit
+itself with an explicit pathspec, and `git show --stat` was checked after
+each to confirm only the intended files landed.
 
 An implementer also found that the shared SQL Server customer fixture needed a
 unique non-null email. That was corrected because SQL Server unique-column NULL
 behavior could otherwise cause a false failure before the intended bay-slot
 constraint was reached.
 
+A separate minor incident during Task 9: the implementer's report initially
+included the real `DB_PASSWORD` value in plaintext. The report file lives
+under `.superpowers/sdd/`, which is git-ignored (confirmed via `git
+check-ignore`), so it was never staged or committed — but the controller
+redacted the value on sight as a precaution, and later task dispatches were
+given an explicit instruction not to echo the password value at all.
+
+## Known follow-up for later phases (not a Phase 1 defect)
+
+`BookingManagementService.complete()` (reads `booking.getCustomer().getTier()`),
+`BookingManagementService.toResponse()` (reads `customerId`/`customerName`/
+`customerPhone` off `getCustomer()` — already anticipated by the plan as a
+Phase 3 dependent), and `AdminService.bookingMap()` (reads
+`getCustomer().getFullName()`) all assume `Booking.customer` is non-null and
+will NPE if ever called against a guest-only booking. Confirmed unreachable
+today (no code path creates guest bookings pre-Phase-2). Whichever phase
+first implements guest-booking creation must also update these three call
+sites to branch on customer-vs-guest.
+
+## Scope boundary held throughout Phase 1
+
+No `tiers` table, no `services`/`branches` pricing or duration/buffer
+columns, no `bay_id` column added to `bookings` (bay assignment is
+represented solely via `slot_reservations.bay_id`), and no business logic
+(OTP, slot/bay allocation, pricing, VNPAY, RBAC state machine, scheduled
+jobs) — all deferred to later phases, each requiring its own plan.
+
 ## Evidence status
 
-This log records implementation progress and reviewed commits only. Do not
-claim the Backend + Swagger gate has passed yet. Full HTTP integration tests,
+This log now records Phase 1 as fully implemented, committed, and reviewed,
+with live SQL Server evidence for both the schema and the `BaySeeder`
+behavior. **Do not claim the Backend + Swagger gate has passed** — Phase 1
+was schema/entity/repository-only by design. Full HTTP integration tests,
 concurrency tests, OTP tests, VNPAY tests, OpenAPI contract checks, live API
-verification, and final gate evidence remain outstanding in later phases.
+verification, and the final gate evidence remain outstanding in later
+phases (Phase 2 onward), each requiring its own plan before implementation
+starts.

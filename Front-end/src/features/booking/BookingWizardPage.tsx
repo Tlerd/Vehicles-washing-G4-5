@@ -1,10 +1,11 @@
 import { ArrowLeft, ArrowRight, CheckCircle2, Droplets } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button, LanguageToggle, Stepper, ThemeToggle } from '@/components/ui';
+import { Badge, Button, LanguageToggle, Stepper, ThemeToggle } from '@/components/ui';
 import { formatVND } from '@/lib/money';
 import { cn } from '@/lib/utils';
-import { useCreateBooking, type Booking } from '@/lib/api/bookings';
+import { useCreateBooking, useCustomerBookings, type Booking } from '@/lib/api/bookings';
+import { useAuth } from '@/features/auth/AuthContext';
 import { LAST_STEP, WIZARD_STEPS, useBookingStore } from './store';
 import { useCartSummary } from './selectors';
 import { StepBranch } from './steps/StepBranch';
@@ -158,6 +159,14 @@ function BookingSuccess({
   onAgain: () => void;
 }) {
   const { t } = useTranslation('booking');
+  const { customer } = useAuth();
+  const {
+    data: myBookings,
+    isFetching: isCheckingStatus,
+    refetch: refetchStatus,
+  } = useCustomerBookings(customer?.id);
+  const bookingStatus = myBookings?.find((b) => b.bookingRef === booking.bookingRef)?.status ?? booking.status;
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6 text-center">
       <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-success/10 text-success">
@@ -167,11 +176,22 @@ function BookingSuccess({
         {t('wizard.success.title')}
       </h1>
       <p className="text-text-secondary">{t('wizard.success.ref', { ref: booking.bookingRef })}</p>
-      <img
-        src={booking.vietQrUrl}
-        alt="VietQR"
-        className="my-6 w-56 rounded-2xl border border-border"
-      />
+      <div className="mb-6 flex w-full max-w-sm items-center justify-between rounded-2xl border border-border bg-surface p-4 text-sm">
+        <div className="flex items-center gap-2">
+          <span className="text-text-secondary">{t('wizard.success.statusPanel.label')}</span>
+          <Badge tone={bookingStatus === 'CONFIRMED' || bookingStatus === 'COMPLETED' ? 'success' : 'neutral'}>
+            {bookingStatus}
+          </Badge>
+        </div>
+        <button
+          onClick={() => void refetchStatus()}
+          disabled={isCheckingStatus}
+          className="text-primary underline-offset-2 hover:underline disabled:opacity-50"
+        >
+          {isCheckingStatus ? t('wizard.success.statusPanel.refreshing') : t('wizard.success.statusPanel.refresh')}
+        </button>
+      </div>
+
       <p className="mb-8 max-w-sm text-text-secondary">{t('wizard.success.description')}</p>
       <div className="flex gap-3">
         <Button variant="secondary" onClick={onHome}>

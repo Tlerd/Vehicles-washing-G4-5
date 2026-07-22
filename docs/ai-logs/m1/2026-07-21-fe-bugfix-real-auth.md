@@ -30,8 +30,9 @@ and both seeded STAFF/ADMIN accounts, all authenticate correctly against the
 real endpoint before any FE changes were made.
 
 ## What was done
-- **Password rotation (STAFF/ADMIN)**: `SystemAccountSeeder.java` already
-  auto-seeds `+84900000001`/`Staff@123` and `+84900000002`/`Admin@123` on
+- **Password rotation (STAFF/ADMIN)**: `SystemAccountSeeder.java` previously
+  auto-seeded two privileged accounts with tracked legacy credentials (values
+  redacted from the working tree) on
   every backend startup (idempotent) — these are hardcoded in tracked source,
   a pre-existing security-blocker finding. Generated two fresh bcrypt hashes
   (Python `bcrypt`, rounds=10, matching Spring's `BCryptPasswordEncoder`),

@@ -8,11 +8,13 @@
 4. Start frontend: `cd Front-end`, run `npm install`, then `npm run dev`.
 5. Register/login and add at least one saved vehicle before opening Booking.
 
-Default database connection: `localhost:1433`, database `autowash_pro`, user `sa`, password `AutoWash@123456`.
+Default database location: `localhost:1433`, database `autowash_pro`. Supply a
+dedicated least-privileged login through `Back-end/.env`; no password is stored
+in this document.
 
-## 2. FR-005 — booking and VietQR
+## 2. FR-005 — booking
 
-Use the six-step wizard, choose a saved vehicle, service `wc1`–`wc5`, branch, future date and an available time. Confirm. Expected: database receives `bookings` and `booking_services` rows; payment step displays the booking reference, exact backend total and VietQR.
+Use the six-step wizard, choose a saved vehicle, service `wc1`–`wc5`, branch, future date and an available time. Confirm. Expected: database receives `bookings` and `booking_services` rows. Do not treat this as evidence of payment completion; payment verification requires the approved provider integration.
 
 ## 3. FR-006 and FR-007 — points and tier
 

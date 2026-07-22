@@ -18,9 +18,14 @@
     "success": {
       "title": "Đặt lịch thành công!",
       "ref": "Mã đặt lịch: {{ref}}",
-      "description": "Quét mã VietQR bên trên hoặc thanh toán tại quầy khi đến chi nhánh.",
+      "description": "Yêu cầu đặt lịch của bạn đã được ghi nhận.",
       "home": "Về trang chủ",
-      "again": "Đặt lịch khác"
+      "again": "Đặt lịch khác",
+      "statusPanel": {
+        "label": "Trạng thái đặt lịch",
+        "refresh": "Làm mới",
+        "refreshing": "Đang tải…"
+      }
     }
   },
   "branch": {
@@ -76,11 +81,11 @@
     "phone": "Điện thoại"
   },
   "confirm": {
-    "paymentTitle": "Thanh toán",
-    "paymentSubtitle": "Quét mã VietQR hoặc thanh toán tại quầy",
+    "bookingTitle": "Xác nhận đặt lịch",
+    "bookingSubtitle": "Kiểm tra lại tổng đơn trước khi gửi yêu cầu",
     "totalLabel": "Tổng đơn",
     "submitError": "Không thể đặt lịch, vui lòng thử lại.",
-    "note": "Lịch hẹn sẽ ở trạng thái chờ xác nhận cho đến khi bạn thanh toán tại quầy hoặc quét mã VietQR."
+    "note": "Yêu cầu sẽ được gửi để hệ thống xử lý theo trạng thái đặt lịch."
   },
   "categoryGrid": {
     "comboGroupTitle": "Gói combo",

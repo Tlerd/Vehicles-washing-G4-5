@@ -30,11 +30,11 @@ function mapBranch(b: BranchApiResponse): Branch {
   };
 }
 
-/** GET /api/v1/catalog/branches — real, ACTIVE-only branches. */
+/** GET /api/v1/branches — safe ACTIVE-only branch summaries. */
 export function useBranches() {
   return useQuery({
     queryKey: ['booking-branches'],
-    queryFn: async () => (await apiClient.get<BranchApiResponse[]>('/catalog/branches')).map(mapBranch),
+    queryFn: async () => (await apiClient.get<BranchApiResponse[]>('/branches')).map(mapBranch),
   });
 }
 
@@ -120,7 +120,6 @@ interface BookingApiResponse {
   bookingTime: string;
   totalPrice: number;
   status: string;
-  vietQrUrl: string;
 }
 
 export interface Booking {
@@ -132,7 +131,6 @@ export interface Booking {
   bookingTime: string;
   totalPrice: number;
   status: string;
-  vietQrUrl: string;
 }
 
 function mapBooking(b: BookingApiResponse): Booking {
@@ -145,8 +143,18 @@ function mapBooking(b: BookingApiResponse): Booking {
     bookingTime: b.bookingTime.slice(0, 5),
     totalPrice: b.totalPrice,
     status: b.status,
-    vietQrUrl: b.vietQrUrl,
   };
+}
+
+/** GET /api/v1/bookings/customer/{customerId} — the path segment is required
+ *  by the route but ignored server-side in favor of the JWT subject. */
+export function useCustomerBookings(customerId: string | undefined) {
+  return useQuery({
+    queryKey: ['customer-bookings', customerId],
+    enabled: Boolean(customerId),
+    queryFn: async () =>
+      (await apiClient.get<BookingApiResponse[]>(`/bookings/customer/${customerId}`)).map(mapBooking),
+  });
 }
 
 /** POST /api/v1/bookings. `customerId` is required by the DTO's Bean
@@ -169,6 +177,9 @@ export function useCreateBooking() {
           bookingTime: input.bookingTime,
         })
         .then(mapBooking),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['vehicles'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['vehicles'] });
+      qc.invalidateQueries({ queryKey: ['customer-bookings'] });
+    },
   });
 }

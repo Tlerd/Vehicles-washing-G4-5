@@ -18,9 +18,14 @@
     "success": {
       "title": "Booking confirmed!",
       "ref": "Booking reference: {{ref}}",
-      "description": "Scan the VietQR code above or pay at the counter when you arrive.",
+      "description": "Your booking request has been recorded.",
       "home": "Go home",
-      "again": "Book another"
+      "again": "Book another",
+      "statusPanel": {
+        "label": "Booking status",
+        "refresh": "Refresh",
+        "refreshing": "Loading…"
+      }
     }
   },
   "branch": {
@@ -76,11 +81,11 @@
     "phone": "Phone"
   },
   "confirm": {
-    "paymentTitle": "Payment",
-    "paymentSubtitle": "Scan the VietQR code or pay at the counter",
+    "bookingTitle": "Confirm booking",
+    "bookingSubtitle": "Review the order total before submitting your request",
     "totalLabel": "Order total",
     "submitError": "Couldn't create the booking, please try again.",
-    "note": "Your booking stays pending confirmation until you pay at the counter or via VietQR."
+    "note": "Your request will be submitted for processing through the booking lifecycle."
   },
   "categoryGrid": {
     "comboGroupTitle": "Combo packages",

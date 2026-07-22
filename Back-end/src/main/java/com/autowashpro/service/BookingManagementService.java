@@ -7,18 +7,12 @@ import com.autowashpro.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.beans.factory.annotation.Value;
 import java.math.*;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.*;
 import java.util.*;
 
 @Service @RequiredArgsConstructor @Transactional
 public class BookingManagementService {
-    @Value("${autowash.payment.bank-code:VCB}") private String bankCode;
-    @Value("${autowash.payment.account-number:1234567890}") private String accountNumber;
-    @Value("${autowash.payment.account-name:VINAWASH CO. LTD}") private String accountName;
     private final BookingRepository bookingRepository;
     private final CustomerRepository customerRepository;
     private final VehicleRepository vehicleRepository;
@@ -43,17 +37,24 @@ public class BookingManagementService {
         LocalTime endTime = r.getBookingTime().plusMinutes(duration);
         validateSchedule(branch, r.getBookingDate(), r.getBookingTime(), endTime);
         BigDecimal multiplier = switch (vehicle.getVehicleSize()) { case HATCHBACK -> new BigDecimal("0.9"); case SEDAN -> BigDecimal.ONE; case SUV -> new BigDecimal("1.2"); case PICKUP -> new BigDecimal("1.4"); };
-        BigDecimal total = services.stream().map(com.autowashpro.entity.Service::getBasePrice).reduce(BigDecimal.ZERO, BigDecimal::add).multiply(multiplier).setScale(0, RoundingMode.HALF_UP);
+        BigDecimal subtotal = services.stream().map(com.autowashpro.entity.Service::getBasePrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add).setScale(0, RoundingMode.HALF_UP);
+        BigDecimal preVoucherTotal = subtotal.multiply(multiplier).setScale(0, RoundingMode.HALF_UP);
+        BigDecimal total = preVoucherTotal;
+        BigDecimal voucherDiscount = BigDecimal.ZERO;
         Voucher voucher = null;
         if (r.getVoucherId() != null) {
             voucher = voucherRepository.findByVoucherIdAndCustomerCustomerId(r.getVoucherId(), r.getCustomerId()).orElseThrow(() -> new ForbiddenException("Voucher does not belong to customer"));
             if (!"ACTIVE".equalsIgnoreCase(voucher.getStatus()) || voucher.getExpiredAt().isBefore(LocalDate.now())) throw new BadRequestException("Voucher is not active");
-            total = total.subtract(voucher.getDiscountAmount()).max(BigDecimal.ZERO);
+            voucherDiscount = voucher.getDiscountAmount().min(total);
+            total = total.subtract(voucherDiscount);
             voucher.setStatus("LOCKED"); voucherRepository.save(voucher);
         }
         Booking b = new Booking();
         b.setBookingRef("AWP-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase()); b.setCustomer(customer); b.setVehicle(vehicle); b.setBranch(branch);
-        b.setBookingDate(r.getBookingDate()); b.setBookingTime(r.getBookingTime()); b.setEndTime(endTime); b.setDurationMinutes(duration); b.setTotalPrice(total); b.setStatus("PENDING"); b.setPointsEarned(0); b.setAppliedVoucher(voucher); b.setCreatedAt(LocalDateTime.now());
+        b.setBookingDate(r.getBookingDate()); b.setBookingTime(r.getBookingTime()); b.setEndTime(endTime); b.setDurationMinutes(duration);
+        b.setSubtotal(subtotal); b.setSizeAdjustment(preVoucherTotal.subtract(subtotal)); b.setVoucherDiscount(voucherDiscount);
+        b.setTotalPrice(total); b.setCounterBalance(total); b.setStatus("PENDING"); b.setPointsEarned(0); b.setAppliedVoucher(voucher); b.setCreatedAt(LocalDateTime.now());
         b = bookingRepository.save(b);
         for (com.autowashpro.entity.Service s : services) bookingServiceRepository.save(new com.autowashpro.entity.BookingService(new BookingServiceId(b.getBookingId(), s.getServiceId()), b, s));
         return toResponse(b);
@@ -113,18 +114,26 @@ public class BookingManagementService {
         }
     }
 
-    private BookingResponse toResponse(Booking b) {
+    public BookingResponse toResponse(Booking b) {
         List<BookingService> bookingServices = bookingServiceRepository.findByBookingBookingId(b.getBookingId());
         List<Long> ids = bookingServices.stream().map(x -> x.getService().getServiceId()).toList();
         List<String> serviceNames = bookingServices.stream().map(x -> x.getService().getServiceName()).toList();
-        String info = URLEncoder.encode(b.getBookingRef(), StandardCharsets.UTF_8);
-        String qr = "https://img.vietqr.io/image/" + bankCode + "-" + accountNumber + "-compact2.png?amount=" + b.getTotalPrice().toPlainString() + "&addInfo=" + info + "&accountName=" + URLEncoder.encode(accountName, StandardCharsets.UTF_8);
+        Customer customer = b.getCustomer();
+        Guest guest = b.getGuest();
+        Vehicle vehicle = b.getVehicle();
         return BookingResponse.builder().id(b.getBookingId()).bookingRef(b.getBookingRef())
-                .customerId(b.getCustomer().getCustomerId()).customerName(b.getCustomer().getFullName()).customerPhone(b.getCustomer().getPhone())
-                .vehicleId(b.getVehicle().getVehicleId()).licensePlate(b.getVehicle().getLicensePlate()).vehicleBrand(b.getVehicle().getBrand()).vehicleSize(b.getVehicle().getVehicleSize().name())
+                .customerId(customer == null ? null : customer.getCustomerId())
+                .customerName(customer == null ? guest.getFullName() : customer.getFullName())
+                .customerPhone(customer == null ? guest.getPhone() : customer.getPhone())
+                .vehicleId(vehicle == null ? null : vehicle.getVehicleId())
+                .licensePlate(vehicle == null ? b.getGuestLicensePlate() : vehicle.getLicensePlate())
+                .vehicleBrand(vehicle == null ? b.getGuestVehicleBrand() : vehicle.getBrand())
+                .vehicleSize(vehicle == null
+                        ? b.getGuestVehicleSize().name() : vehicle.getVehicleSize().name())
                 .branchId(b.getBranch().getBranchId()).serviceIds(ids).serviceNames(serviceNames)
                 .bookingDate(b.getBookingDate()).bookingTime(b.getBookingTime()).endTime(b.getEndTime()).durationMinutes(b.getDurationMinutes())
                 .totalPrice(b.getTotalPrice()).status(b.getStatus()).pointsEarned(b.getPointsEarned())
-                .appliedVoucherId(b.getAppliedVoucher() == null ? null : b.getAppliedVoucher().getVoucherId()).createdAt(b.getCreatedAt()).vietQrUrl(qr).build();
+                .appliedVoucherId(b.getAppliedVoucher() == null ? null : b.getAppliedVoucher().getVoucherId()).createdAt(b.getCreatedAt())
+                .build();
     }
 }

@@ -12,15 +12,20 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final RestAuthenticationEntryPoint authenticationEntryPoint;
 
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider,
+                                   RestAuthenticationEntryPoint authenticationEntryPoint) {
         this.jwtTokenProvider = jwtTokenProvider;
+        this.authenticationEntryPoint = authenticationEntryPoint;
     }
 
     @Override
@@ -33,11 +38,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String token = authorizationHeader.substring(7);
-
-            if (jwtTokenProvider.isTokenValid(token)) {
+            try {
+                if (token.isBlank()) {
+                    throw new org.springframework.security.authentication.BadCredentialsException(
+                            "Invalid bearer token.");
+                }
                 var claims = jwtTokenProvider.parseToken(token);
                 String customerId = claims.getSubject();
                 String role = claims.get("role", String.class);
+                if (claims.getExpiration() == null
+                        || !claims.getExpiration().after(new Date())
+                        || customerId == null
+                        || !customerId.matches("[1-9][0-9]*")
+                        || !Set.of("CUSTOMER", "STAFF", "ADMIN").contains(role)) {
+                    throw new org.springframework.security.authentication.BadCredentialsException(
+                            "Invalid bearer token.");
+                }
 
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         customerId,
@@ -46,6 +62,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 );
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (Exception ex) {
+                SecurityContextHolder.clearContext();
+                authenticationEntryPoint.commence(request, response,
+                        new org.springframework.security.authentication.BadCredentialsException("Invalid bearer token."));
+                return;
             }
         }
 

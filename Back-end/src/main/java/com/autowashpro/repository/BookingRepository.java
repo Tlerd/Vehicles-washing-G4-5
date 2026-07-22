@@ -1,16 +1,74 @@
 package com.autowashpro.repository;
 
 import com.autowashpro.entity.Booking;
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.QueryHint;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
+import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
+    interface LegacyAvailabilityProjection {
+        Long getBookingId();
+        String getStatus();
+        LocalTime getBookingTime();
+        LocalTime getEndTime();
+        Integer getDurationMinutes();
+        Boolean getLegacyFinancialSnapshot();
+    }
     boolean existsByBranchBranchIdAndBookingDateAndBookingTimeAndStatusNot(Long branchId, LocalDate date, LocalTime time, String status);
     List<Booking> findByCustomerCustomerIdOrderByCreatedAtDesc(Long customerId);
     List<Booking> findByBookingDateOrderByBookingTimeAsc(LocalDate date);
     List<Booking> findByBranchBranchIdAndBookingDateAndStatusNot(Long branchId, LocalDate date, String status);
     boolean existsByCustomerCustomerIdAndStatusIn(Long customerId, List<String> statuses);
     List<Booking> findByCustomerCustomerIdAndStatusAndBookingDateGreaterThanEqual(Long customerId, String status, LocalDate fromDate);
+    Optional<Booking> findByBookingRef(String bookingRef);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT b FROM Booking b WHERE b.bookingId = :bookingId")
+    @QueryHints(@QueryHint(name = "jakarta.persistence.query.timeout", value = "2000"))
+    Optional<Booking> findByIdForUpdate(@Param("bookingId") Long bookingId);
+
+    @Query(value = "SELECT TOP (:batchSize) booking_id FROM dbo.bookings " +
+            "WITH (UPDLOCK, READPAST, READCOMMITTEDLOCK, ROWLOCK, " +
+            "INDEX(IX_bookings_expiry_claim)) WHERE status = 'PENDING_DEPOSIT' " +
+            "AND deposit_expires_at <= :now ORDER BY deposit_expires_at, booking_id",
+            nativeQuery = true)
+    @QueryHints(@QueryHint(name = "jakarta.persistence.query.timeout", value = "2000"))
+    List<Long> findDueIdsForExpiry(
+            @Param("now") LocalDateTime now,
+            @Param("batchSize") int batchSize);
+
+    @Query("SELECT b FROM Booking b " +
+            "LEFT JOIN FETCH b.customer " +
+            "LEFT JOIN FETCH b.guest " +
+            "LEFT JOIN FETCH b.vehicle " +
+            "JOIN FETCH b.branch " +
+            "WHERE b.bookingRef = :bookingRef")
+    Optional<Booking> findForLookupByBookingRef(@Param("bookingRef") String bookingRef);
+
+    @Query("""
+            SELECT b.bookingId AS bookingId,
+                   b.status AS status,
+                   b.bookingTime AS bookingTime,
+                   b.endTime AS endTime,
+                   b.durationMinutes AS durationMinutes,
+                   b.legacyFinancialSnapshot AS legacyFinancialSnapshot
+            FROM Booking b
+            WHERE b.branch.branchId = :branchId
+              AND b.bookingDate = :date
+              AND b.legacyFinancialSnapshot = true
+              AND b.status IN :statuses
+            """)
+    List<LegacyAvailabilityProjection> findLegacyAvailabilityCandidates(
+            @Param("branchId") Long branchId,
+            @Param("date") LocalDate date,
+            @Param("statuses") List<String> statuses);
 }

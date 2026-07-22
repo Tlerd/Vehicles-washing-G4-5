@@ -7,6 +7,7 @@ import {
   LogOut,
   Star,
   Ticket,
+  UserCircle,
 } from 'lucide-react';
 import { useAuth } from '@/features/auth/AuthContext';
 import { roleHomePath } from '@/features/auth/roleNavigation';
@@ -19,6 +20,7 @@ const NAV_ITEMS = [
   { to: '/app/points', label: 'Điểm thưởng', icon: Star },
   { to: '/app/vouchers', label: 'Voucher', icon: Ticket },
   { to: '/app/history', label: 'Lịch sử', icon: CalendarClock },
+  { to: '/app/profile', label: 'Hồ sơ', icon: UserCircle },
 ];
 
 /** Authenticated shell for Phase 2 customer pages. Redirects to /login,
