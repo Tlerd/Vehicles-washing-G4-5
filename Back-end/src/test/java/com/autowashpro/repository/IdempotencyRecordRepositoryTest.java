@@ -31,6 +31,8 @@ class IdempotencyRecordRepositoryTest extends RepositoryIntegrationTest {
         record.setClientKeyHash("d".repeat(64));
         record.setResponseStatus(201);
         record.setResponseBody("{\"bookingRef\":\"AWP-TESTD1\"}");
+        record.setResponseLocation("/api/v1/bookings/AWP-TESTD1");
+        record.setResponseCacheControl("no-store");
         record.setCreatedAt(now);
         record.setExpiresAt(now.plusHours(24));
 
@@ -43,6 +45,8 @@ class IdempotencyRecordRepositoryTest extends RepositoryIntegrationTest {
         assertThat(found.getClientKeyHash()).isEqualTo("d".repeat(64));
         assertThat(found.getResponseStatus()).isEqualTo(201);
         assertThat(found.getResponseBody()).contains("AWP-TESTD1");
+        assertThat(found.getResponseLocation()).isEqualTo("/api/v1/bookings/AWP-TESTD1");
+        assertThat(found.getResponseCacheControl()).isEqualTo("no-store");
         assertThat(idempotencyRecordRepository.findById(rawKey)).isEmpty();
     }
 
@@ -59,6 +63,8 @@ class IdempotencyRecordRepositoryTest extends RepositoryIntegrationTest {
         record.setGuestProofHash("5".repeat(64));
         record.setResponseStatus(201);
         record.setResponseBody("{\"bookingRef\":\"AWP-GUEST1\"}");
+        record.setResponseLocation("/api/v1/bookings/AWP-GUEST1");
+        record.setResponseCacheControl("no-store");
         record.setCreatedAt(now);
         record.setExpiresAt(now.plusHours(24));
 

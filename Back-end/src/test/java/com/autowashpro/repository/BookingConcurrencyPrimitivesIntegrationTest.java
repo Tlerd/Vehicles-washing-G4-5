@@ -293,6 +293,8 @@ class BookingConcurrencyPrimitivesIntegrationTest {
             record.setClientKeyHash("e".repeat(64));
             record.setResponseStatus(201);
             record.setResponseBody("{}");
+            record.setResponseLocation("/api/v1/bookings/AWP-LOCK");
+            record.setResponseCacheControl("no-store");
             record.setCreatedAt(now);
             record.setExpiresAt(now.plusHours(24));
             idempotencyRecords.saveAndFlush(record);

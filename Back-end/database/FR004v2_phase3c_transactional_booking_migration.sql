@@ -74,16 +74,40 @@ IF COL_LENGTH('dbo.idempotency_records', 'guest_proof_hash') IS NULL
 
 IF COL_LENGTH('dbo.idempotency_records', 'client_key_hash') IS NULL
     ALTER TABLE dbo.idempotency_records ADD client_key_hash CHAR(64) NULL;
+
+IF COL_LENGTH('dbo.idempotency_records', 'response_location') IS NULL
+    ALTER TABLE dbo.idempotency_records ADD response_location VARCHAR(200) NULL;
+
+IF COL_LENGTH('dbo.idempotency_records', 'response_cache_control') IS NULL
+    ALTER TABLE dbo.idempotency_records ADD response_cache_control VARCHAR(100) NULL;
+
+IF COL_LENGTH('dbo.idempotency_records', 'hash_version') IS NULL
+    ALTER TABLE dbo.idempotency_records ADD hash_version TINYINT NULL;
 GO
 
--- Historical records cannot recover their raw client key. Preserve their
--- remaining short TTL under a deterministic non-secret fallback value.
+-- Historical records cannot recover their raw client key. Mark, but do not
+-- pretend, that the legacy primary-key digest is the new domain-separated
+-- client-key digest. Deployment fails closed until any live replay window ends.
 UPDATE dbo.idempotency_records
 SET client_key_hash = idempotency_key
 WHERE client_key_hash IS NULL;
 
+UPDATE dbo.idempotency_records
+SET hash_version = CASE WHEN client_key_hash = idempotency_key THEN 1 ELSE 2 END
+WHERE hash_version IS NULL;
+
 IF EXISTS (SELECT 1 FROM dbo.idempotency_records WHERE client_key_hash IS NULL)
     THROW 51005, 'Idempotency client-key backfill is incomplete.', 1;
+
+DECLARE @vietnam_now DATETIME2(7) = CAST(
+    SYSDATETIMEOFFSET() AT TIME ZONE 'SE Asia Standard Time' AS DATETIME2(7)
+);
+
+IF EXISTS (
+    SELECT 1 FROM dbo.idempotency_records
+    WHERE hash_version = 1 AND expires_at > @vietnam_now
+)
+    THROW 51018, 'Unexpired legacy idempotency records must age out before Phase 3C.', 1;
 
 IF EXISTS (
     SELECT request_path, principal_scope_hash, client_key_hash
@@ -99,6 +123,38 @@ IF EXISTS (
       AND name = 'client_key_hash' AND is_nullable = 1
 )
     ALTER TABLE dbo.idempotency_records ALTER COLUMN client_key_hash CHAR(64) NOT NULL;
+
+IF EXISTS (
+    SELECT 1 FROM sys.columns
+    WHERE object_id = OBJECT_ID('dbo.idempotency_records')
+      AND name = 'hash_version' AND is_nullable = 1
+)
+    ALTER TABLE dbo.idempotency_records ALTER COLUMN hash_version TINYINT NOT NULL;
+
+IF EXISTS (
+    SELECT 1 FROM sys.columns
+    WHERE object_id = OBJECT_ID('dbo.idempotency_records')
+      AND name = 'response_location' AND is_nullable = 0
+)
+    ALTER TABLE dbo.idempotency_records ALTER COLUMN response_location VARCHAR(200) NULL;
+
+IF EXISTS (
+    SELECT 1 FROM sys.columns
+    WHERE object_id = OBJECT_ID('dbo.idempotency_records')
+      AND name = 'response_cache_control' AND is_nullable = 0
+)
+    ALTER TABLE dbo.idempotency_records ALTER COLUMN response_cache_control VARCHAR(100) NULL;
+
+IF NOT EXISTS (
+    SELECT 1 FROM sys.default_constraints default_constraint
+    JOIN sys.columns column_metadata
+      ON column_metadata.object_id = default_constraint.parent_object_id
+     AND column_metadata.column_id = default_constraint.parent_column_id
+    WHERE default_constraint.parent_object_id = OBJECT_ID('dbo.idempotency_records')
+      AND column_metadata.name = 'hash_version'
+)
+    ALTER TABLE dbo.idempotency_records ADD CONSTRAINT DF_idempotency_hash_version
+        DEFAULT (2) FOR hash_version;
 
 -- Upgrade an unambiguous historical LOCKED voucher if one exists.
 IF EXISTS (
@@ -510,6 +566,19 @@ ALTER TABLE dbo.idempotency_records WITH CHECK ADD CONSTRAINT CK_idempotency_has
 );
 
 ALTER TABLE dbo.idempotency_records WITH CHECK CHECK CONSTRAINT CK_idempotency_hashes;
+
+IF EXISTS (
+    SELECT 1 FROM sys.check_constraints
+    WHERE name = 'CK_idempotency_hash_version'
+      AND parent_object_id = OBJECT_ID('dbo.idempotency_records')
+)
+    ALTER TABLE dbo.idempotency_records DROP CONSTRAINT CK_idempotency_hash_version;
+
+ALTER TABLE dbo.idempotency_records WITH CHECK ADD CONSTRAINT CK_idempotency_hash_version CHECK (
+    hash_version IN (1, 2)
+);
+
+ALTER TABLE dbo.idempotency_records WITH CHECK CHECK CONSTRAINT CK_idempotency_hash_version;
 
 IF EXISTS (
     SELECT 1 FROM sys.check_constraints

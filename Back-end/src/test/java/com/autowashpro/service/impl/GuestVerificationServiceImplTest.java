@@ -18,6 +18,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -77,6 +81,34 @@ class GuestVerificationServiceImplTest {
         assertThat(captor.getValue().getConsumedAt()).isNull();
         assertThat(captor.getValue().getProofToken()).isEqualTo(ProofTokenCodec.digest(response.getProofToken()));
         assertThat(captor.getValue().getProofToken()).isNotEqualTo(response.getProofToken());
+    }
+
+    @Test
+    void issueAndConsume_useVietnamWallTimeEvenWhenJvmClockIsUtc() throws FirebaseAuthException {
+        Clock utcClock = Clock.fixed(Instant.parse("2026-07-22T05:00:00Z"), ZoneOffset.UTC);
+        service = new GuestVerificationServiceImpl(
+                firebaseTokenVerifier, proofRepository, rateLimiter, utcClock);
+        when(firebaseTokenVerifier.verify("valid-token"))
+                .thenReturn(new VerifiedFirebaseIdentity("+84901234567", null));
+        when(rateLimiter.tryConsume(any(), anyString(), anyInt(), any())).thenReturn(true);
+        when(proofRepository.consumeIfValid(
+                anyString(), eq("+84901234567"), eq(VerificationPurpose.GUEST_BOOKING),
+                eq(LocalDateTime.of(2026, 7, 22, 12, 0))))
+                .thenReturn(1);
+
+        VerificationProofResponse response = service.issueProof(
+                "0901234567", "valid-token", VerificationPurpose.GUEST_BOOKING);
+        String phone = service.consumeProofForPhone(
+                response.getProofToken(), "0901234567", VerificationPurpose.GUEST_BOOKING);
+
+        ArgumentCaptor<PhoneVerificationProof> proof =
+                ArgumentCaptor.forClass(PhoneVerificationProof.class);
+        verify(proofRepository).save(proof.capture());
+        assertThat(proof.getValue().getIssuedAt())
+                .isEqualTo(LocalDateTime.of(2026, 7, 22, 12, 0));
+        assertThat(proof.getValue().getExpiresAt())
+                .isEqualTo(LocalDateTime.of(2026, 7, 22, 12, 5));
+        assertThat(phone).isEqualTo("+84901234567");
     }
 
     @Test

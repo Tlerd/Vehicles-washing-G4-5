@@ -36,7 +36,8 @@ class BookingEngineSchemaIntegrationTest {
         assertColumns("vouchers", List.of("min_tier", "min_tier_id", "locked_booking_id"));
         assertColumns("guests", List.of("vehicle_brand"));
         assertColumns("idempotency_records", List.of(
-                "request_hash", "principal_scope_hash", "client_key_hash", "guest_proof_hash"));
+                "request_hash", "principal_scope_hash", "client_key_hash", "guest_proof_hash",
+                "response_location", "response_cache_control", "hash_version"));
         assertColumns("idempotency_guest_proofs", List.of(
                 "proof_hash", "idempotency_key", "created_at"));
         assertColumns("tiers", List.of(
@@ -226,6 +227,7 @@ class BookingEngineSchemaIntegrationTest {
                     'CK_vouchers_lock_state',
                     'CK_idempotency_actor',
                     'CK_idempotency_hashes',
+                    'CK_idempotency_hash_version',
                     'CK_idempotency_expiry',
                     'CK_idempotency_guest_proof_hash'
                 )
@@ -242,6 +244,7 @@ class BookingEngineSchemaIntegrationTest {
                 "CK_vouchers_lock_state",
                 "CK_idempotency_actor",
                 "CK_idempotency_hashes",
+                "CK_idempotency_hash_version",
                 "CK_idempotency_expiry",
                 "CK_idempotency_guest_proof_hash");
 

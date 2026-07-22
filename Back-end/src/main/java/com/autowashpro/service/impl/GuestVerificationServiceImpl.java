@@ -10,6 +10,7 @@ import com.autowashpro.service.FirebaseTokenVerifier;
 import com.autowashpro.service.GuestVerificationService;
 import com.autowashpro.service.RateLimiter;
 import com.autowashpro.service.VerifiedFirebaseIdentity;
+import com.autowashpro.service.BookingAvailabilityService;
 import com.autowashpro.utils.PhoneNormalizer;
 import com.autowashpro.utils.ProofTokenCodec;
 import com.autowashpro.utils.ProofTokenGenerator;
@@ -17,8 +18,11 @@ import com.google.firebase.auth.FirebaseAuthException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Propagation;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.Clock;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Service
@@ -36,13 +40,23 @@ public class GuestVerificationServiceImpl implements GuestVerificationService {
     private final FirebaseTokenVerifier firebaseTokenVerifier;
     private final PhoneVerificationProofRepository proofRepository;
     private final RateLimiter rateLimiter;
+    private final Clock clock;
 
+    @Autowired
     public GuestVerificationServiceImpl(FirebaseTokenVerifier firebaseTokenVerifier,
                                          PhoneVerificationProofRepository proofRepository,
                                          RateLimiter rateLimiter) {
+        this(firebaseTokenVerifier, proofRepository, rateLimiter, Clock.systemUTC());
+    }
+
+    GuestVerificationServiceImpl(FirebaseTokenVerifier firebaseTokenVerifier,
+                                 PhoneVerificationProofRepository proofRepository,
+                                 RateLimiter rateLimiter,
+                                 Clock clock) {
         this.firebaseTokenVerifier = firebaseTokenVerifier;
         this.proofRepository = proofRepository;
         this.rateLimiter = rateLimiter;
+        this.clock = clock;
     }
 
     @Override
@@ -76,7 +90,7 @@ public class GuestVerificationServiceImpl implements GuestVerificationService {
             throw new TooManyRequestsException(GENERIC_RATE_LIMIT_ERROR, 900);
         }
 
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = now();
         String rawToken = ProofTokenGenerator.generate();
         PhoneVerificationProof proof = new PhoneVerificationProof();
         proof.setProofToken(ProofTokenCodec.digest(rawToken));
@@ -102,7 +116,7 @@ public class GuestVerificationServiceImpl implements GuestVerificationService {
         enforceConsumptionRateLimit(proofToken);
 
         int updated = proofRepository.consumeIfValid(
-                ProofTokenCodec.digest(proofToken), normalizedPhone, purpose, LocalDateTime.now());
+                ProofTokenCodec.digest(proofToken), normalizedPhone, purpose, now());
         if (updated != 1) {
             throw new BadRequestException(GENERIC_PROOF_ERROR);
         }
@@ -118,7 +132,7 @@ public class GuestVerificationServiceImpl implements GuestVerificationService {
         enforceConsumptionRateLimit(proofToken);
 
         String proofDigest = ProofTokenCodec.digest(proofToken);
-        int updated = proofRepository.consumeIfValidForPurpose(proofDigest, purpose, LocalDateTime.now());
+        int updated = proofRepository.consumeIfValidForPurpose(proofDigest, purpose, now());
         if (updated != 1) {
             throw new BadRequestException(GENERIC_PROOF_ERROR);
         }
@@ -132,5 +146,10 @@ public class GuestVerificationServiceImpl implements GuestVerificationService {
                 RateLimiter.Scope.PROOF_CONSUMPTION, key, CONSUMPTION_MAX_ATTEMPTS, CONSUMPTION_WINDOW)) {
             throw new TooManyRequestsException(GENERIC_RATE_LIMIT_ERROR, 900);
         }
+    }
+
+    private LocalDateTime now() {
+        return LocalDateTime.ofInstant(
+                Instant.now(clock), BookingAvailabilityService.BUSINESS_ZONE);
     }
 }

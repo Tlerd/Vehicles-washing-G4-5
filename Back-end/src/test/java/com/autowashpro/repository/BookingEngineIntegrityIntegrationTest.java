@@ -137,12 +137,26 @@ class BookingEngineIntegrityIntegrationTest extends RepositoryIntegrationTest {
         record.setClientKeyHash("9".repeat(64));
         record.setResponseStatus(201);
         record.setResponseBody("{}");
+        record.setResponseLocation("/api/v1/bookings/AWP-TEST");
+        record.setResponseCacheControl("no-store");
         record.setCreatedAt(now);
         record.setExpiresAt(now.plusHours(24).plusSeconds(1));
 
         assertThatThrownBy(() -> idempotencyRecords.saveAndFlush(record))
                 .isInstanceOf(DataIntegrityViolationException.class)
                 .hasMessageContaining("CK_idempotency_expiry");
+        entityManager.clear();
+    }
+
+    @Test
+    void idempotencyRecord_unknownHashVersion_isRejected() {
+        IdempotencyRecord record = idempotencyRecord("9", "8", "7");
+        record.setCustomerId(42L);
+        record.setHashVersion(3);
+
+        assertThatThrownBy(() -> idempotencyRecords.saveAndFlush(record))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("CK_idempotency_hash_version");
         entityManager.clear();
     }
 
@@ -228,6 +242,8 @@ class BookingEngineIntegrityIntegrationTest extends RepositoryIntegrationTest {
         record.setClientKeyHash(clientCharacter.repeat(64));
         record.setResponseStatus(201);
         record.setResponseBody("{}");
+        record.setResponseLocation("/api/v1/bookings/AWP-TEST");
+        record.setResponseCacheControl("no-store");
         record.setCreatedAt(now);
         record.setExpiresAt(now.plusHours(24));
         return record;
