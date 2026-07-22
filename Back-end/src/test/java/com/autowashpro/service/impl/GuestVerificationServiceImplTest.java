@@ -9,6 +9,7 @@ import com.autowashpro.repository.PhoneVerificationProofRepository;
 import com.autowashpro.service.FirebaseTokenVerifier;
 import com.autowashpro.service.RateLimiter;
 import com.autowashpro.service.VerifiedFirebaseIdentity;
+import com.autowashpro.utils.ProofTokenCodec;
 import com.google.firebase.auth.FirebaseAuthException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,10 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class GuestVerificationServiceImplTest {
+
+    private static final String TOKEN_1 = "gvp_" + "A".repeat(43);
+    private static final String TOKEN_2 = "gvp_" + "B".repeat(43);
+    private static final String TOKEN_3 = "gvp_" + "C".repeat(43);
 
     @Mock
     private FirebaseTokenVerifier firebaseTokenVerifier;
@@ -58,7 +63,7 @@ class GuestVerificationServiceImplTest {
     void issueProof_validFirebaseVerification_returnsProofBoundToNormalizedPhoneAndPurpose() throws FirebaseAuthException {
         when(firebaseTokenVerifier.verify("valid-token"))
                 .thenReturn(new VerifiedFirebaseIdentity("+84901234567", null));
-        when(rateLimiter.tryConsume(anyString(), anyInt(), any())).thenReturn(true);
+        when(rateLimiter.tryConsume(any(), anyString(), anyInt(), any())).thenReturn(true);
 
         VerificationProofResponse response = service.issueProof("0901234567", "valid-token", VerificationPurpose.GUEST_BOOKING);
 
@@ -70,6 +75,8 @@ class GuestVerificationServiceImplTest {
         assertThat(captor.getValue().getPhone()).isEqualTo("+84901234567");
         assertThat(captor.getValue().getPurpose()).isEqualTo(VerificationPurpose.GUEST_BOOKING);
         assertThat(captor.getValue().getConsumedAt()).isNull();
+        assertThat(captor.getValue().getProofToken()).isEqualTo(ProofTokenCodec.digest(response.getProofToken()));
+        assertThat(captor.getValue().getProofToken()).isNotEqualTo(response.getProofToken());
     }
 
     @Test
@@ -105,7 +112,7 @@ class GuestVerificationServiceImplTest {
     void issueProof_rateLimitExceeded_throwsTooManyRequestsWithGenericMessageOnly() throws FirebaseAuthException {
         when(firebaseTokenVerifier.verify("any-token"))
                 .thenReturn(new VerifiedFirebaseIdentity("+84901234567", null));
-        when(rateLimiter.tryConsume(anyString(), anyInt(), any())).thenReturn(false);
+        when(rateLimiter.tryConsume(any(), anyString(), anyInt(), any())).thenReturn(false);
 
         assertThatThrownBy(() -> service.issueProof("0901234567", "any-token", VerificationPurpose.GUEST_BOOKING))
                 .isInstanceOf(TooManyRequestsException.class)
@@ -115,30 +122,30 @@ class GuestVerificationServiceImplTest {
 
     @Test
     void consumeProofForPhone_validProof_returnsNormalizedPhone() {
-        when(rateLimiter.tryConsume(anyString(), anyInt(), any())).thenReturn(true);
-        when(proofRepository.consumeIfValid(eq("token-1"), eq("+84901234567"), eq(VerificationPurpose.GUEST_BOOKING), any()))
+        when(rateLimiter.tryConsume(any(), anyString(), anyInt(), any())).thenReturn(true);
+        when(proofRepository.consumeIfValid(eq(ProofTokenCodec.digest(TOKEN_1)), eq("+84901234567"), eq(VerificationPurpose.GUEST_BOOKING), any()))
                 .thenReturn(1);
 
-        String phone = service.consumeProofForPhone("token-1", "0901234567", VerificationPurpose.GUEST_BOOKING);
+        String phone = service.consumeProofForPhone(TOKEN_1, "0901234567", VerificationPurpose.GUEST_BOOKING);
 
         assertThat(phone).isEqualTo("+84901234567");
     }
 
     @Test
     void consumeProofForPhone_invalidProof_throwsGenericBadRequest() {
-        when(rateLimiter.tryConsume(anyString(), anyInt(), any())).thenReturn(true);
+        when(rateLimiter.tryConsume(any(), anyString(), anyInt(), any())).thenReturn(true);
         when(proofRepository.consumeIfValid(anyString(), anyString(), any(), any())).thenReturn(0);
 
-        assertThatThrownBy(() -> service.consumeProofForPhone("token-1", "0901234567", VerificationPurpose.GUEST_BOOKING))
+        assertThatThrownBy(() -> service.consumeProofForPhone(TOKEN_1, "0901234567", VerificationPurpose.GUEST_BOOKING))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage("Invalid or expired verification proof.");
     }
 
     @Test
     void consumeProofForPhone_rateLimitExceeded_throwsTooManyRequests() {
-        when(rateLimiter.tryConsume(anyString(), anyInt(), any())).thenReturn(false);
+        when(rateLimiter.tryConsume(any(), anyString(), anyInt(), any())).thenReturn(false);
 
-        assertThatThrownBy(() -> service.consumeProofForPhone("token-1", "0901234567", VerificationPurpose.GUEST_BOOKING))
+        assertThatThrownBy(() -> service.consumeProofForPhone(TOKEN_1, "0901234567", VerificationPurpose.GUEST_BOOKING))
                 .isInstanceOf(TooManyRequestsException.class);
     }
 
@@ -153,26 +160,26 @@ class GuestVerificationServiceImplTest {
 
     @Test
     void consumeProofForLookup_validProof_returnsPhoneFromRecord() {
-        when(rateLimiter.tryConsume(anyString(), anyInt(), any())).thenReturn(true);
-        when(proofRepository.consumeIfValidForPurpose(eq("token-2"), eq(VerificationPurpose.GUEST_BOOKING_LOOKUP), any()))
+        when(rateLimiter.tryConsume(any(), anyString(), anyInt(), any())).thenReturn(true);
+        when(proofRepository.consumeIfValidForPurpose(eq(ProofTokenCodec.digest(TOKEN_2)), eq(VerificationPurpose.GUEST_BOOKING_LOOKUP), any()))
                 .thenReturn(1);
         PhoneVerificationProof stored = new PhoneVerificationProof();
-        stored.setProofToken("token-2");
+        stored.setProofToken(ProofTokenCodec.digest(TOKEN_2));
         stored.setPhone("+84901234567");
         stored.setPurpose(VerificationPurpose.GUEST_BOOKING_LOOKUP);
-        when(proofRepository.findById("token-2")).thenReturn(Optional.of(stored));
+        when(proofRepository.findById(ProofTokenCodec.digest(TOKEN_2))).thenReturn(Optional.of(stored));
 
-        String phone = service.consumeProofForLookup("token-2", VerificationPurpose.GUEST_BOOKING_LOOKUP);
+        String phone = service.consumeProofForLookup(TOKEN_2, VerificationPurpose.GUEST_BOOKING_LOOKUP);
 
         assertThat(phone).isEqualTo("+84901234567");
     }
 
     @Test
     void consumeProofForLookup_invalidProof_throwsGenericBadRequest() {
-        when(rateLimiter.tryConsume(anyString(), anyInt(), any())).thenReturn(true);
+        when(rateLimiter.tryConsume(any(), anyString(), anyInt(), any())).thenReturn(true);
         when(proofRepository.consumeIfValidForPurpose(anyString(), any(), any())).thenReturn(0);
 
-        assertThatThrownBy(() -> service.consumeProofForLookup("token-3", VerificationPurpose.GUEST_BOOKING_LOOKUP))
+        assertThatThrownBy(() -> service.consumeProofForLookup(TOKEN_3, VerificationPurpose.GUEST_BOOKING_LOOKUP))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage("Invalid or expired verification proof.");
     }
@@ -180,6 +187,15 @@ class GuestVerificationServiceImplTest {
     @Test
     void consumeProofForLookup_blankToken_throwsGenericBadRequestWithoutQueryingRepository() {
         assertThatThrownBy(() -> service.consumeProofForLookup("   ", VerificationPurpose.GUEST_BOOKING_LOOKUP))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("Invalid or expired verification proof.");
+
+        verifyNoInteractions(proofRepository, rateLimiter);
+    }
+
+    @Test
+    void consumeProofForLookup_malformedToken_doesNotAllocateRateLimitEntry() {
+        assertThatThrownBy(() -> service.consumeProofForLookup("gvp_too-short", VerificationPurpose.GUEST_BOOKING_LOOKUP))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage("Invalid or expired verification proof.");
 

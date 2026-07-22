@@ -11,10 +11,12 @@ import com.autowashpro.service.GuestVerificationService;
 import com.autowashpro.service.RateLimiter;
 import com.autowashpro.service.VerifiedFirebaseIdentity;
 import com.autowashpro.utils.PhoneNormalizer;
+import com.autowashpro.utils.ProofTokenCodec;
 import com.autowashpro.utils.ProofTokenGenerator;
 import com.google.firebase.auth.FirebaseAuthException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -44,7 +46,6 @@ public class GuestVerificationServiceImpl implements GuestVerificationService {
     }
 
     @Override
-    @Transactional
     public VerificationProofResponse issueProof(String phone, String firebaseToken, VerificationPurpose purpose) {
         // Order matters here, per the adversarial security review: verify the caller's Firebase
         // identity BEFORE rate-limiting. The original draft rate-limited on the caller's raw, unproven
@@ -70,35 +71,38 @@ public class GuestVerificationServiceImpl implements GuestVerificationService {
             throw new BadRequestException("Verified phone does not match the phone number provided.");
         }
 
-        if (!rateLimiter.tryConsume("issue|" + verifiedPhone + "|" + purpose, ISSUANCE_MAX_ATTEMPTS, ISSUANCE_WINDOW)) {
-            throw new TooManyRequestsException(GENERIC_RATE_LIMIT_ERROR);
+        if (!rateLimiter.tryConsume(RateLimiter.Scope.VERIFIED_ISSUANCE,
+                verifiedPhone + "|" + purpose, ISSUANCE_MAX_ATTEMPTS, ISSUANCE_WINDOW)) {
+            throw new TooManyRequestsException(GENERIC_RATE_LIMIT_ERROR, 900);
         }
 
         LocalDateTime now = LocalDateTime.now();
+        String rawToken = ProofTokenGenerator.generate();
         PhoneVerificationProof proof = new PhoneVerificationProof();
-        proof.setProofToken(ProofTokenGenerator.generate());
+        proof.setProofToken(ProofTokenCodec.digest(rawToken));
         proof.setPhone(normalizedPhone);
         proof.setPurpose(purpose);
         proof.setIssuedAt(now);
         proof.setExpiresAt(now.plus(PROOF_TTL));
         proofRepository.save(proof);
 
-        return new VerificationProofResponse(proof.getProofToken(), proof.getExpiresAt());
+        return new VerificationProofResponse(rawToken, proof.getExpiresAt());
     }
 
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public String consumeProofForPhone(String proofToken, String phone, VerificationPurpose purpose) {
-        if (proofToken == null || proofToken.isBlank()) {
+        if (!ProofTokenCodec.isValid(proofToken)) {
             throw new BadRequestException(GENERIC_PROOF_ERROR);
         }
         String normalizedPhone = PhoneNormalizer.toE164(phone);
         // Keyed on the token, not the phone (see the Global Constraints rate-limit table) — an
         // attacker with no valid token for a phone cannot exhaust that phone's consumption budget
         // using garbage tokens, the same class of lockout the issuance-side reordering above closes.
-        enforceConsumptionRateLimit("consume|" + proofToken);
+        enforceConsumptionRateLimit(proofToken);
 
-        int updated = proofRepository.consumeIfValid(proofToken, normalizedPhone, purpose, LocalDateTime.now());
+        int updated = proofRepository.consumeIfValid(
+                ProofTokenCodec.digest(proofToken), normalizedPhone, purpose, LocalDateTime.now());
         if (updated != 1) {
             throw new BadRequestException(GENERIC_PROOF_ERROR);
         }
@@ -106,25 +110,27 @@ public class GuestVerificationServiceImpl implements GuestVerificationService {
     }
 
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public String consumeProofForLookup(String proofToken, VerificationPurpose purpose) {
-        if (proofToken == null || proofToken.isBlank()) {
+        if (!ProofTokenCodec.isValid(proofToken)) {
             throw new BadRequestException(GENERIC_PROOF_ERROR);
         }
-        enforceConsumptionRateLimit("lookup|" + proofToken);
+        enforceConsumptionRateLimit(proofToken);
 
-        int updated = proofRepository.consumeIfValidForPurpose(proofToken, purpose, LocalDateTime.now());
+        String proofDigest = ProofTokenCodec.digest(proofToken);
+        int updated = proofRepository.consumeIfValidForPurpose(proofDigest, purpose, LocalDateTime.now());
         if (updated != 1) {
             throw new BadRequestException(GENERIC_PROOF_ERROR);
         }
-        return proofRepository.findById(proofToken)
+        return proofRepository.findById(proofDigest)
                 .map(PhoneVerificationProof::getPhone)
                 .orElseThrow(() -> new BadRequestException(GENERIC_PROOF_ERROR));
     }
 
     private void enforceConsumptionRateLimit(String key) {
-        if (!rateLimiter.tryConsume(key, CONSUMPTION_MAX_ATTEMPTS, CONSUMPTION_WINDOW)) {
-            throw new TooManyRequestsException(GENERIC_RATE_LIMIT_ERROR);
+        if (!rateLimiter.tryConsume(
+                RateLimiter.Scope.PROOF_CONSUMPTION, key, CONSUMPTION_MAX_ATTEMPTS, CONSUMPTION_WINDOW)) {
+            throw new TooManyRequestsException(GENERIC_RATE_LIMIT_ERROR, 900);
         }
     }
 }

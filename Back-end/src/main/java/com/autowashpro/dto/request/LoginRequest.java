@@ -16,6 +16,6 @@ public class LoginRequest {
 
     @NotBlank
     @Size(min = 6, max = 100)
-    @Schema(description = "Account password", example = "secret123")
+    @Schema(description = "Account password", format = "password")
     private String password;
 }

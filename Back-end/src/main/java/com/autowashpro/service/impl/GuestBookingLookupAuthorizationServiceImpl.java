@@ -21,17 +21,15 @@ public class GuestBookingLookupAuthorizationServiceImpl implements GuestBookingL
         this.bookingRepository = bookingRepository;
     }
 
-    // Deliberately NOT @Transactional. consumeProofForLookup() below commits the proof's single-use
-    // burn in its own transaction. If this method were wrapped in an outer transaction (by a future
-    // caller), the exceptions thrown after consumption (ResourceNotFoundException/ForbiddenException)
-    // would mark that outer transaction rollback-only, undoing the burn and making the proof replayable
-    // — reopening exactly the replay/enumeration risk single-use consumption exists to prevent. See
-    // GuestBookingLookupAuthorizationIntegrationTest, which proves this behaviorally.
+    // Deliberately NOT @Transactional. consumeProofForLookup() commits the proof's single-use burn in
+    // its own REQUIRES_NEW transaction, so later lookup/ownership failures cannot restore it even if a
+    // future caller adds an outer transaction. GuestBookingLookupAuthorizationIntegrationTest proves
+    // that durability behaviorally.
     @Override
     public Booking authorize(String bookingRef, String proofToken) {
         String verifiedPhone = guestVerificationService.consumeProofForLookup(proofToken, VerificationPurpose.GUEST_BOOKING_LOOKUP);
 
-        Booking booking = bookingRepository.findByBookingRef(bookingRef)
+        Booking booking = bookingRepository.findForLookupByBookingRef(bookingRef)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found."));
 
         if (booking.getGuest() == null || !verifiedPhone.equals(booking.getGuest().getPhone())) {

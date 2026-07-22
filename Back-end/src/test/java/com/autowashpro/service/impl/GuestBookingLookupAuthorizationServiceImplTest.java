@@ -44,7 +44,7 @@ class GuestBookingLookupAuthorizationServiceImplTest {
         Booking booking = new Booking();
         booking.setBookingRef("AWP-ABC12345");
         booking.setGuest(guest);
-        when(bookingRepository.findByBookingRef("AWP-ABC12345")).thenReturn(Optional.of(booking));
+        when(bookingRepository.findForLookupByBookingRef("AWP-ABC12345")).thenReturn(Optional.of(booking));
 
         Booking result = service.authorize("AWP-ABC12345", "token-1");
 
@@ -55,7 +55,7 @@ class GuestBookingLookupAuthorizationServiceImplTest {
     void authorize_unknownBookingRef_throwsResourceNotFound() {
         when(guestVerificationService.consumeProofForLookup("token-1", VerificationPurpose.GUEST_BOOKING_LOOKUP))
                 .thenReturn("+84901234567");
-        when(bookingRepository.findByBookingRef("AWP-MISSING")).thenReturn(Optional.empty());
+        when(bookingRepository.findForLookupByBookingRef("AWP-MISSING")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.authorize("AWP-MISSING", "token-1"))
                 .isInstanceOf(ResourceNotFoundException.class);
@@ -70,7 +70,7 @@ class GuestBookingLookupAuthorizationServiceImplTest {
         Booking booking = new Booking();
         booking.setBookingRef("AWP-ABC12345");
         booking.setGuest(guest);
-        when(bookingRepository.findByBookingRef("AWP-ABC12345")).thenReturn(Optional.of(booking));
+        when(bookingRepository.findForLookupByBookingRef("AWP-ABC12345")).thenReturn(Optional.of(booking));
 
         assertThatThrownBy(() -> service.authorize("AWP-ABC12345", "token-1"))
                 .isInstanceOf(ForbiddenException.class);
@@ -83,7 +83,7 @@ class GuestBookingLookupAuthorizationServiceImplTest {
         Booking booking = new Booking();
         booking.setBookingRef("AWP-MEMBER01");
         booking.setGuest(null);
-        when(bookingRepository.findByBookingRef("AWP-MEMBER01")).thenReturn(Optional.of(booking));
+        when(bookingRepository.findForLookupByBookingRef("AWP-MEMBER01")).thenReturn(Optional.of(booking));
 
         assertThatThrownBy(() -> service.authorize("AWP-MEMBER01", "token-1"))
                 .isInstanceOf(ForbiddenException.class);

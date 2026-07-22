@@ -40,4 +40,11 @@ public interface PhoneVerificationProofRepository extends JpaRepository<PhoneVer
            "AND p.consumedAt IS NULL AND p.expiresAt > :now")
     int consumeIfValidForPurpose(@Param("token") String token, @Param("purpose") VerificationPurpose purpose,
                                   @Param("now") LocalDateTime now);
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query(value = "DELETE TOP (:batchSize) FROM phone_verification_proofs " +
+            "WHERE expires_at <= :cutoff", nativeQuery = true)
+    int deleteExpiredBatch(@Param("cutoff") LocalDateTime cutoff,
+                           @Param("batchSize") int batchSize);
 }

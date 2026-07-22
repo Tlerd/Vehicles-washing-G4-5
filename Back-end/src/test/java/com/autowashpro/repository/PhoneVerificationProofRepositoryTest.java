@@ -102,4 +102,25 @@ class PhoneVerificationProofRepositoryTest extends RepositoryIntegrationTest {
         assertThat(updated).isEqualTo(0);
         assertThat(proofRepository.findById("tok-purpose-2").orElseThrow().getConsumedAt()).isNull();
     }
+
+    @Test
+    void deleteExpiredBatch_removesOnlyExpiredRowsAndHonorsBatchLimit() {
+        LocalDateTime now = LocalDateTime.now();
+        proofRepository.saveAndFlush(newProof("cleanup-expired-1", "+84911444101",
+                VerificationPurpose.GUEST_BOOKING, now.minusMinutes(3)));
+        proofRepository.saveAndFlush(newProof("cleanup-expired-2", "+84911444102",
+                VerificationPurpose.GUEST_BOOKING, now.minusMinutes(2)));
+        proofRepository.saveAndFlush(newProof("cleanup-expired-3", "+84911444103",
+                VerificationPurpose.GUEST_BOOKING, now.minusMinutes(1)));
+        proofRepository.saveAndFlush(newProof("cleanup-active-1", "+84911444104",
+                VerificationPurpose.GUEST_BOOKING, now.plusMinutes(5)));
+
+        int deleted = proofRepository.deleteExpiredBatch(now, 2);
+
+        assertThat(deleted).isEqualTo(2);
+        assertThat(proofRepository.findAll())
+                .filteredOn(proof -> proof.getProofToken().startsWith("cleanup-expired"))
+                .hasSize(1);
+        assertThat(proofRepository.findById("cleanup-active-1")).isPresent();
+    }
 }
