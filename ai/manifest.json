@@ -12,6 +12,8 @@
     ".claude/agents/",
     ".claude/rules/project/",
     ".codex/agents/",
+    ".agents/agents/",
+    ".agents/rules/",
     ".agents/skills/",
     "scripts/ai-harness/"
   ],
@@ -27,6 +29,25 @@
       "commit": "754b8dd76ca885b764ec22f476664377aa46b6cd",
       "source": "adopted from existing .claude assets",
       "reviewStatus": "adopted-local-pending-human-review"
+    },
+    {
+      "id": "karpathy-skills",
+      "repository": "https://github.com/multica-ai/andrej-karpathy-skills",
+      "commit": "daced9bd64f25908ebedeb4701fb406985dc8366",
+      "source": "adapted karpathy-guidelines skill plus existing CLAUDE.md import",
+      "reviewStatus": "adopted-project-local-for-claude-and-codex"
+    },
+    {
+      "id": "mattpocock-skills",
+      "repository": "https://github.com/mattpocock/skills",
+      "source": "adapted codebase-design and diagnosing-bugs skills",
+      "reviewStatus": "adopted-project-local-for-claude-and-codex"
+    },
+    {
+      "id": "understand-anything",
+      "repository": "https://github.com/Egonex-AI/Understand-Anything",
+      "source": "Claude project plugin plus official Codex installer",
+      "reviewStatus": "installed-for-claude-and-codex"
     }
   ],
   "agents": [
@@ -177,6 +198,24 @@
       "source": "ai/vendor/ecc/skills/security-review",
       "codexOutput": ".agents/skills/security-review",
       "claudeOutput": "preserved-existing:.claude/skills/security-review"
+    },
+    {
+      "id": "karpathy-guidelines",
+      "source": "https://github.com/multica-ai/andrej-karpathy-skills/tree/main/skills/karpathy-guidelines",
+      "codexOutput": ".agents/skills/karpathy-guidelines",
+      "claudeOutput": ".claude/skills/karpathy-guidelines"
+    },
+    {
+      "id": "codebase-design",
+      "source": "https://github.com/mattpocock/skills/tree/main/codebase-design",
+      "codexOutput": ".agents/skills/codebase-design",
+      "claudeOutput": ".claude/skills/codebase-design"
+    },
+    {
+      "id": "diagnosing-bugs",
+      "source": "https://github.com/mattpocock/skills/tree/main/diagnosing-bugs",
+      "codexOutput": ".agents/skills/diagnosing-bugs",
+      "claudeOutput": ".claude/skills/diagnosing-bugs"
     }
   ]
 }

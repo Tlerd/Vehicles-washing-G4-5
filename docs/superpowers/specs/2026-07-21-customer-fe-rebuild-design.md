@@ -15,13 +15,13 @@ Owner amendments to the original proposal:
 
 - **Payment gateway = payOS** (VietQR PRO), replacing every VNPAY reference. See
   §6 and decision **D-27** in `docs/plans/00-QUYET-DINH-REFACTOR.md`.
-- **FR-013 is IN, minus the AI**: build the campaign / point-multiplier promotion
-  builder as plain admin CRUD (no AI generation).
+- **FR-013 is IN**: build manual administrator CRUD for campaigns and their
+  point multipliers.
 - If the database needs changes for the above, update the schema/migrations.
 - Ask the owner whenever information is missing mid-build.
 
-Out of scope for the customer rebuild: admin & counter portals (separate track),
-AI generation of any kind.
+Out of scope for the customer rebuild: admin & counter portals (separate track)
+and automated campaign or promotional-content generation of any kind.
 
 ## 2. Standard stack
 
@@ -68,7 +68,7 @@ src/
 │                   EmptyState Stepper PriceTag Countdown Toast
 ├── components/domain/ ServiceIconGrid ServicePickerSheet WeekGrid SlotCell
 │                   CartBar BookingCard VehicleCard TierProgress
-├── features/       auth · booking · customer · (admin promo = FR-013 non-AI)
+├── features/       auth · booking · customer · (admin campaign CRUD = FR-013)
 ├── lib/            api/ · firebase.ts · money.ts · slot.ts · datetime.ts · mock/
 └── types/          DTO-aligned types
 ```
@@ -111,8 +111,8 @@ Sign-In as the alternate provider with account linking (D-20).
   **Done = `npm --prefix Front-end run build` exits 0 and dev renders landing → wizard.**
 - **Phase 2:** auth (OTP/Google), dashboard, garage (vehicles CRUD), points,
   vouchers, history, check-in / complete (D-01), feedback (#13).
-- **Phase 3:** real API + payOS deposit + soft-hold polling; FR-013 admin promo
-  CRUD (non-AI); DB migrations.
+- **Phase 3:** real API + payOS deposit + soft-hold polling; FR-013 manual
+  administrator campaign CRUD and point multipliers; DB migrations.
 
 ## 9. Definition of done (per PLAN-V2 §8, per PR)
 

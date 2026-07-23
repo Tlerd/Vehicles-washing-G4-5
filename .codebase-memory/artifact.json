@@ -1,0 +1,11 @@
+{
+    "schema_version": 2,
+    "commit": "f2eac2078def42b9c80c6f5fc34208018d64393f",
+    "indexed_at": "2026-07-23T14:26:08Z",
+    "project": "D-demoSWP-demomain-Vehicles-washing-G4-5",
+    "nodes": 7678,
+    "edges": 16655,
+    "original_size": 18350080,
+    "compressed_size": 3050580,
+    "compression_level": 3
+}

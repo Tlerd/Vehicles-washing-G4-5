@@ -44,7 +44,7 @@
 | D-25 | Bảng màu | Cố định trong tài liệu | **Kiến trúc token 3 lớp.** Màu lấy từ landing page, chỉ sửa `palette.css` | `04`, `PLAN-V2` |
 | D-26 | Mức cọc | `[GIẢ ĐỊNH]` chờ duyệt | **Chốt cứng**: 50k / 200k / 500k theo bậc, kèm 3 luật đi kèm | `06`, `PLAN-V2 §12` |
 | D-27 | Cổng thanh toán | VNPAY (D-02) | **payOS (VietQR PRO)** thay cho VNPAY. Cấu hình `PAYOS_CLIENT_ID/API_KEY/CHECKSUM_KEY` chỉ trong biến môi trường, không commit; credential đã lộ trong ảnh phải xoay vòng. Bảng `payments` khóa theo `orderCode` + idempotency webhook thay cho IPN VNPAY | `01`, `06`, `PLAN-V2 §4/§5`, spec 2026-07-21 |
-| D-28 | FR-013 | Campaign builder có AI | **Giữ FR-013 nhưng bỏ phần AI** — chỉ CRUD campaign + hệ số nhân điểm | `07`, `FR-013` |
+| D-28 | FR-013 | Campaign CRUD do admin quản lý | **Giữ FR-013** — admin CRUD campaign thủ công + hệ số nhân điểm | `07`, `FR-013` |
 
 > 📄 Kế hoạch thực thi chi tiết cho vòng 2: [PLAN-V2-LAM-LAI-FE.md](PLAN-V2-LAM-LAI-FE.md)
 > 📄 Thiết kế rebuild FE khách hàng: [../superpowers/specs/2026-07-21-customer-fe-rebuild-design.md](../superpowers/specs/2026-07-21-customer-fe-rebuild-design.md)
