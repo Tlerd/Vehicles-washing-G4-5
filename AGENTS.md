@@ -28,6 +28,23 @@
 4. State assumptions when repository evidence is missing.
 5. Keep unrelated user changes intact.
 
+## Shared runtime context
+- `AGENTS.md` is the runtime-neutral entrypoint for Claude Code, Codex, and
+  Antigravity.
+- `ai/manifest.json` is the repository's agent/skill inventory; `ai/catalog/agents/`
+  is the canonical role source; and `ai/workflows/` contains the planning,
+  implementation, review, hierarchy, and verification procedures.
+- Read the relevant `ai/workflows/<name>.md` and catalog role before dispatching
+  or claiming work. Do not assume a runtime automatically loads `ai/`.
+- Antigravity workspace adapters are under `.agents/agents/`, `.agents/rules/`,
+  and `.agents/skills/`; they are generated runtime views of the canonical
+  repository context and must be checked for drift with
+  `scripts/ai-harness/verify-antigravity-sync.ps1`. Regenerate the agent/rule
+  adapters after catalog or project-rule changes with
+  `scripts/ai-harness/Sync-AntigravityAdapters.ps1`.
+- `.agents/skills/` is the canonical workspace skill path for Antigravity and
+  Codex. There is intentionally no legacy `.agent/` directory.
+
 ## Commands from repository root
 - Install frontend dependencies: `npm --prefix Front-end ci`.
 - Build frontend: `npm --prefix Front-end run build`.

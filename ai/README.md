@@ -8,12 +8,22 @@ has passed.
 
 ## Canonical sources
 
-- ai/catalog/agents contains the two shared read-only roles.
+- ai/catalog/agents contains the canonical repository agent inventory.
 - ai/vendor/ecc is an immutable local adoption of the current Claude ECC assets.
-- ai/manifest.json describes only created Codex/Claude adapters and Codex skill
-  mirrors.
+- ai/manifest.json describes the managed agent/skill inventory and runtime
+  adapters.
 - ai/lock/vendors.lock.json records hashes for the adopted ECC inventory.
-- ai/state/managed-files.json owns created adapters, skill mirrors, and the read-only verifier.
+- ai/state/managed-files.json owns the original generated adapters and skill
+  mirrors. `scripts/ai-harness/verify-antigravity-sync.ps1` verifies the
+  Antigravity-specific adapters and current shared-context parity.
+- `.agents/agents/` and `.agents/rules/` are Antigravity runtime adapters;
+  their canonical sources remain `ai/catalog/agents/` and the project rules.
+- Run `scripts/ai-harness/Sync-AntigravityAdapters.ps1` after changing the
+  canonical agent catalog or project source-priority rule, then run
+  `scripts/ai-harness/verify-antigravity-sync.ps1`.
+- `AGENTS.md` is the shared context entrypoint. Antigravity does not
+  automatically load `ai/`, so the entrypoint and the adapter rules explicitly
+  direct it to the relevant inventory and workflow files.
 
 ## Deferred decisions
 

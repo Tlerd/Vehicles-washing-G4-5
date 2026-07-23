@@ -16,6 +16,6 @@ This index identifies the v2 requirement set. Detailed behaviour is defined by t
 | FR-010 | Admin directories | exceptions | 4 | medium | [FR-010](FR-010-admin-customer-directory.md) |
 | FR-011 | Admin booking management | exceptions | 3 | low | [FR-011](FR-011-admin-booking-infinite-scroll.md) |
 | FR-012 | Revenue statistics and audit logs | exceptions | 4 | medium | [FR-012](FR-012-admin-income-statistics-logs.md) |
-| FR-013 | Campaign promotion builder | exceptions | 4 | low | [FR-013](FR-013-ai-campaign-promotion-builder.md) |
+| FR-013 | Campaign promotion builder | exceptions | 4 | low | [FR-013](FR-013-campaign-promotion-builder.md) |
 
 Estimated total remains **43 developer days**; see [effort chart](fr-effort-chart.md). The authoritative cross-cutting rules are [the v2 flow](../refactor/01-LUONG-CHAY-MOI.md), [business rules](../refactor/06-BUSINESS-RULES-V2.md), and [admin specification](../refactor/07-ADMIN-SPEC.md).

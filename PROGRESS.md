@@ -1,6 +1,56 @@
 # Progress — AutoWash Pro
 
 ## Current state
+- 2026-07-23 — Clarified the approved FR-013 scope as manual administrator
+  campaign/promotion CRUD with a loyalty point multiplier. Only active
+  documentation changed; no application source, API, database, or UI was
+  removed, and historical evidence was preserved.
+- 2026-07-23 — Configured shared project context for Antigravity. `AGENTS.md`
+  now explicitly routes Claude Code, Codex, and Antigravity through the same
+  `PROGRESS.md`, approved documents, `ai/manifest.json`, catalog roles, and
+  workflow definitions. Added 22 Antigravity custom-agent adapters under
+  `.agents/agents/`, two project rules under `.agents/rules/`, and safe
+  regeneration/verification scripts under `scripts/ai-harness/`. The fresh
+  verifier passed with 22/22 agents, 8/8 manifest skill outputs, and 32
+  workspace skills. The older `Test-AiHarness.ps1` remains blocked by its
+  pre-existing `.codex/config.toml` managed-hash mismatch; no unrelated runtime
+  file was changed to hide that finding. Design and evidence:
+  `docs/superpowers/specs/2026-07-23-antigravity-shared-context-design.md`,
+  `docs/superpowers/plans/2026-07-23-antigravity-shared-context.md`, and
+  `docs/ai-logs/m1/2026-07-23-antigravity-shared-context.md`.
+- 2026-07-23 — Exposed the already-installed Karpathy, ECC, Superpowers,
+  Engram, Understand-Anything, and Matt Pocock skill repositories to
+  Antigravity through the canonical `.agents/skills` workspace directory.
+  Existing project skills were preserved; the installed Superpowers 6.1.1,
+  Engram 0.1.1, and Understand-Anything 2.9.4 skill directories were copied
+  with their supporting files. Verification found 32 skill directories and 32
+  `SKILL.md` files. No application build or test was needed for this tooling
+  configuration change. See
+  `docs/ai-logs/m1/2026-07-23-antigravity-skill-repository-parity.md`.
+- 2026-07-23 — Corrected Antigravity CLI skill discovery to use the documented
+  canonical project path `.agents/skills`. Removed the temporary legacy
+  `.agent/skills` junction; `.agents/skills` remains the single source for all
+  eight project skill directories. No application build or test was needed for
+  this tooling-only change.
+- 2026-07-23 — Synchronized the adopted AI skill layer across Claude Code and
+  Codex. ECC skills were already project-local in both runtimes; Superpowers and
+  Engram were already installed and enabled in both runtimes. Added project-local
+  Karpathy, `codebase-design`, and `diagnosing-bugs` skills for both runtimes.
+  Installed Understand-Anything for Codex with its official installer while
+  preserving the enabled Claude project plugin. Fresh CLI sessions are still
+  required for runtime discovery. See
+  `docs/ai-logs/m1/2026-07-23-claude-codex-skill-parity.md`.
+- 2026-07-23 — Completed a read-only FR/API completion audit across FR-001..FR-013.
+  Against the approved v2 SRS/design baseline (the lecturer's original rubric is
+  still absent), equal-weight capability is estimated at **40.0%** and backend
+  REST coverage at **43.1%**. FR-001..FR-003 are the strongest areas; FR-005 and
+  FR-009 have critical missing/incorrect lifecycle behavior; FR-010..FR-013 are
+  mostly limited legacy endpoints or UI shells. The audit found that STAFF can
+  complete bookings and trigger loyalty, payment APIs/authority are absent,
+  voucher redemption is race-prone, auth has no API throttling, and several
+  frontend customer/admin flows remain mock-backed. No files were edited during
+  the audit except this evidence log and this progress entry. Full details:
+  `docs/ai-logs/m1/2026-07-23-fr-api-completion-audit.md`.
 - 2026-07-22 — Added project-local Engram identification in
   `.engram/config.json` for the `autowash-pro` memory namespace. The verified
   local Engram binary and existing Codex MCP registration use an explicit
